@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CommUtil</string>
+    <string name="im_tips_check_network">Network connection failure,please check your network settings.</string>
 </resources>
