@@ -1,4 +1,4 @@
-package fz.gb.commutil.text;
+package fz.gb.commutil.crypto;
 
 import java.nio.charset.Charset;
 import java.security.SecureRandom;

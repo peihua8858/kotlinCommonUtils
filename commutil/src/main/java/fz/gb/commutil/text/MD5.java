@@ -1,3 +1,4 @@
+/*
 package fz.gb.commutil.text;
 
 import java.io.File;
@@ -64,3 +65,4 @@ public final class MD5 {
         return toHexString(encodeBytes);
     }
 }
+*/
