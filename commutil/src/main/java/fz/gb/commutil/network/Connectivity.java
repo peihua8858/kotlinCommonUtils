@@ -138,7 +138,7 @@ final class Connectivity {
     }
 
 
-    static NetworkType getNetworkType(Context context) {
+    static  @NetworkType.Type String getNetworkType(Context context) {
         return getNetworkType(getNetworkInfo(context));
     }
 
@@ -156,8 +156,8 @@ final class Connectivity {
      * <li>{@link NetworkType#NETWORK_NO     } </li>
      * </ul>
      */
-    static NetworkType getNetworkType(NetworkInfo info) {
-        NetworkType netType = NetworkType.NETWORK_NO;
+    static  @NetworkType.Type String getNetworkType(NetworkInfo info) {
+        @NetworkType.Type String netType = NetworkType.NETWORK_NO;
         if (info != null && info.isAvailable() && info.isConnected()) {
             if (info.getType() == ConnectivityManager.TYPE_WIFI) {
                 netType = NetworkType.NETWORK_WIFI;
