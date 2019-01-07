@@ -13,19 +13,12 @@ import android.text.TextUtils;
  */
 
 public class DeviceUtil {
-
-    public static Context context;
-
-    public static void init(Context context) {
-        DeviceUtil.context = context;
-    }
-
     /**
      * 获取设备的唯一号码，用于区别设备
      *
      * @return ANDROID_ID和serial组合的字符串，基本上可以确保不同的设备字符串不同
      */
-    public static String getDeviceID() {
+    public static String getDeviceID(Context context) {
         String androidID = Settings.Secure.getString(context.getContentResolver(), Settings
                 .Secure.ANDROID_ID);
         return TextUtils.isEmpty(androidID)?"":androidID + (Build.SERIAL.equals(Build.UNKNOWN)? "" : Build.SERIAL);
