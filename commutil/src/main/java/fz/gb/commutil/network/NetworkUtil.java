@@ -177,11 +177,11 @@ public final class NetworkUtil {
         return Connectivity.isConnectedFast(context);
     }
 
-    public static NetworkType getNetworkType(Context context) {
+    public static @NetworkType.Type String  getNetworkType(Context context) {
         return Connectivity.getNetworkType(context);
     }
 
-    public static NetworkType getNetworkType(NetworkInfo info) {
+    public static @NetworkType.Type String  getNetworkType(NetworkInfo info) {
         return Connectivity.getNetworkType(info);
     }//Must specify a repository for deployment
 
