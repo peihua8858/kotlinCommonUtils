@@ -10,6 +10,11 @@
 
 package fz.gb.commutil.network;
 
+import android.support.annotation.IntDef;
+import android.support.annotation.StringDef;
+
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * 手机网络类型
  *
@@ -17,34 +22,38 @@ package fz.gb.commutil.network;
  * @version 1.0
  * @date 2017/11/8 09:05
  */
-public enum NetworkType {
+public class NetworkType {
     /**
      * WiFi
      */
-    NETWORK_WIFI("WiFi"),
+    public static final String NETWORK_WIFI = ("WiFi");
     /**
      * 移动4G
      */
-    NETWORK_4G("4G"),
+    public static final String NETWORK_4G =("4G");
     /**
      * 移动3G
      */
-    NETWORK_3G("3G"),
+    public static final String NETWORK_3G =("3G");
     /**
      * 移动2G
      */
-    NETWORK_2G("2G"),
+    public static final String NETWORK_2G = ("2G");
     /**
      * 未知网络类型
      */
-    NETWORK_UNKNOWN("Unknown"),
+    public static final String NETWORK_UNKNOWN = ("Unknown");
     /**
      * 无网络
      */
-    NETWORK_NO("No network");
+    public static final String NETWORK_NO =("No network");
 
     private String desc;
 
+    @StringDef({NETWORK_WIFI,NETWORK_4G,NETWORK_3G,NETWORK_2G,NETWORK_UNKNOWN,NETWORK_NO})
+    public @interface Type{
+
+    }
     NetworkType(String desc) {
         this.desc = desc;
     }
