@@ -1,14 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 apply plugin: 'maven'
-def buildType = /*"SNAPSHOT"*/"release"
-def mavenUrl = "http://10.32.2.200:8081/repository/globalegrow/"
-def mavenUrlSnapshot = "http://10.32.2.200:8081/repository/globalegrow-snapshot/"
+def buildType = "SNAPSHOT"/*"release"*/
+def mavenUrl = "http://" + String.valueOf(maven_ip) + ":8081/repository/globalegrow/"
+def mavenUrlSnapshot = "http://" + String.valueOf(maven_ip) + ":8081/repository/globalegrow-snapshot/"
 def mavenUserName = "longxl"
 def mavenPwd = "longxl123"
 def sdkVersionName = "1.0.0"
-def sdkVersionNameSnapshot = "1.0.9-SNAPSHOT"
+def sdkVersionNameSnapshot = "1.0.0-SNAPSHOT"
 def pomName = "comm-utils"
-def pomGroupId = "fz.gb.utils"
+def pomGroupId = "com.fz.gb.utils"
 def pomArtifactId = "comm-utils"
 def pomPackaging = "aar"
 task androidJavadocs(type: Javadoc) {
@@ -20,13 +20,13 @@ task androidJavadocs(type: Javadoc) {
 
 //打包doc
 task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    classifier = 'javadoc' //分类器，区分jar
+    archiveClassifier = 'javadoc' //分类器，区分jar
     from androidJavadocs.destinationDir
 }
 
 //打包源码
 task androidSourcesJar(type: Jar) {
-    classifier = 'sources'//分类器，区分jar
+    archiveClassifier = 'sources'//分类器，区分jar
     from android.sourceSets.main.java.srcDirs
 }
 //解决 JavaDoc 中文注释生成失败的问题

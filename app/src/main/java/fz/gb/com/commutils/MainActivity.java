@@ -1,9 +1,10 @@
 package fz.gb.com.commutils;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import fz.gb.commutil.text.StringUtil;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.fz.gb.commutil.text.StringUtil;
 
 /**
  * 测试验证activity
