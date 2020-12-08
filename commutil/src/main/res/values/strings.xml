@@ -14,4 +14,7 @@
     <string name="year">year</string>
     <string name="years">years</string>
     <string name="ago">ago</string>
+    <string name="tips_check_network">Network connection failure,please check your network settings.</string>
+    <string name="text_choose_application">Open with</string>
+    <string name="precessing">Processing</string>
 </resources>
