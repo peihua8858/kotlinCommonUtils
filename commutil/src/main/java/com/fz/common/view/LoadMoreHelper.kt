@@ -1,4 +1,4 @@
-package fz.gb.com.commutils
+package com.fz.common.view
 
 import android.content.Context
 import androidx.annotation.IntDef

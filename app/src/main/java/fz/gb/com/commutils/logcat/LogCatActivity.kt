@@ -14,7 +14,7 @@
 //import com.fz.common.rxjava.RxLifecycleUtil
 //import com.fz.common.rxjava.XSubscriber
 //import com.fz.common.text.copyTextToClipboard
-//import fz.gb.com.commutils.LoadMoreHelper
+//import com.fz.common.view.utils.LoadMoreHelper
 //import com.fz.toast.showToast
 //import com.fz.common.decoration.DividerItemDecoration
 //import com.fz.common.rxjava.applySchedulers
