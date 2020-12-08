@@ -1,4 +1,4 @@
-package com.fz.common.model;
+package fz.gb.com.commutils.model;
 
 import androidx.core.util.ObjectsCompat;
 
