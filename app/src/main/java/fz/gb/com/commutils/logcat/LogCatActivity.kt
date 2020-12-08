@@ -10,7 +10,7 @@
 //import com.chad.library.adapter.base.loadmore.BaseLoadMoreView
 //import com.fz.common.app.BaseApplication
 //import com.fz.common.file.read
-//import com.fz.common.model.AdapterBean
+//import fz.gb.com.commutils.model.AdapterBean
 //import com.fz.common.rxjava.RxLifecycleUtil
 //import com.fz.common.rxjava.XSubscriber
 //import com.fz.common.text.copyTextToClipboard
