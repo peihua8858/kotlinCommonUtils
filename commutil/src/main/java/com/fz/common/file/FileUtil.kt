@@ -12,10 +12,10 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Base64
 import androidx.core.content.FileProvider
+import com.fz.common.R
 import com.fz.common.text.isNonEmpty
 import com.fz.common.utils.isNotNull
 import com.fz.common.utils.isNull
-import com.fz.commutil.R
 import com.socks.library.KLog
 import java.io.*
 import java.nio.charset.Charset

@@ -5,11 +5,8 @@ import androidx.annotation.IntDef
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.entity.MultiItemEntity
-import com.chad.library.adapter.base.loadmore.BaseLoadMoreView
-import com.chad.library.adapter.base.module.LoadMoreModule
-import com.chad.library.adapter.base.module.LoadMoreModuleConfig.defLoadMoreView
-import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import com.chad.library.adapter.base.BaseViewHolder
+import com.chad.library.adapter.base.loadmore.LoadMoreView
 import com.fz.common.network.NetworkUtil
 
 /**
@@ -19,7 +16,7 @@ import com.fz.common.network.NetworkUtil
  * @version 1.0
  * @date 2019/3/4 11:53
  */
-open class LoadMoreHelper<T : MultiItemEntity, ADAPTER : BaseQuickAdapter<T, out BaseViewHolder>>(
+open class LoadMoreHelper<T, ADAPTER : BaseQuickAdapter<T, out BaseViewHolder>>(
         private val mRecyclerView: RecyclerView,
         private val mAdapter: ADAPTER,
         private val helperListener: OnLoadMoreHelperListener) {
@@ -67,13 +64,18 @@ open class LoadMoreHelper<T : MultiItemEntity, ADAPTER : BaseQuickAdapter<T, out
     }
 
     private fun setLoadMoreView(adapter: ADAPTER, helperListener: OnLoadMoreHelperListener) {
-        if (helperListener.isEnableLoadMore && adapter is LoadMoreModule) {
-            defLoadMoreView = helperListener.loadMoreView
-            val moreModule = adapter.loadMoreModule
-            moreModule.loadMoreView = helperListener.loadMoreView
-            moreModule.isEnableLoadMore = helperListener.isEnableLoadMore
-            moreModule.setOnLoadMoreListener { onLoadMore() }
-        }
+            if (helperListener.isEnableLoadMore) {
+                    adapter.setEnableLoadMore(true)
+                    adapter.setLoadMoreView(helperListener.loadMoreView)
+                    adapter.setOnLoadMoreListener({ onLoadMore() }, mRecyclerView)
+            }
+//        if (helperListener.isEnableLoadMore && adapter is LoadMoreModule) {
+//            defLoadMoreView = helperListener.loadMoreView
+//            val moreModule = adapter.loadMoreModule
+//            moreModule.loadMoreView = helperListener.loadMoreView
+//            moreModule.isEnableLoadMore = helperListener.isEnableLoadMore
+//            moreModule.setOnLoadMoreListener { onLoadMore() }
+//        }
     }
 
     interface OnLoadMoreHelperListener {
@@ -85,7 +87,7 @@ open class LoadMoreHelper<T : MultiItemEntity, ADAPTER : BaseQuickAdapter<T, out
          * @date 2019/3/4 13:46
          * @version 1.0
          */
-        val loadMoreView: BaseLoadMoreView
+        val loadMoreView: LoadMoreView
 
         /**
          * 请求接口数据
@@ -408,7 +410,7 @@ open class LoadMoreHelper<T : MultiItemEntity, ADAPTER : BaseQuickAdapter<T, out
         if (data != null && data.isNotEmpty()) {
             when (mRequestType) {
                 REQUEST_TYPE_LOAD_MORE -> mAdapter.addData(data)
-                else -> mAdapter.setNewInstance(ArrayList(data))
+                else -> mAdapter.setNewData(ArrayList(data))
             }
         }
         refreshComplete(false, isMoreData, gone)
@@ -434,9 +436,9 @@ open class LoadMoreHelper<T : MultiItemEntity, ADAPTER : BaseQuickAdapter<T, out
             }
         }
         if (isMoreData) {
-            mAdapter.loadMoreModule.loadMoreComplete()
+            mAdapter.loadMoreComplete()
         } else {
-            mAdapter.loadMoreModule.loadMoreEnd(gone)
+            mAdapter.loadMoreEnd(gone)
         }
         isLoadingData = false
         helperListener.onComplete()

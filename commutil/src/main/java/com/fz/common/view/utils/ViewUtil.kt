@@ -1,11 +1,24 @@
 package com.fz.common.view.utils
 
 import android.graphics.RectF
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import com.fz.common.listener.OnNoDoubleClickListener
 import java.util.*
+
+/**
+ * 扩展方法，用于获取View
+ * @receiver ViewGroup parent
+ * @param layoutResId Int
+ * @return View
+ */
+fun ViewGroup.getItemView(@LayoutRes layoutResId: Int): View {
+    return LayoutInflater.from(this.context).inflate(layoutResId, this, false)
+}
 
 /**
  * 布局方向是从右到左

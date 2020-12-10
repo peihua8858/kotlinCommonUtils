@@ -3,8 +3,8 @@ package com.fz.common.date;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import com.fz.common.R;
 import com.fz.common.utils.ParseUtilKt;
-import com.fz.commutil.R;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;

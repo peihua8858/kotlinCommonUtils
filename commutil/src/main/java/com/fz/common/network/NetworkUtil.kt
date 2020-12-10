@@ -2,8 +2,8 @@ package com.fz.common.network
 
 import android.content.Context
 import androidx.fragment.app.Fragment
+import com.fz.common.R
 import com.fz.common.text.isNonEmpty
-import com.fz.commutil.R
 import com.fz.toast.ToastCompat
 
 /**

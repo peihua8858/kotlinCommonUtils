@@ -21,8 +21,6 @@ import android.view.Window;
 import com.socks.library.KLog;
 
 
-import fz.gb.commutil.network.NetworkType;
-
 /**
  * 屏幕适配工具类，可以以屏幕宽度或高度为基准进行适配
  * <pre>
