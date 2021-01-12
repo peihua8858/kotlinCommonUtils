@@ -1,3 +1,5 @@
+@file:JvmName("ParseUtil")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.content.Context

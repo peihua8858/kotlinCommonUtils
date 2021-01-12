@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.fz.common.R;
-import com.fz.common.utils.ParseUtilKt;
+import com.fz.common.utils.ParseUtil;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -94,7 +94,7 @@ public class TimeUtils {
     }
 
     public static long checkTime(long timeInMillis, int maxBit) {
-        StringBuilder time = new StringBuilder(ParseUtilKt.toString(timeInMillis));
+        StringBuilder time = new StringBuilder(ParseUtil.toString(timeInMillis));
         int length = time.length();
         //如果小于maxBit位，则不是毫秒
         if (length < maxBit) {
@@ -102,7 +102,7 @@ public class TimeUtils {
             for (int i = 0; i < difference; i++) {
                 time.append("0");
             }
-            return ParseUtilKt.toLong(time.toString());
+            return ParseUtil.toLong(time.toString());
         }
         return timeInMillis;
     }
@@ -269,7 +269,7 @@ public class TimeUtils {
      */
     public static String format(String seconds) {
         try {
-            long timeMillis = ParseUtilKt.toLong(seconds);
+            long timeMillis = ParseUtil.toLong(seconds);
             return format(timeMillis);
         } catch (Exception e) {
             e.printStackTrace();
@@ -288,7 +288,7 @@ public class TimeUtils {
     }
 
     public static String format(String seconds, DateFormat format) {
-        long timeMillis = ParseUtilKt.toLong(seconds) * 1000;
+        long timeMillis = ParseUtil.toLong(seconds) * 1000;
         return format(timeMillis, format);
     }
 
@@ -451,6 +451,6 @@ public class TimeUtils {
     }
 
     public static String toFormatUS(String delta) {
-        return toFormatUS(ParseUtilKt.toLong(delta));
+        return toFormatUS(ParseUtil.toLong(delta));
     }
 }

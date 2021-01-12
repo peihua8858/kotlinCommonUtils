@@ -1,3 +1,5 @@
+@file:JvmName("ViewUtil")
+@file:JvmMultifileClass
 package com.fz.common.view.utils
 
 import android.graphics.RectF
@@ -43,6 +45,19 @@ fun View?.setGone(isGone: Boolean) {
         return
     }
     this.visibility = if (isGone) View.GONE else View.VISIBLE
+}
+
+/**
+ * 设置多个视图监听器，避免连续单击问题
+ * @param listener
+ * @author dingpeihua
+ * @date 2020/11/29 17:11
+ * @version 1.0
+ */
+fun Any?.setOnNoDoubleClickListener(listener: View.OnClickListener?, vararg views: View?) {
+    for (view in views) {
+        view.setOnNoDoubleClickListener(listener)
+    }
 }
 
 /**

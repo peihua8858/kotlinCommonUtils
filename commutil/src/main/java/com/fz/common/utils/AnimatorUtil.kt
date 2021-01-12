@@ -1,3 +1,5 @@
+@file:JvmName("AnimatorUtil")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.app.Activity

@@ -1,3 +1,5 @@
+@file:JvmName("Utils")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.os.Looper
@@ -64,4 +66,13 @@ fun Array<Any?>?.checkNotNull(msg: String?): Boolean {
         return true
     }
     throw NullPointerException(msg)
+}
+
+
+fun Any.rangeArray(min: Int, length: Int): Array<String?> {
+    val data: Array<String?> = arrayOfNulls(length)
+    for (i in 0 until length) {
+        data[i] = ((min + i).toString())
+    }
+    return data
 }

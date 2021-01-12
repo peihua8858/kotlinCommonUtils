@@ -1,11 +1,16 @@
+@file:JvmName("TextUtil")
+@file:JvmMultifileClass
+
 package com.fz.common.text
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.text.TextUtils
 import android.util.Base64
 import android.util.Patterns
 import android.widget.EditText
+import android.widget.TextView
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Matcher
@@ -31,6 +36,16 @@ fun EditText?.getEditToString(): String? {
  */
 fun Any?.getEditToString(editText: EditText?): String? {
     return editText?.text?.toString()?.trim { it <= ' ' }
+}
+
+/**
+ * 获取[TextView]的字符串
+ *
+ * @param textView 输入框
+ * @return 输入字符串
+ */
+fun Any.getTextToString(textView: TextView?): String? {
+    return textView?.text?.toString()?.trim { it <= ' ' }
 }
 
 fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
@@ -86,6 +101,26 @@ fun CharSequence?.isEmail(): Boolean {
     return this != null && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 }
 
+/**
+ * 判断字符串是否为空
+ * @author dingpeihua
+ * @date 2020/8/7 8:58
+ * @version 1.0
+ */
+@OptIn(ExperimentalContracts::class)
+fun CharSequence?.isEmptyOrBlank(): Boolean {
+    contract {
+        returns(false) implies (this@isEmptyOrBlank != null)
+    }
+    return this == null || isEmpty() || isNullOrBlank()
+}
+
+/**
+ * 判断字符串是否为空
+ * @author dingpeihua
+ * @date 2020/8/7 8:58
+ * @version 1.0
+ */
 @OptIn(ExperimentalContracts::class)
 fun CharSequence?.isNonEmpty(): Boolean {
     contract {
@@ -94,6 +129,29 @@ fun CharSequence?.isNonEmpty(): Boolean {
     return this != null && length > 0 && isNotBlank()
 }
 
+/**
+ * 判断多个字符串是否为空，如果有某一个为空则返回false，否则返回true
+ * @param text
+ * @author dingpeihua
+ * @date 2021/1/11 11:02
+ * @version 1.0
+ */
+fun Any?.isNonEmpty(vararg text: CharSequence?): Boolean {
+    for (c in text) {
+        if (c.isNullOrEmpty()) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
+ * 判断字符串是否为空
+ * @param text
+ * @author dingpeihua
+ * @date 2020/8/7 8:58
+ * @version 1.0
+ */
 @OptIn(ExperimentalContracts::class)
 fun Any?.isNonEmpty(text: CharSequence?): Boolean {
     contract {
@@ -228,4 +286,62 @@ fun CharSequence?.isExistNumber(): Boolean {
  */
 fun CharSequence?.isExistChar(): Boolean {
     return isNonEmpty() && this.matches(".*[a-zA-Z]+.*".toRegex())
+}
+
+/**
+ * 用户电话号码的打码隐藏加星号加*
+ *
+ * @return 处理完成的身份证
+ */
+fun CharSequence?.phoneMask(): String {
+    var res = ""
+    if (this.isNonEmpty()) {
+        val stringBuilder = StringBuilder(this)
+        res = stringBuilder.replace(4, 9, "****").toString()
+    }
+    return res
+}
+
+const val MOBILE_PHONE =
+        "^((\\+86)?(13\\d|14[5-9]|15[0-35-9]|16[5-6]|17[0-8]|18\\d|19[158-9])\\d{8})$"
+
+val MOBILE_PHONE_PATTERN: Pattern = Pattern.compile(MOBILE_PHONE)
+fun CharSequence?.isPhoneNumber(): Boolean {
+    return this != null && MOBILE_PHONE_PATTERN.matcher(this).matches()
+}
+
+/**
+ * 生成保护隐私的用户昵称
+ * @param originNickname 原始用户昵称
+ * @param defaultName 默认显示（如果originNickname参数为空，则默认返回改参数值）
+ * @return a*****b 中间带了*号的昵称
+ * @author dingpeihua
+ * @date 2020/7/10 21:41
+ * @version 1.0
+ */
+fun Any?.generatePrivacyNickname(originNickname: String, defaultName: String): String? {
+    if (TextUtils.isEmpty(originNickname)) {
+        return defaultName
+    }
+    return if (originNickname.length == 1) {
+        "$originNickname*****"
+    } else originNickname[0] + "*****" +
+            originNickname[originNickname.length - 1]
+}
+
+
+/**
+ * 首字母大写
+ *
+ * @return 成功返回true，失败返回false
+ */
+fun CharSequence?.firstLetterUpperCase(): String {
+    if (this.isEmptyOrBlank()) {
+        return ""
+    }
+    if (length <= 1) {
+        return this.toString().toUpperCase()
+    }
+    val firstLetter = substring(0, 1).toUpperCase()
+    return firstLetter + substring(1)
 }

@@ -14,6 +14,24 @@ import com.fz.toast.ToastCompat
  * @date 2017/11/8 10:18
  */
 object NetworkUtil {
+    private var mContext: Context? = null
+
+    @JvmStatic
+    fun init(context: Context) {
+        mContext = context
+    }
+
+    /**
+     * 检测网络是否连接
+     *
+     * @author dingpeihua
+     * @date 2016/10/19 16:42
+     * @version 1.0
+     */
+    @JvmStatic
+    fun isConnected(): Boolean {
+        return mContext?.let { Connectivity.isConnected(it) } ?: false
+    }
 
     /**
      * 检测网络是否连接
@@ -52,15 +70,27 @@ object NetworkUtil {
      * @version 1.0
      */
     @JvmStatic
-    fun isConnected(fragment: Fragment?): Boolean {
+    fun isConnected(fragment: Fragment?, showNetworkErrorTips: Boolean): Boolean {
         if (fragment != null) {
             val isConnect = isConnected(fragment.requireContext())
-            if (!isConnect) {
+            if (!isConnect && showNetworkErrorTips) {
                 showToast(fragment.context, fragment.getString(R.string.tips_check_network))
             }
             return isConnect
         }
         return false
+    }
+
+    /**
+     * 检测网络是否连接
+     *
+     * @author dingpeihua
+     * @date 2016/10/19 16:42
+     * @version 1.0
+     */
+    @JvmStatic
+    fun isConnected(fragment: Fragment?): Boolean {
+        return isConnected(fragment, false)
     }
 
     @JvmStatic

@@ -1,3 +1,5 @@
+@file:JvmName("CanvasCompat")
+@file:JvmMultifileClass
 package com.fz.common.view.utils
 
 import android.graphics.Canvas

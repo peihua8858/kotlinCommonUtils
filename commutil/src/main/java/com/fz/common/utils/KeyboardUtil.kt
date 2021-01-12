@@ -1,3 +1,5 @@
+@file:JvmName("KeyboardUtil")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.content.Context
@@ -29,7 +31,6 @@ fun Any?.showSoftKeyboard(context: Context?, view: View?) {
             val imm:InputMethodManager =
                     context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(view,0)
-//            imm.showSoftInputFromInputMethod(view.windowToken, 0)
         } catch (e: Throwable) {
             e.printStackTrace()
         }

@@ -1,3 +1,5 @@
+@file:JvmName("ReflectUtil")
+@file:JvmMultifileClass
 package com.fz.common.reflect
 
 import java.lang.reflect.*

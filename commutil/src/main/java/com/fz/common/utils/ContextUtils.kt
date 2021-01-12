@@ -1,3 +1,6 @@
+@file:JvmName("ContextUtils")
+@file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.app.Activity
@@ -8,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.view.View
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 
 internal var mContext: Context? = null
@@ -59,6 +63,29 @@ fun checkContextOrNull(any: Any?): Context? {
             null
         }
     }
+}
+
+/**
+ * 判断通知是否启用
+ *
+ * @param context
+ * @author dingpeihua
+ * @date 2019/12/17 16:30
+ * @version 1.0
+ */
+fun Any?.isEnabledNotification(context: Context): Boolean {
+    return NotificationManagerCompat.from(context).areNotificationsEnabled()
+}
+
+/**
+ * 判断通知是否启用
+ *
+ * @author dingpeihua
+ * @date 2019/12/17 16:30
+ * @version 1.0
+ */
+fun Context?.isEnabledNotification(): Boolean {
+    return this != null && isEnabledNotification(this)
 }
 
 /**

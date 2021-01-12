@@ -1,3 +1,6 @@
+@file:JvmName("DensityUtils")
+@file:JvmMultifileClass
+
 package com.fz.common.view.utils
 
 import android.app.Activity
@@ -23,10 +26,7 @@ fun Any?.dip2px(dpValue: Int): Int {
 fun Any?.dip2px(dpValue: Float): Int {
     val context = checkContext(this)
     checkNotNull(context, "Context not found.")
-    if (context != null) {
-        return dip2px(context, dpValue)
-    }
-    return dpValue.toInt()
+    return dip2px(context, dpValue)
 }
 
 fun Any?.dip2px(context: Context, dpValue: Float): Int {
@@ -65,10 +65,7 @@ fun Any?.px2dip(pxValue: Int): Int {
 fun Any?.px2dip(pxValue: Float): Int {
     val context = checkContext(this)
     checkNotNull(context, "Context not found.")
-    if (context != null) {
-        return px2dip(context, pxValue)
-    }
-    return pxValue.toInt()
+    return px2dip(context, pxValue)
 }
 
 fun Any?.px2dip(context: Context, pxValue: Float): Int {

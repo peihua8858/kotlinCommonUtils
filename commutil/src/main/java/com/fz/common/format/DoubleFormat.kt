@@ -1,3 +1,5 @@
+@file:JvmName("DoubleFormat")
+@file:JvmMultifileClass
 package com.fz.common.format
 
 import com.socks.library.KLog

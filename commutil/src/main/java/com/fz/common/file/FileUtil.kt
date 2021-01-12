@@ -1,3 +1,6 @@
+@file:JvmName("FileUtil")
+@file:JvmMultifileClass
+
 package com.fz.common.file
 
 import android.annotation.SuppressLint
@@ -143,8 +146,8 @@ fun File?.deleteDirectory(isDeleteParent: Boolean = true): Boolean {
  * @param directoryName 目录文件对象
  * @return
  */
-fun deleteDirectory(directoryName: String?): Boolean {
-    return !directoryName.isNullOrEmpty() && File(directoryName).deleteDirectory()
+fun CharSequence?.deleteDirectory(): Boolean {
+    return this.isNonEmpty() && File(this.toString()).deleteDirectory()
 }
 
 /**
@@ -168,13 +171,13 @@ fun File?.delete(): Boolean {
  *
  * @param fileOrDirName 文件名（全路径）或目录名
  */
-fun delete(fileOrDirName: String?): Boolean {
-    return !fileOrDirName.isNullOrEmpty() && File(fileOrDirName).delete()
+fun CharSequence?.delete(): Boolean {
+    return this.isNonEmpty() && File(this.toString()).delete()
 }
 
 
 @JvmOverloads
-fun File?.write(content: String, append: Boolean = false): Boolean {
+fun File?.write(content: String?, append: Boolean = false): Boolean {
     if (this == null) {
         return false
     }
@@ -205,18 +208,18 @@ fun File?.write(content: String, append: Boolean = false): Boolean {
     return false
 }
 
-fun write(fileName: String?, content: String): Boolean {
-    if (fileName == null) {
+fun CharSequence?.write(fileName: String?): Boolean {
+    if (fileName == null || this == null) {
         return false
     }
-    return File(fileName).write(content, false)
+    return File(fileName).write(this.toString(), false)
 }
 
-fun write(fileName: String?, content: String, append: Boolean): Boolean {
-    if (fileName == null) {
+fun CharSequence?.write(fileName: String?, append: Boolean): Boolean {
+    if (fileName == null || this == null) {
         return false
     }
-    return File(fileName).write(content, append)
+    return File(fileName).write(this.toString(), append)
 }
 
 fun File?.read(): String {
@@ -278,16 +281,20 @@ fun String?.createFile(): Boolean {
  * @date 2018/5/12 20:28
  * @version 1.0
  */
-fun copyFile(source: File?, dest: File?): Boolean {
+fun File?.copyToFile(dest: File?): Boolean {
     try {
-        FileInputStream(source).use { fis ->
-            FileOutputStream(dest).use { fos ->
-                val buffer = ByteArray(1024)
-                var length: Int
-                while (fis.read(buffer).also { length = it } > 0) {
-                    fos.write(buffer, 0, length)
+        this?.let { input ->
+            FileInputStream(input).use { fis ->
+                dest?.let { out ->
+                    FileOutputStream(out).use { fos ->
+                        val buffer = ByteArray(1024)
+                        var length: Int
+                        while (fis.read(buffer).also { length = it } > 0) {
+                            fos.write(buffer, 0, length)
+                        }
+                        return true
+                    }
                 }
-                return true
             }
         }
     } catch (e: Exception) {
@@ -316,12 +323,12 @@ fun File?.writeBitmapToFile(
 }
 
 fun File?.writeBitmapToFile(bitmap: Bitmap?): File? {
-    if (this == null) {
+    if (this == null || bitmap == null) {
         return null
     }
     try {
         FileOutputStream(this).use { outStream ->
-            bitmap!!.compress(
+            bitmap.compress(
                     Bitmap.CompressFormat.JPEG,
                     100,
                     outStream
@@ -330,15 +337,15 @@ fun File?.writeBitmapToFile(bitmap: Bitmap?): File? {
     } catch (e: Exception) {
         e.printStackTrace()
     } finally {
-        bitmap?.recycle()
+        bitmap.recycle()
     }
     return this
 }
 
-fun writeBitmapToFile(bitmap: Bitmap?, outFile: File): File? {
+fun Bitmap?.writeBitmapToFile(outFile: File): File? {
     return if (outFile.isFile) {
-        outFile.writeBitmapToFile(bitmap)
-    } else outFile.writeBitmapToFile(bitmap, false)
+        outFile.writeBitmapToFile(this)
+    } else outFile.writeBitmapToFile(this, false)
 }
 
 fun File?.writeBitmapToFile(bitmap: Bitmap?, deleteFile: Boolean): File? {
