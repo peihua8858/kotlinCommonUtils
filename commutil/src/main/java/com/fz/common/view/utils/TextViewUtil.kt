@@ -11,6 +11,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.fz.common.listener.EditTextWatcher
 import com.fz.common.listener.IControlEnabledListener
+import com.fz.common.utils.eLog
 import com.google.android.material.textfield.TextInputLayout
 
 fun TextView?.setDrawableStart(@DrawableRes start: Int): Drawable? {
@@ -19,7 +20,7 @@ fun TextView?.setDrawableStart(@DrawableRes start: Int): Drawable? {
     }
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
     val startDrawable: Drawable? =
-            if (start != 0) ContextCompat.getDrawable(context, start) else null
+            if (start != 0) ContextCompat.getDrawable(context, start) else null.eLog { "start  is 0." }
     this.setCompoundDrawablesRelativeWithIntrinsicBounds(
             startDrawable, drawables[1],
             drawables[2], drawables[3]
@@ -32,7 +33,7 @@ fun TextView?.setDrawableTop(@DrawableRes top: Int): Drawable? {
         return null
     }
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
-    val topDrawable: Drawable? = if (top != 0) ContextCompat.getDrawable(context, top) else null
+    val topDrawable: Drawable? = if (top != 0) ContextCompat.getDrawable(context, top) else null.eLog { "top  is 0." }
     this.setCompoundDrawablesRelativeWithIntrinsicBounds(
             drawables[0], topDrawable,
             drawables[2], drawables[3]
@@ -45,7 +46,7 @@ fun TextView?.setDrawableEnd(@DrawableRes end: Int): Drawable? {
         return null
     }
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
-    val endDrawable: Drawable? = if (end != 0) ContextCompat.getDrawable(context, end) else null
+    val endDrawable: Drawable? = if (end != 0) ContextCompat.getDrawable(context, end) else null.eLog { "end  is 0." }
     this.setCompoundDrawablesRelativeWithIntrinsicBounds(
             drawables[0], drawables[1],
             endDrawable, drawables[3]
@@ -59,7 +60,7 @@ fun TextView?.setDrawableBottom(@DrawableRes bottom: Int): Drawable? {
     }
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
     val bottomDrawable: Drawable? =
-            if (bottom != 0) ContextCompat.getDrawable(context, bottom) else null
+            if (bottom != 0) ContextCompat.getDrawable(context, bottom) else null.eLog { "bottom  is 0." }
     this.setCompoundDrawablesRelativeWithIntrinsicBounds(
             drawables[0], drawables[1], drawables[2],
             bottomDrawable

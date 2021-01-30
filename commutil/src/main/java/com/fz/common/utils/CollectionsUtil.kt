@@ -1,5 +1,6 @@
 @file:JvmName("CollectionsUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import kotlin.contracts.ExperimentalContracts

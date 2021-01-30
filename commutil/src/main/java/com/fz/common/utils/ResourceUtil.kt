@@ -1,5 +1,6 @@
 @file:JvmName("ResourceUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.content.Context
@@ -14,23 +15,22 @@ import com.fz.common.view.utils.dip2px
 import java.io.IOException
 import java.io.InputStream
 
-internal fun Any?.getResource(): Resources {
-    val context: Context? = checkContext(this)
-    checkNotNull(context, "请主动调用ContextUtils.initContext()")
+internal fun Any?.getResource(): Resources? {
+    val context: Context = checkContext(this) ?: return null.eLog { "Context  is null." }
     return context.resources
 }
 
 fun Any?.getNameWithResId(@IdRes resourceId: Int): String? {
     return try {
-        getResource().getResourceName(resourceId)
+        val resource = getResource() ?: return "".eLog { "Resource  is null." } ?: ""
+        resource.getResourceName(resourceId)
     } catch (e: Exception) {
         null
     }
 }
 
 fun Any?.getIdWithName(resourceTypeName: String, resourceName: String): Int {
-    val context: Context? = checkContext(this)
-    checkNotNull(context, "请主动调用ContextUtils.initContext()")
+    val context: Context = checkContext(this) ?: return 0.eLog { "Context  is null." }
     return context.resources.getIdentifier(
             resourceName,
             resourceTypeName,
@@ -55,11 +55,14 @@ fun Any?.getString(context: Context, @StringRes resourceId: Int, vararg formatAr
 }
 
 fun Any?.getString(@StringRes resourceId: Int): String {
-    return getResource().getString(resourceId)
+    val resource = getResource() ?: return "".eLog { "Resource  is null." } ?: ""
+    return resource.getString(resourceId)
 }
 
 fun Any?.getStringArray(@ArrayRes resourceId: Int): Array<String> {
-    return getResource().getStringArray(resourceId)
+    val d = arrayOf<String>()
+    val resource = getResource() ?: return d.eLog { "Resource  is null." } ?: d
+    return resource.getStringArray(resourceId)
 }
 
 fun Any?.getString(resourceName: String): String {
@@ -67,27 +70,30 @@ fun Any?.getString(resourceName: String): String {
 }
 
 fun Any?.getString(@StringRes resourceId: Int, vararg formatArgs: Any?): String {
-    return getResource().getString(resourceId, *formatArgs) ?: ""
+    val resource = getResource() ?: return "".eLog { "Resource  is null." } ?: ""
+    return resource.getString(resourceId, *formatArgs) ?: ""
 }
 
 fun Any?.getString(resourceName: String, vararg formatArgs: Any?): String {
     return getResource().getString(getIdWithName(resourceName, "string"), *formatArgs)
 }
 
-fun Any?.getColor(@ColorRes resourceId: Int): Int {
-    val context: Context? = checkContext(this)
-    checkNotNull(context, "请主动调用ContextUtils.initContext()")
+fun Any?.getColor(@ColorRes resourceId: Int, @ColorInt defaultColor: Int): Int {
+    val context: Context = checkContext(this) ?: return defaultColor.eLog { "Context  is null." }
     return getColor(context, resourceId)
 }
 
-fun Any?.getColor(context: Context?, @ColorRes resourceId: Int): Int {
-    checkNotNull(context)
+fun Any?.getColor(@ColorRes resourceId: Int): Int {
+    return getColor(resourceId, 0)
+}
+
+fun Any?.getColor(context: Context, @ColorRes resourceId: Int): Int {
     return ContextCompat.getColor(context, resourceId)
 }
 
 fun Any?.openAssetsFile(fileName: String): InputStream? {
     try {
-        return getResource().assets?.open(fileName)
+        return getResource()?.assets?.open(fileName)
     } catch (e: IOException) {
         e.printStackTrace()
     }
@@ -96,7 +102,8 @@ fun Any?.openAssetsFile(fileName: String): InputStream? {
 
 fun Any?.openAssetsFile(fileName: String, accessMode: Int): InputStream? {
     try {
-        return getResource().assets?.open(fileName, accessMode)
+        val resource = getResource() ?: return null.eLog { "Resource  is null." }
+        return resource.assets?.open(fileName, accessMode)
     } catch (e: IOException) {
         e.printStackTrace()
     }
@@ -105,7 +112,8 @@ fun Any?.openAssetsFile(fileName: String, accessMode: Int): InputStream? {
 
 fun Any?.getAssetsFiles(dir: String): Array<String>? {
     try {
-        return getResource().assets?.list(dir)
+        val resource = getResource() ?: return null.eLog { "Resource  is null." }
+        return resource.assets?.list(dir)
     } catch (e: IOException) {
         e.printStackTrace()
     }
@@ -118,29 +126,38 @@ fun Any?.getAssetsFiles(dir: String): Array<String>? {
  * @param resId 尺寸资源id
  * @return
  */
-fun Any?.getDimens(@DimenRes resId: Int): Int {
+fun Context.getDimens(@DimenRes resId: Int): Int {
     val value = TypedValue()
+    val resource = getResource() ?: return 0.eLog { "Resource  is null." }
     try {
-        getResource().getValue(resId, value, true)
+        resource.getValue(resId, value, true)
         if (value.type == TypedValue.TYPE_DIMENSION) {
-            return dip2px(TypedValue.complexToFloat(value.data))
+            return dip2px(resource, TypedValue.complexToFloat(value.data))
         }
     } catch (e: Exception) {
         e.printStackTrace()
     }
-    return getResource().getDimensionPixelSize(resId)
+    return resource.getDimensionPixelSize(resId)
 }
 
 /**
- * 获取drawable
+ * 获取dimen
  *
- * @param resId 图片的资源id
- * @return drawable对象
+ * @param resId 尺寸资源id
+ * @return
  */
-fun Any?.getDrawable(@DrawableRes resId: Int): Drawable? {
-    val context: Context? = checkContext(this)
-    checkNotNull(context, "请主动调用ContextUtils.initContext()")
-    return getDrawable(context, resId)
+fun Any?.getDimens(@DimenRes resId: Int): Int {
+    val value = TypedValue()
+    val resource = getResource() ?: return 0.eLog { "Resource  is null." }
+    try {
+        resource.getValue(resId, value, true)
+        if (value.type == TypedValue.TYPE_DIMENSION) {
+            return dip2px(resource, TypedValue.complexToFloat(value.data))
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return resource.getDimensionPixelSize(resId)
 }
 
 /**
@@ -150,10 +167,7 @@ fun Any?.getDrawable(@DrawableRes resId: Int): Drawable? {
  * @return drawable对象
  */
 fun Any?.getResourceId(context: Context, attrId: Int): Int {
-    val ta = context.obtainStyledAttributes(intArrayOf(attrId))
-    val resourceId = ta.getResourceId(0, -1)
-    ta.recycle()
-    return resourceId
+    return context.getResourceId(attrId)
 }
 
 /**
@@ -162,8 +176,8 @@ fun Any?.getResourceId(context: Context, attrId: Int): Int {
  * @param resId 图片的资源id
  * @return drawable对象
  */
-fun Any?.getDrawable(context: Context?, @DrawableRes resId: Int): Drawable? {
-    checkNotNull(context)
+fun Any?.getDrawable(@DrawableRes resId: Int): Drawable? {
+    val context: Context = checkContext(this) ?: return null.eLog { "Context  is null." }
     return if (AppCompatDelegate.isCompatVectorFromResourcesEnabled()) {
         AppCompatResources.getDrawable(context, resId)
     } else ContextCompat.getDrawable(context, resId)
@@ -182,7 +196,7 @@ fun Any?.getDrawable(context: Context?, @DrawableRes resId: Int): Drawable? {
 fun Any?.resolveAttribute(
         context: Context,
         resId: Int,
-        @StyleRes defaultRes: Int
+        @StyleRes defaultRes: Int,
 ): Int {
     val resourceId = resolveAttribute(context, resId)
     return if (resourceId != 0) {
@@ -203,4 +217,17 @@ fun Any?.resolveAttribute(context: Context, resId: Int): Int {
     val outValue = TypedValue()
     context.theme.resolveAttribute(resId, outValue, true)
     return outValue.resourceId
+}
+
+/**
+ * 获取资源id
+ *
+ * @param attrId 属性id
+ * @return drawable对象
+ */
+fun Context.getResourceId(attrId: Int): Int {
+    val ta = obtainStyledAttributes(intArrayOf(attrId))
+    val resourceId = ta.getResourceId(0, -1)
+    ta.recycle()
+    return resourceId
 }

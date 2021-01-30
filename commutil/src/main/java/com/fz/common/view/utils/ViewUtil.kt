@@ -1,15 +1,23 @@
 @file:JvmName("ViewUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.view.utils
 
+import android.content.Context
 import android.graphics.RectF
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.LayoutRes
+import androidx.annotation.*
+import androidx.core.content.ContextCompat
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import com.fz.common.listener.OnNoDoubleClickListener
+import com.fz.common.utils.checkContext
+import com.fz.common.utils.getDimens
+import com.fz.common.utils.getResourceId
+import com.fz.common.utils.resolveAttribute
 import java.util.*
 
 /**
@@ -95,4 +103,46 @@ fun Any?.calcViewScreenLocation(view: View): RectF {
             .toFloat(), (location[0] + view.width).toFloat(),
             (location[1] + view.height).toFloat()
     )
+}
+
+@ColorInt
+fun View.getColor(@ColorRes colorRes: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return ContextCompat.getColor(context, colorRes)
+}
+
+fun View?.getDrawable(@DrawableRes drawableRes: Int): Drawable? {
+    val context: Context = checkContext(this) ?: return null
+    return ContextCompat.getDrawable(context, drawableRes)
+}
+
+fun View?.getDimens(@DimenRes resId: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return context.getDimens(resId)
+}
+
+/**
+ * 获取资源id
+ *
+ * @param attrId 属性id
+ * @return drawable对象
+ */
+fun View?.getResourceId(attrId: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return getResourceId(context, attrId)
+}
+
+/**
+ * 解析当前上下文主题，获取主题样式
+ *
+ * @param context    当前上下文
+ * @param resId      资源ID
+ * @param defaultRes 默认主题样式
+ * @author dingpeihua
+ * @date 2020/7/7 10:31
+ * @version 1.0
+ */
+fun View?.resolveAttribute(resId: Int, @StyleRes defaultRes: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return resolveAttribute(context, resId, defaultRes)
 }

@@ -535,6 +535,8 @@ fun File?.toBase64(): String {
         e.printStackTrace()
     } catch (e: IOException) {
         e.printStackTrace()
+    }catch (e:OutOfMemoryError){
+        e.printStackTrace()
     }
     return ""
 }

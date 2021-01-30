@@ -19,6 +19,14 @@ fun initContext(context: Context) {
     mContext = context
 }
 
+/**
+ * 检查当前[any]是否可转为[Context]
+ * @return 返回当前上下文，如果当前对象不能获取[Context],则返回当前[mContext]
+ * @param any
+ * @author dingpeihua
+ * @date 2021/1/18 16:37
+ * @version 1.0
+ */
 fun checkContext(any: Any?): Context? {
     return when (any) {
         is Context -> {
@@ -42,6 +50,13 @@ fun checkContext(any: Any?): Context? {
     }
 }
 
+/**
+ * 检查当前[any]是否可转为[Context]
+ * @return 返回当前上下文，如果当前对象不能获取[Context],则返回null
+ * @author dingpeihua
+ * @date 2021/1/18 16:39
+ * @version 1.0
+ */
 fun checkContextOrNull(any: Any?): Context? {
     return when (any) {
         is Context -> {
