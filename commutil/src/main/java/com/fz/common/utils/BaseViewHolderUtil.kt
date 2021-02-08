@@ -1,5 +1,4 @@
 @file:JvmName("BaseViewHolderUtil")
-@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.graphics.Typeface

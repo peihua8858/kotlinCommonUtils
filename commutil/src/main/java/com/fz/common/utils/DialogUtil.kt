@@ -1,5 +1,4 @@
 @file:JvmName("DialogUtil")
-@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.app.Dialog

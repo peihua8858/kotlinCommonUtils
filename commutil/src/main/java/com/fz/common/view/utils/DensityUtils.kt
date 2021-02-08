@@ -1,5 +1,4 @@
 @file:JvmName("DensityUtils")
-@file:JvmMultifileClass
 
 package com.fz.common.view.utils
 

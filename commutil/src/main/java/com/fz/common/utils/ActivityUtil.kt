@@ -1,5 +1,4 @@
 @file:JvmName("ActivityUtil")
-@file:JvmMultifileClass
 
 package com.fz.common.utils
 
@@ -7,8 +6,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.FragmentManager
 
 @ColorInt
 fun Activity?.getColor(@ColorRes colorRes: Int): Int {
@@ -70,6 +74,20 @@ fun Any?.findActivity(): Activity? {
     return findActivity(checkContextOrNull(this))
 }
 
+fun Context?.getActivity(): Activity? {
+    return getActivity(this)
+}
+
+fun Any?.getActivity(context: Context?): Activity? {
+    var cxt = context
+    while (cxt is ContextWrapper) {
+        if (cxt is Activity) {
+            return cxt
+        }
+        cxt = cxt.baseContext
+    }
+    return null
+}
 
 /**
  * 查找当前上下文activity
@@ -80,14 +98,7 @@ fun Any?.findActivity(): Activity? {
  * @version 1.0
  */
 fun Any?.findActivity(context: Context?): Activity? {
-    if (context is Activity) {
-        if (!context.isFinishing && !context.isDestroyed) {
-            return context
-        }
-    } else if (context is ContextWrapper) {
-        return findActivity(context.baseContext)
-    }
-    return null
+    return getActivity(context)
 }
 
 /**
@@ -123,7 +134,7 @@ fun Any?.isFinish(context: Context): Boolean {
  * @version 1.0
  */
 fun Activity?.isDestroy(): Boolean {
-    return this != null && this.isDestroyed
+    return this == null || this.isDestroyed
 }
 
 /**
@@ -135,7 +146,7 @@ fun Activity?.isDestroy(): Boolean {
  * @version 1.0
  */
 fun Any?.isDestroy(activity: Activity?): Boolean {
-    return activity != null && activity.isDestroyed
+    return activity == null || activity.isDestroyed
 }
 
 /**
@@ -147,5 +158,15 @@ fun Any?.isDestroy(activity: Activity?): Boolean {
  * @version 1.0
  */
 fun Any?.isFinish(activity: Activity?): Boolean {
-    return activity != null && activity.isFinishing
+    return activity == null || activity.isFinishing
+}
+
+inline fun <reified T : Fragment?> FragmentActivity.newFragment(clazz: Class<T>, args: Bundle?): T? {
+    if (classLoader == null) {
+        return null
+    }
+    val factory: FragmentFactory = supportFragmentManager.fragmentFactory
+    val fragment: Fragment = factory.instantiate(classLoader, clazz.name)
+    fragment.arguments = args
+    return if (fragment is T) fragment else null
 }

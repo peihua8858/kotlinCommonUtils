@@ -102,7 +102,7 @@ public class TimeUtils {
             for (int i = 0; i < difference; i++) {
                 time.append("0");
             }
-            return ParseUtil.toLong(time.toString());
+            return ParseUtil.toLong(time);
         }
         return timeInMillis;
     }

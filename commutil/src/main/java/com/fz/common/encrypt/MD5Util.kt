@@ -1,5 +1,4 @@
 @file:JvmName("MD5Util")
-@file:JvmMultifileClass
 package com.fz.common.encrypt
 
 import java.io.File

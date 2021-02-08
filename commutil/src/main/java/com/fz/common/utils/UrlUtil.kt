@@ -1,5 +1,4 @@
 @file:JvmName("UrlUtil")
-@file:JvmMultifileClass
 
 package com.fz.common.utils
 

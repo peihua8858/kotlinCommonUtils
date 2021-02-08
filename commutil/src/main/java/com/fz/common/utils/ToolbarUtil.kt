@@ -1,5 +1,4 @@
 @file:JvmName("ToolbarUtil")
-@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.graphics.drawable.Drawable

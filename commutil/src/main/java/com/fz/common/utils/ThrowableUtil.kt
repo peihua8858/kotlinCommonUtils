@@ -1,5 +1,4 @@
 @file:JvmName("ThrowableUtil")
-@file:JvmMultifileClass
 package com.fz.common.utils
 
 import java.io.PrintWriter

@@ -1,5 +1,4 @@
-@file:JvmName("ContextUtils")
-@file:JvmMultifileClass
+@file:JvmName("DrawableUtils")
 
 package com.fz.common.utils
 

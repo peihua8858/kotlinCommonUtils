@@ -1,5 +1,4 @@
 @file:JvmName("ColorUtil")
-@file:JvmMultifileClass
 
 package com.fz.common.utils
 

@@ -1,5 +1,4 @@
 @file:JvmName("AdapterUtil")
-@file:JvmMultifileClass
 
 package com.fz.common.utils
 

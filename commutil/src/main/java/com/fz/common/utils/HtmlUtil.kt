@@ -1,5 +1,4 @@
 @file:JvmName("HtmlUtil")
-@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.os.Build

@@ -1,12 +1,15 @@
 @file:JvmName("FragmentUtil")
-@file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.FragmentManager
 
 @ColorInt
 fun Fragment?.getColor(@ColorRes colorRes: Int): Int {

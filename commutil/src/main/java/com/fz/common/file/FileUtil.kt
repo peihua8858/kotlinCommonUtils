@@ -1,5 +1,4 @@
 @file:JvmName("FileUtil")
-@file:JvmMultifileClass
 
 package com.fz.common.file
 
@@ -19,6 +18,8 @@ import com.fz.common.R
 import com.fz.common.text.isNonEmpty
 import com.fz.common.utils.isNotNull
 import com.fz.common.utils.isNull
+import com.fz.common.utils.no
+import com.fz.common.utils.yes
 import com.socks.library.KLog
 import java.io.*
 import java.nio.charset.Charset
@@ -306,7 +307,7 @@ fun File?.copyToFile(dest: File?): Boolean {
 fun File?.writeBitmapToFile(
         bitmap: Bitmap?,
         fileName: String?,
-        deleteParentAllFile: Boolean
+        deleteParentAllFile: Boolean,
 ): File? {
     if (fileName == null) {
         return null
@@ -385,7 +386,7 @@ fun writeImageToFile(data: ByteArray?, outFile: File, deleteFile: Boolean): File
 fun File?.writeToFile(
         data: ByteArray?,
         fileName: String?,
-        deleteParentAllFile: Boolean
+        deleteParentAllFile: Boolean,
 ): File? {
     if (fileName == null) {
         return null
@@ -520,7 +521,7 @@ fun calculate(length: Long): String {
  * @return
  */
 fun File?.toBase64(): String {
-    if (this.exists()) {
+    if (!this.exists()) {
         return ""
     }
     try {
@@ -535,7 +536,7 @@ fun File?.toBase64(): String {
         e.printStackTrace()
     } catch (e: IOException) {
         e.printStackTrace()
-    }catch (e:OutOfMemoryError){
+    } catch (e: OutOfMemoryError) {
         e.printStackTrace()
     }
     return ""
@@ -802,4 +803,17 @@ fun Any?.writeLog(message: String, logFolderName: CharSequence?) {
         return
     }
     writeLog(logFolderName, message)
+}
+
+fun File.ensureDir(): Boolean {
+    try {
+        isDirectory.no {
+            isFile.yes {
+                delete()
+            }
+            return mkdirs()
+        }
+    } catch (e: Exception) {
+    }
+    return false
 }

@@ -1,9 +1,9 @@
-package fz.gb.com.commutils.logcat
+package com.fz.commutils.demo.logcat
 
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter
 import com.chad.library.adapter.base.module.LoadMoreModule
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import fz.gb.com.commutils.model.AdapterBean
+import com.fz.commutils.demo.model.AdapterBean
 import java.io.File
 
 class LogCatAdapter : BaseMultiItemQuickAdapter<AdapterBean<File>, BaseViewHolder>(

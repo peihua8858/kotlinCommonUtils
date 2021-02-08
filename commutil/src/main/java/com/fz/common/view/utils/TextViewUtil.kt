@@ -1,5 +1,5 @@
 @file:JvmName("TextViewUtil")
-@file:JvmMultifileClass
+
 package com.fz.common.view.utils
 
 import android.graphics.drawable.Drawable
@@ -74,25 +74,38 @@ fun Any?.setAfterTextChanged(listener: IControlEnabledListener?, vararg views: E
     }
 }
 
+fun EditText?.setAfterTextChanged(block: (CharSequence) -> Unit) {
+    this?.addTextChangedListener(EditTextAfterWatcher(this, block))
+}
+
 fun EditText?.setAfterTextChanged(listener: IControlEnabledListener?) {
     this?.addTextChangedListener(AfterEditTextWatcher(listener, this))
 }
 
+private class EditTextAfterWatcher(
+        val view: EditText,
+        val block: (CharSequence) -> Unit,
+) : EditTextWatcher {
+    override fun afterTextChanged(s: Editable?) {
+        block(if (s.isNullOrEmpty()) "" else s)
+    }
+}
+
 private class AfterEditTextWatcher(
-        val view: EditText?,
-        listeners: Array<out IControlEnabledListener?>
+        val view: EditText,
+        listeners: Array<out IControlEnabledListener?>,
 ) :
         EditTextWatcher {
     private val mListeners = listeners
 
-    constructor(listener: IControlEnabledListener?, view: EditText?) : this(view, arrayOf(listener))
+    constructor(listener: IControlEnabledListener?, view: EditText) : this(view, arrayOf(listener))
 
     override fun afterTextChanged(s: Editable?) {
         for (listener in mListeners) {
             listener?.onControlEnabled()
         }
         if (!s.isNullOrEmpty()) {
-            val parent = view?.parent?.parent
+            val parent = view.parent?.parent
             if (parent is TextInputLayout) {
                 parent.error = null
                 parent.isErrorEnabled = false
@@ -121,7 +134,7 @@ fun EditText?.setOnFocusChangeListener(vararg listeners: IControlEnabledListener
 
 private class FocusChangeListener(
         val view: EditText?,
-        listeners: Array<out IControlEnabledListener?>
+        listeners: Array<out IControlEnabledListener?>,
 ) : View.OnFocusChangeListener {
     private val mListeners = listeners
 

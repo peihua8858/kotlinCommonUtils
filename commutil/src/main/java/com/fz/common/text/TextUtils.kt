@@ -1,5 +1,4 @@
 @file:JvmName("TextUtil")
-@file:JvmMultifileClass
 
 package com.fz.common.text
 
@@ -11,6 +10,7 @@ import android.util.Base64
 import android.util.Patterns
 import android.widget.EditText
 import android.widget.TextView
+import com.fz.common.utils.copyToClipBoard
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Matcher
@@ -21,10 +21,28 @@ import kotlin.contracts.contract
 /**
  * 获取input的字符串
  *
+ * @return 输入字符串
+ */
+fun EditText?.editToString(block: (CharSequence) -> Unit) {
+    block(editTextToString() ?: "")
+}
+
+/**
+ * 获取input的字符串
+ *
+ * @return 输入字符串
+ */
+fun EditText?.getEditToString(block: (CharSequence) -> Unit) {
+    block(editTextToString() ?: "")
+}
+
+/**
+ * 获取input的字符串
+ *
  * @param editText 输入框
  * @return 输入字符串
  */
-fun EditText?.getEditToString(): String? {
+fun EditText?.editTextToString(): String? {
     return this?.text?.toString()?.trim { it <= ' ' }
 }
 
@@ -34,8 +52,22 @@ fun EditText?.getEditToString(): String? {
  * @param editText 输入框
  * @return 输入字符串
  */
+fun EditText?.getEditToString(): String? {
+    return editTextToString()
+}
+
+/**
+ * 获取input的字符串
+ *
+ * @param editText 输入框
+ * @return 输入字符串
+ */
 fun Any?.getEditToString(editText: EditText?): String? {
-    return editText?.text?.toString()?.trim { it <= ' ' }
+    return editText.editTextToString()
+}
+
+fun TextView?.textViewToString(block: (CharSequence) -> Unit) {
+    block(textViewToString() ?: "")
 }
 
 /**
@@ -45,9 +77,12 @@ fun Any?.getEditToString(editText: EditText?): String? {
  * @return 输入字符串
  */
 fun Any.getTextToString(textView: TextView?): String? {
-    return textView?.text?.toString()?.trim { it <= ' ' }
+    return textView.textViewToString()
 }
 
+fun TextView?.textViewToString(): String? {
+    return this?.text?.toString()?.trim { it <= ' ' }
+}
 fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
     if (this == null) {
         return false
@@ -344,4 +379,17 @@ fun CharSequence?.firstLetterUpperCase(): String {
     }
     val firstLetter = substring(0, 1).toUpperCase()
     return firstLetter + substring(1)
+}
+
+/**
+ * 根据sku截取商品spu
+ * @author dingpeihua
+ * @date 2021/2/1 15:37
+ * @version 1.0
+ */
+fun CharSequence?.splitSpu(): CharSequence? {
+    if (isNonEmpty() && length > 7) {
+        return substring(0, 7)
+    }
+    return this
 }

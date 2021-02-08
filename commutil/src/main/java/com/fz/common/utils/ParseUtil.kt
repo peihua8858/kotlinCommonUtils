@@ -1,9 +1,42 @@
 @file:JvmName("ParseUtil")
-@file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.content.Context
+import android.widget.EditText
+import android.widget.TextView
 import androidx.annotation.StringRes
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+/**
+ * 将Object对象转成boolean类型
+ *
+ * @param value
+ * @return 如果value不能转成boolean，则默认false
+ */
+inline fun Any?.toBoolean(block: (result: Boolean) -> Unit) = block(toBoolean())
+
+/**
+ * 将Object对象转成boolean类型
+ *
+ * @param value
+ * @return 如果value不能转成boolean，则默认false
+ */
+fun Any?.toBoolean(): Boolean {
+    return toBoolean(this, false)
+}
+
+/**
+ * 将Object对象转成boolean类型
+ *
+ * @param value
+ * @return 如果value不能转成boolean，则默认false
+ */
+fun Any?.toBoolean(defaultValue: Boolean = false): Boolean {
+    return toBoolean(this, defaultValue)
+}
 
 /**
  * 将Object对象转成boolean类型
@@ -11,7 +44,6 @@ import androidx.annotation.StringRes
  * @param value
  * @return 如果value不能转成boolean，则默认defaultValue
  */
-@JvmOverloads
 fun Any?.toBoolean(value: Any?, defaultValue: Boolean = false): Boolean {
     if (value is Boolean) {
         return value
@@ -22,14 +54,29 @@ fun Any?.toBoolean(value: Any?, defaultValue: Boolean = false): Boolean {
 }
 
 /**
- * 将Object对象转成boolean类型
+ * 将Object对象转成Double类型
+ *
+ * @return 如果value不能转成Double，则默认0.00
+ */
+inline fun Any?.toDouble(block: (result: Double) -> Unit) = block(toDouble())
+
+/**
+ * 将Object对象转成Double类型
+ *
+ * @return 如果value不能转成Double，则默认0.00
+ */
+fun Any?.toDouble(): Double {
+    return toDouble(this, 0.00)
+}
+
+/**
+ * 将Object对象转成Double类型
  *
  * @param value
- * @return 如果value不能转成boolean，则默认false
+ * @return 如果value不能转成Double，则默认0.00
  */
-@JvmOverloads
-fun Any?.toBoolean(defaultValue: Boolean = false): Boolean {
-    return toBoolean(this, defaultValue)
+fun Any?.toDouble(defaultValue: Double = 0.00): Double {
+    return toDouble(this, defaultValue)
 }
 
 /**
@@ -38,7 +85,6 @@ fun Any?.toBoolean(defaultValue: Boolean = false): Boolean {
  * @param value
  * @return 如果value不能转成Double，则默认defaultValue
  */
-@JvmOverloads
 fun Any?.toDouble(value: Any?, defaultValue: Double = 0.00): Double {
     when (value) {
         is Double -> {
@@ -60,21 +106,35 @@ fun Any?.toDouble(value: Any?, defaultValue: Double = 0.00): Double {
 /**
  * 将Object对象转成Double类型
  *
- * @param value
- * @return 如果value不能转成Double，则默认0.00
+ * @return 如果value不能转成Float，则默认0.00
  */
-@JvmOverloads
-fun Any?.toDouble(defaultValue: Double = 0.00): Double {
-    return toDouble(this, defaultValue)
+inline fun Any?.toFloat(block: (result: Float) -> Unit) = block(toFloat())
+
+/**
+ * 将Object对象转成Float类型
+ *
+ * @return 如果value不能转成Float，则默认0.00
+ */
+fun Any?.toFloat(): Float {
+    return toFloat(this, 0.00f)
 }
 
 /**
- * 将Object对象转成Double类型
+ * 将Object对象转成Float类型
+ *
+ * @param value
+ * @return 如果value不能转成Float，则默认0.00
+ */
+fun Any?.toFloat(defaultValue: Float = 0.00f): Float {
+    return toFloat(this, defaultValue)
+}
+
+/**
+ * 将Object对象转成Float类型
  *
  * @param value
  * @return 如果value不能转成Float，则默认defaultValue
  */
-@JvmOverloads
 fun Any?.toFloat(value: Any?, defaultValue: Float = 0.00f): Float {
     when (value) {
         is Double -> {
@@ -94,14 +154,20 @@ fun Any?.toFloat(value: Any?, defaultValue: Float = 0.00f): Float {
 }
 
 /**
- * 将Object对象转成Double类型
+ * 将Object对象转成Integer类型
+ *
+ * @return 如果value不能转成Integer，则默认0
+ */
+inline fun Any?.toInteger(block: (result: Int) -> Unit) = block(toInteger())
+
+/**
+ * 将Object对象转成Integer类型
  *
  * @param value
- * @return 如果value不能转成Float，则默认0.00
+ * @return 如果value不能转成Integer，则默认0
  */
-@JvmOverloads
-fun Any?.toFloat(defaultValue: Float = 0.00f): Float {
-    return toFloat(this, defaultValue)
+fun Any?.toInteger(): Int {
+    return toInteger(0)
 }
 
 /**
@@ -110,7 +176,6 @@ fun Any?.toFloat(defaultValue: Float = 0.00f): Float {
  * @param value
  * @return 如果value不能转成Integer，则默认0
  */
-@JvmOverloads
 fun Any?.toInteger(defaultValue: Int = 0): Int {
     return toInteger(this, defaultValue)
 }
@@ -121,7 +186,6 @@ fun Any?.toInteger(defaultValue: Int = 0): Int {
  * @param value
  * @return 如果value不能转成Integer，则默认0
  */
-@JvmOverloads
 fun Any?.toInteger(value: Any?, defaultValue: Int = 0): Int {
     when (value) {
         is Int -> {
@@ -143,10 +207,26 @@ fun Any?.toInteger(value: Any?, defaultValue: Int = 0): Int {
 /**
  * 将Object对象转成Long类型
  *
+ * @return 如果value不能转成Long，则默认0
+ */
+inline fun Any?.toLong(block: (result: Long) -> Unit) = block(toLong())
+
+/**
+ * 将Object对象转成Long类型
+ *
  * @param value
  * @return 如果value不能转成Long，则默认0
  */
-@JvmOverloads
+fun Any?.toLong(): Long {
+    return toLong(this, 0L)
+}
+
+/**
+ * 将Object对象转成Long类型
+ *
+ * @param value
+ * @return 如果value不能转成Long，则默认0
+ */
 fun Any?.toLong(defaultValue: Long = 0L): Long {
     return toLong(this, defaultValue)
 }
@@ -157,7 +237,6 @@ fun Any?.toLong(defaultValue: Long = 0L): Long {
  * @param value
  * @return 如果value不能转成Long，则默认defaultValue
  */
-@JvmOverloads
 fun Any?.toLong(value: Any?, defaultValue: Long = 0L): Long {
     when (value) {
         is Long -> {
@@ -179,11 +258,39 @@ fun Any?.toLong(value: Any?, defaultValue: Long = 0L): Long {
 /**
  * 将Object对象转成String类型
  *
+ * @return 如果value不能转成String，则默认""
+ */
+inline fun Any?.toString(block: (result: String) -> Unit) = block(toString())
+
+/**
+ * 将Object对象转成String类型
+ *
+ * @return 如果value不能转成String，则默认""
+ */
+fun Any?.toString(): String = toString(this, "")
+
+/**
+ * 将Object对象转成String类型
+ *
  * @param value
  * @return 如果value不能转成String，则默认""
  */
-fun Any?.toString(context: Context?, value: Any?, @StringRes resId: Int): String {
-    return toString(value, context?.getString(resId) ?: "")
+fun Any?.toString(defaultValue: String = ""): String {
+    return when {
+        this is String -> {
+            this
+        }
+        this is EditText -> {
+            text.toString()
+        }
+        this is TextView -> {
+            text.toString()
+        }
+        this != null -> {
+            this.toString()
+        }
+        else -> defaultValue
+    }
 }
 
 /**
@@ -192,14 +299,8 @@ fun Any?.toString(context: Context?, value: Any?, @StringRes resId: Int): String
  * @param value
  * @return 如果value不能转成String，则默认defaultValue
  */
-@JvmOverloads
 fun Any?.toString(value: Any?, defaultValue: String = ""): String {
-    if (value is String) {
-        return value
-    } else if (value != null) {
-        return value.toString()
-    }
-    return defaultValue
+    return value.toString(defaultValue)
 }
 
 /**
@@ -208,7 +309,17 @@ fun Any?.toString(value: Any?, defaultValue: String = ""): String {
  * @param value
  * @return 如果value不能转成String，则默认""
  */
-@JvmOverloads
-fun Any?.toString(defaultValue: String = ""): String {
-    return toString(this, defaultValue)
+fun Any?.toString(context: Context?, value: Any?, @StringRes resId: Int): String {
+    return value.toString(context?.getString(resId) ?: "")
 }
+
+/**
+ * 将Object对象转成String类型
+ *
+ * @param value
+ * @return 如果value不能转成String，则默认""
+ */
+fun Any?.toString(context: Context?, @StringRes resId: Int): String {
+    return toString(context?.getString(resId) ?: "")
+}
+

@@ -1,11 +1,10 @@
-package fz.gb.com.commutils
+package com.fz.commutils.demo
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.chad.library.adapter.base.loadmore.BaseLoadMoreView
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import com.fz.commutil.R
 
 /**
  *加载更多视图

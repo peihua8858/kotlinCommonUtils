@@ -1,10 +1,11 @@
 @file:JvmName("ContextUtils")
-@file:JvmMultifileClass
 
 package com.fz.common.utils
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -18,6 +19,16 @@ internal var mContext: Context? = null
 fun initContext(context: Context) {
     mContext = context
 }
+
+/**
+ * 检查当前[any]是否可转为[Context]
+ * @return 返回当前上下文，如果当前对象不能获取[Context],则返回当前[mContext]
+ * @param any
+ * @author dingpeihua
+ * @date 2021/1/18 16:37
+ * @version 1.0
+ */
+inline fun checkContext(any: Any?, block: (context: Context?) -> Unit) = block(checkContext(any))
 
 /**
  * 检查当前[any]是否可转为[Context]
@@ -145,3 +156,36 @@ private fun buildIntent(context: Context): Intent {
     return intent
 }
 
+/**
+ * 粘贴到系统剪贴板
+ */
+fun Context?.copyToClipBoard(lazyContent: () -> CharSequence) {
+    val content = lazyContent()
+    if (this != null) copyToClipBoard(content, null) else eLog { "Context  is null." }
+}
+
+/**
+ * 粘贴到系统剪贴板
+ */
+fun Context?.copyToClipBoard(lazyContent: () -> CharSequence, callback: (Boolean) -> Unit) {
+    val content = lazyContent()
+    if (this != null) copyToClipBoard(content, callback) else callback(false).eLog { "Context  is null." }
+}
+
+/**
+ * 粘贴到系统剪贴板
+ */
+fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)?) {
+    val context = this.applicationContext
+    val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val text = ClipData.newPlainText("url", content)
+    cm.setPrimaryClip(text)
+    callback?.let {
+        cm.addPrimaryClipChangedListener(object : ClipboardManager.OnPrimaryClipChangedListener {
+            override fun onPrimaryClipChanged() {
+                cm.removePrimaryClipChangedListener(this)
+                callback(true)
+            }
+        })
+    }
+}

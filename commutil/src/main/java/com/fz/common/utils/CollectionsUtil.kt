@@ -1,5 +1,4 @@
 @file:JvmName("CollectionsUtil")
-@file:JvmMultifileClass
 
 package com.fz.common.utils
 
