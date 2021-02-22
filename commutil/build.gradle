@@ -36,10 +36,10 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.50'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.20'
-//    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-//    implementation "io.reactivex.rxjava3:rxjava:3.0.6"
-//    implementation 'com.uber.autodispose2:autodispose:2.0.0'
-//    implementation 'com.uber.autodispose2:autodispose-androidx-lifecycle:2.0.0'
+    implementation "androidx.work:work-runtime-ktx:2.5.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.0"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.fz.multistateview:MultiStateView:1.0.2'

@@ -128,7 +128,7 @@ fun View?.getDimens(@DimenRes resId: Int): Int {
  */
 fun View?.getResourceId(attrId: Int): Int {
     val context: Context = checkContext(this) ?: return 0
-    return getResourceId(context, attrId)
+    return context.getResourceId(attrId)
 }
 
 /**
@@ -143,5 +143,5 @@ fun View?.getResourceId(attrId: Int): Int {
  */
 fun View?.resolveAttribute(resId: Int, @StyleRes defaultRes: Int): Int {
     val context: Context = checkContext(this) ?: return 0
-    return resolveAttribute(context, resId, defaultRes)
+    return context.resolveAttribute(resId, defaultRes)
 }

@@ -2,6 +2,7 @@
 
 package com.fz.common.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
@@ -216,6 +217,21 @@ fun Any?.resolveAttribute(context: Context, resId: Int): Int {
     val outValue = TypedValue()
     context.theme.resolveAttribute(resId, outValue, true)
     return outValue.resourceId
+}
+
+/**
+ * 解析当前上下文主题，获取主题样式
+ *
+ * @param context    当前上下文
+ * @param resId      资源ID
+ * @param defaultRes 默认主题样式
+ * @author dingpeihua
+ * @date 2020/7/7 10:31
+ * @version 1.0
+ */
+fun Context?.resolveAttribute(resId: Int, @StyleRes defaultRes: Int): Int {
+    val context: Context = checkContext(this) ?: return 0.eLog { "Context  is null." }
+    return resolveAttribute(context, resId, defaultRes)
 }
 
 /**

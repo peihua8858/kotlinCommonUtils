@@ -2,6 +2,7 @@
 package com.fz.common.utils
 
 import android.os.Looper
+import com.fz.common.entity.IHttpResponse
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
