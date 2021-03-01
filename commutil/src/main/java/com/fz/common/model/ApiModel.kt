@@ -77,11 +77,19 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
         }
     }
 
-    fun showProcessDialog(fragmentManager: FragmentManager) {
+    fun showProcessDialog(fragmentManager: FragmentManager, isCancelable: Boolean = false) {
         if (processDialog == null) {
             processDialog = LoadingDialogFragment()
+            processDialog!!.isCancelable = isCancelable
+            processDialog!!.setCanceledOnTouchOutside(isCancelable)
         }
-        processDialog?.show(fragmentManager, "ApiLoadingDialog")
+        if (processDialog != null && processDialog!!.isShowing) {
+            processDialog!!.show(fragmentManager, "ApiLoadingDialog")
+        }
+    }
+
+    fun showProcessDialog(fragmentManager: FragmentManager) {
+        showProcessDialog(fragmentManager, false)
     }
 
     fun dismissProcessDialog() {
@@ -102,6 +110,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
             onError?.invoke(e)
         } finally {
             onComplete?.invoke()
+            dismissProcessDialog()
         }
     }
 
@@ -118,6 +127,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
             onError?.invoke(e)
         } finally {
             onComplete?.invoke()
+            dismissProcessDialog()
         }
     }
 
@@ -152,6 +162,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
+                dismissProcessDialog()
             }
         }
     }
