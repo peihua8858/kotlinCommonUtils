@@ -1,6 +1,8 @@
 @file:JvmName("ReflectUtil")
+
 package com.fz.common.reflect
 
+import com.socks.library.KLog
 import java.lang.reflect.*
 import java.util.*
 
@@ -121,4 +123,36 @@ fun Any?.getDeclaredMethod(methodName: String?, vararg parameterTypes: Class<*>?
         clazz = clazz.superclass
     }
     return null
+}
+
+fun Type?.getClass(i: Int): Class<*>? {
+    return when (this) {
+        is ParameterizedType -> { // 处理泛型类型
+            getGenericClass(i)
+        }
+        is TypeVariable<*> -> {
+            this.bounds[0].getClass(0) // 处理泛型擦拭对象
+        }
+        else -> { // class本身也是type，强制转型
+            this as Class<*>?
+        }
+    }
+}
+
+fun ParameterizedType.getGenericClass(i: Int): Class<*>? {
+    return when (val genericClass: Any = this.actualTypeArguments[i]) {
+        is ParameterizedType -> { // 处理多级泛型
+            genericClass.rawType as Class<*>
+        }
+        is GenericArrayType -> { // 处理数组泛型
+            genericClass.genericComponentType as Class<*>
+        }
+        is TypeVariable<*> -> { // 处理泛型擦拭对象
+            KLog.d("hhhhhhhhhhhhhhhh")
+            genericClass.bounds[0].getClass(0)
+        }
+        else -> {
+            genericClass as Class<*>
+        }
+    }
 }

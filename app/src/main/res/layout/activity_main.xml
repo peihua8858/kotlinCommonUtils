@@ -20,10 +20,25 @@
         android:layout_height="wrap_content"
         android:text="执行1" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:drawableStart="@mipmap/ic_facebook"
+        android:drawableEnd="@mipmap/ic_launcher"
+        android:drawablePadding="4dp"
+        android:gravity="center|start"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="product_return_warranty"
+        android:textAlignment="viewStart"
+        android:textSize="14sp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableStart="@mipmap/ic_facebook"
         android:text="Hello World!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -40,6 +55,33 @@
 
     <EditText
         android:id="@+id/editText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPhoneLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="7dp"
+        app:hintEnabled="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:prefixText="+60">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etPhoneLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="noExcludeDescendants"
+            android:inputType="number"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:text="22222222222"
+            android:paddingBottom="10dp"
+            android:textColor="#2d2d2d"
+            android:textColorHint="#999999"
+            android:textSize="16sp"
+            tools:ignore="RtlSymmetry" />
+    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

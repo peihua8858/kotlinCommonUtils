@@ -38,7 +38,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
     implementation project(path: ':commutil')
-//    implementation 'com.fz.commutil:commutil:1.0.13-SNAPSHOT'
+//    implementation 'com.fz.commutil:commutil:1.0.35-SNAPSHOT'
     implementation 'com.fz.toast:ToastCompat:1.0.14-SNAPSHOT'
 //    implementation "com.fz.okhttp:OkHttpWrapper:1.0.6-SNAPSHOT"
     implementation 'com.fz.dialog:Dialog:1.0.5-SNAPSHOT'

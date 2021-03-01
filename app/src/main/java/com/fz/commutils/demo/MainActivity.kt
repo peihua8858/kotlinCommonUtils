@@ -3,14 +3,19 @@ package com.fz.commutils.demo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.fz.common.activity.apiWithAsyncResumed
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.coroutine.asyncApi
 import com.fz.common.model.ViewModelState
-import com.fz.common.utils.*
+import com.fz.common.text.isNonEmpty
+import com.fz.common.utils.dLog
+import com.fz.common.utils.eLog
+import com.fz.common.utils.isMainThread
 import com.fz.commutils.demo.model.MainViewModel
 import com.fz.commutils.demo.model.RequestParam
-import com.socks.library.KLog
+import com.fz.commutils.demo.model.setDrawableStart
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -40,15 +45,41 @@ class MainActivity : AppCompatActivity() {
                     eLog { "请求失败" }
                 }
                 is ViewModelState.Success -> {
-
                     dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "请求成功" }
                     val response = it.data
                 }
             }
         })
+        tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
         btnExecute.setOnClickListener {
-            viewModel.onRequest(1, 20)
+//            viewModel.onRequest(1, 20)
+            textView.text = editText.text.emailMask()
+            apiWithAsyncResumed<Unit> {
+                onRequest {
+
+                }
+            }
+//            apiWithAsyncCreated<String> {
+//                val dialog = processDialog
+//                onStart {
+//                   showProcessDialog(supportFragmentManager)
+//                }
+//                onRequest {
+//                    try {
+//                        Thread.sleep(5000)
+//                    } catch (e: Exception) {
+//                        eLog { ">>>>>" + e.message }
+//                    }
+//                    "响应数据"
+//                }
+//                onResponse {
+//                    dLog { ">>>$it" }
+//                }
+//                onComplete {
+//                    dismissProcessDialog()
+//                }
+//            }
         }
         btnExecute1.setOnClickListener {
 //            request()
@@ -109,10 +140,36 @@ class MainActivity : AppCompatActivity() {
 //                KLog.d("result>>>no>>result1：${result1}")
 //            }
 //        }
+
+    }
+
+    /**
+     * 用户电话号码的打码隐藏加星号加*
+     *
+     * @return 处理完成的身份证
+     */
+    fun CharSequence?.emailMask(): String {
+        var res = ""
+        if (this.isNonEmpty()) {
+            val stringBuilder = StringBuilder(this)
+            val index = indexOf("@")
+            res = when {
+                index > 5 -> {
+                    stringBuilder.replace(5, length, "****").toString()
+                }
+                index != -1 -> {
+                    stringBuilder.replace(index, length, "****").toString()
+                }
+                else -> {
+                    this.toString()
+                }
+            }
+        }
+        return res
     }
 
     private fun request() {
-        asyncWhenStart({
+        val job: Job = asyncWhenStart({
             eLog { "onRequest:" + if (isMainThread()) "在主线程中" else "在子线程中" }
             val callResult = async {
                 eLog { "onRequest>>async:" + if (isMainThread()) "在主线程中" else "在子线程中" }
@@ -133,5 +190,6 @@ class MainActivity : AppCompatActivity() {
         }, {
             eLog { "onComplete:" + if (isMainThread()) "在主线程中" else "在子线程中" }
         })
+        job.cancel()
     }
 }

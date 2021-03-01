@@ -1,11 +1,13 @@
 package com.fz.common.model
 
-import androidx.lifecycle.MutableLiveData
+import androidx.fragment.app.FragmentManager
 import com.fz.common.utils.eLog
 import com.fz.common.utils.getStackTraceMessage
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
+import com.fz.dialog.LoadingDialogFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * api 方法封装
@@ -13,8 +15,9 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @date 2021/2/19 17:45
  * @version 1.0
  */
-class ApiModel<Response> {
+class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, private val isShowDialog: Boolean = false) {
 
+    private var processDialog: LoadingDialogFragment? = null
     internal lateinit var request: suspend () -> Response?
 
     private var onStart: (() -> Unit?)? = null
@@ -25,6 +28,23 @@ class ApiModel<Response> {
 
     private var onComplete: (() -> Unit?)? = null
 
+    constructor() : this(null, false)
+
+    internal fun isOnStart(): Boolean {
+        return onStart != null
+    }
+
+    internal fun isOnResponse(): Boolean {
+        return onResponse != null
+    }
+
+    internal fun isOnError(): Boolean {
+        return onError != null
+    }
+
+    internal fun isOnComplete(): Boolean {
+        return onComplete != null
+    }
 
     infix fun onStart(onStart: (() -> Unit?)?): ApiModel<Response> {
         this.onStart = onStart
@@ -51,7 +71,28 @@ class ApiModel<Response> {
         return this
     }
 
+    private fun showProcessDialog() {
+        if (fragmentManager != null && isShowDialog) {
+            showProcessDialog(fragmentManager)
+        }
+    }
+
+    fun showProcessDialog(fragmentManager: FragmentManager) {
+        if (processDialog == null) {
+            processDialog = LoadingDialogFragment()
+        }
+        processDialog?.show(fragmentManager, "ApiLoadingDialog")
+    }
+
+    fun dismissProcessDialog() {
+        if (processDialog != null) {
+            processDialog!!.dismissAllowingStateLoss()
+            processDialog = null
+        }
+    }
+
     internal suspend fun syncLaunch() {
+        showProcessDialog()
         onStart?.invoke()
         try {
             val response = request()
@@ -65,6 +106,7 @@ class ApiModel<Response> {
     }
 
     internal suspend fun launch() {
+        showProcessDialog()
         onStart?.invoke()
         try {
             val response = withContext(Dispatchers.IO) {
@@ -81,6 +123,7 @@ class ApiModel<Response> {
 
     internal fun syncLaunch(viewModelScope: CoroutineScope) {
         viewModelScope.launch(Dispatchers.Main) {
+            showProcessDialog()
             onStart?.invoke()
             try {
                 val response = request()
@@ -90,12 +133,14 @@ class ApiModel<Response> {
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
+                dismissProcessDialog()
             }
         }
     }
 
     internal fun launch(viewModelScope: CoroutineScope) {
         viewModelScope.launch(Dispatchers.Main) {
+            showProcessDialog()
             onStart?.invoke()
             try {
                 val response = withContext(Dispatchers.IO) {

@@ -2,6 +2,7 @@ package com.fz.commutils.demo;
 
 import android.content.Context;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 
 public class MainApplication extends MultiDexApplication {
@@ -19,5 +20,6 @@ public class MainApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 }

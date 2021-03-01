@@ -67,32 +67,6 @@ fun <T> MutableLiveData<ViewModelState<T>>.parseStaring() {
 /**
  * [ViewModel]开启协程扩展
  */
-fun <T> ViewModel.request(
-        request: suspend () -> T,
-        onSuccess: (T) -> Unit,
-        onStart: () -> Unit = { },
-        onError: (Throwable) -> Unit = { },
-        onComplete: () -> Unit = {},
-) {
-    viewModelScope.launch(Dispatchers.Main) {
-        onStart()
-        try {
-            val response = withContext(Dispatchers.IO) {
-                request()
-            }
-            onSuccess(response)
-        } catch (e: Throwable) {
-            eLog { e.getStackTraceMessage() }
-            onError(e)
-        } finally {
-            onComplete()
-        }
-    }
-}
-
-/**
- * [ViewModel]开启协程扩展
- */
 fun <T> ViewModel.apiRequest(apiDSL: ApiModel<T>.() -> Unit) {
     ApiModel<T>().apply(apiDSL).syncLaunch(viewModelScope)
 }
@@ -104,12 +78,42 @@ fun <T> ViewModel.apiRequest(
         viewState: MutableLiveData<ViewModelState<T>>,
         apiDSL: ApiModel<T>.() -> Unit,
 ) {
-    ApiModel<T>()
-            .apply(apiDSL)
-            .onStart { viewState.parseStaring() }
-            .onComplete { viewState.parseComplete() }
-            .onError { viewState.parseError(it) }
+    ApiModel<T>().apply(apiDSL)
+            .parseMethod(viewState)
             .syncLaunch(viewModelScope)
+
+}
+
+internal fun <T> ApiModel<T>.parseMethod(viewState: MutableLiveData<ViewModelState<T>>): ApiModel<T> {
+    if (!isOnStart()) {
+        onStart { viewState.parseStaring() }
+    }
+    if (!isOnError()) {
+        onError { viewState.parseError(it) }
+    }
+    if (!isOnResponse()) {
+        onResponse { viewState.parseResponse(it) }
+    }
+    if (!isOnComplete()) {
+        onComplete { viewState.parseComplete() }
+    }
+    return this
+}
+
+internal fun <T> ApiModel<IHttpResponse<T?>>.parseMethodLimit(viewState: MutableLiveData<ViewModelState<T>>): ApiModel<IHttpResponse<T?>> {
+    if (!isOnStart()) {
+        onStart { viewState.parseStaring() }
+    }
+    if (!isOnError()) {
+        onError { viewState.parseError(it) }
+    }
+    if (!isOnResponse()) {
+        onResponse { viewState.parseResult(it) }
+    }
+    if (!isOnComplete()) {
+        onComplete { viewState.parseComplete() }
+    }
+    return this
 }
 
 /**
@@ -117,13 +121,11 @@ fun <T> ViewModel.apiRequest(
  */
 fun <T> ViewModel.apiRequestLimit(
         viewState: MutableLiveData<ViewModelState<T>>,
-        apiDSL: ApiModel<IHttpResponse<T>>.() -> Unit,
+        apiDSL: ApiModel<IHttpResponse<T?>>.() -> Unit,
 ) {
-    ApiModel<IHttpResponse<T>>()
+    ApiModel<IHttpResponse<T?>>()
             .apply(apiDSL)
-            .onStart { viewState.parseStaring() }
-            .onComplete { viewState.parseComplete() }
-            .onError { viewState.parseError(it) }
+            .parseMethodLimit(viewState)
             .syncLaunch(viewModelScope)
 }
 
@@ -169,6 +171,32 @@ fun <T> ViewModel.requestLimit(
             viewState.parseError(e)
         } finally {
             viewState.parseComplete()
+        }
+    }
+}
+
+/**
+ * [ViewModel]开启协程扩展
+ */
+fun <T> ViewModel.request(
+        request: suspend () -> T,
+        onSuccess: (T) -> Unit,
+        onStart: () -> Unit = { },
+        onError: (Throwable) -> Unit = { },
+        onComplete: () -> Unit = {},
+) {
+    viewModelScope.launch(Dispatchers.Main) {
+        onStart()
+        try {
+            val response = withContext(Dispatchers.IO) {
+                request()
+            }
+            onSuccess(response)
+        } catch (e: Throwable) {
+            eLog { e.getStackTraceMessage() }
+            onError(e)
+        } finally {
+            onComplete()
         }
     }
 }

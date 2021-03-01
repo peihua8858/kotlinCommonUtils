@@ -55,7 +55,7 @@ fun CharSequence?.isHexColor(): Boolean {
  * @version 1.0
  */
 @ColorInt
-fun getColorInt(color: String): Int {
+fun  Any?.getColorInt(color: String): Int {
     return getColorInt(color, Int.MAX_VALUE)
 }
 
@@ -69,7 +69,7 @@ fun getColorInt(color: String): Int {
  * @version 1.0
  */
 @ColorInt
-fun getColorInt(color: String?, @ColorInt defaultColor: Int): Int {
+fun Any?.getColorInt(color: String?, @ColorInt defaultColor: Int): Int {
     return if (color.isNonEmpty() && color[0] == '#') {
         Color.parseColor(color)
     } else defaultColor
@@ -84,7 +84,7 @@ fun getColorInt(color: String?, @ColorInt defaultColor: Int): Int {
  * @date 2019/9/19 16:52
  * @version 1.0
  */
-fun getColorStateList(normalColor: String, pressedColor: String): ColorStateList {
+fun  Any?.getColorStateList(normalColor: String, pressedColor: String): ColorStateList {
     val normalColorInt = getColorInt(normalColor)
     val pressedColorInt = getColorInt(pressedColor)
     return if (normalColorInt != -1 && pressedColorInt != -1) {
@@ -92,11 +92,11 @@ fun getColorStateList(normalColor: String, pressedColor: String): ColorStateList
     } else ColorStateList(arrayOf(), intArrayOf(Color.WHITE))
 }
 
-fun getColorStateList(context: Context?, @ColorRes normalColorRes: Int, @ColorRes pressedColorRes: Int): ColorStateList {
+fun  Any?.getColorStateList(context: Context?, @ColorRes normalColorRes: Int, @ColorRes pressedColorRes: Int): ColorStateList {
     return getColorStateList(ContextCompat.getColor(context!!, normalColorRes), ContextCompat.getColor(context, pressedColorRes))
 }
 
-fun getColorStateList(@ColorInt normalColor: Int, @ColorInt selectedColor: Int): ColorStateList {
+fun  Any?.getColorStateList(@ColorInt normalColor: Int, @ColorInt selectedColor: Int): ColorStateList {
     val states = arrayOf(
             intArrayOf(android.R.attr.state_enabled),
             intArrayOf(android.R.attr.state_selected),
@@ -117,7 +117,7 @@ fun getColorStateList(@ColorInt normalColor: Int, @ColorInt selectedColor: Int):
     return ColorStateList(states, colors)
 }
 
-fun getColorStateList(@ColorInt normalColor: Int, disabledColor: Int, @ColorInt selectedColor: Int): ColorStateList {
+fun  Any?.getColorStateList(@ColorInt normalColor: Int, disabledColor: Int, @ColorInt selectedColor: Int): ColorStateList {
     val states = arrayOf(
             intArrayOf(android.R.attr.state_enabled),
             intArrayOf(-android.R.attr.state_enabled),

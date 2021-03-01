@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.*
 import com.fz.common.model.ApiModel
 import com.fz.common.coroutine.runCatching
@@ -28,6 +29,17 @@ fun Fragment?.getDrawable(@DrawableRes drawableRes: Int): Drawable? {
 fun Fragment?.getDimens(@DimenRes resId: Int): Int {
     val context: Context = checkContext(this) ?: return 0.eLog { "Context  is null." }
     return context.getDimens(resId)
+}
+
+/**
+ * 跳转到通知设置页面
+ *
+ * @author dingpeihua
+ * @date 2019/12/17 16:27
+ * @version 1.0
+ */
+fun Fragment.startNotificationSettings() {
+    context?.startNotificationSettings()
 }
 
 /**
@@ -94,9 +106,9 @@ fun <T> Fragment.launchWithStart(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenStarted { runCatching(block, callback, onError,complete = onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenStarted { runCatching(block, callback, onError, complete = onComplete) }
     }
 }
 
@@ -107,11 +119,26 @@ fun <T> Fragment.launchWithStart(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> Fragment.apiWithLaunchStarted(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> Fragment.apiWithLaunchStarted(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenStarted {
             ApiModel<T>().apply(api).syncLaunch()
         }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> Fragment.apiWithLaunchStarted(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenStarted { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
 }
 
@@ -128,9 +155,9 @@ fun <T> Fragment.launchWhenCreated(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenCreated { runCatching(block, callback, onError,complete = onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenCreated { runCatching(block, callback, onError, complete = onComplete) }
     }
 }
 
@@ -141,11 +168,26 @@ fun <T> Fragment.launchWhenCreated(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> Fragment.apiWithLaunchCreated(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> Fragment.apiWithLaunchCreated(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenCreated {
             ApiModel<T>().apply(api).syncLaunch()
         }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> Fragment.apiWithLaunchCreated(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenCreated { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
 }
 
@@ -162,9 +204,9 @@ fun <T> Fragment.launchWhenResumed(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenResumed { runCatching(block, callback, onError,complete = onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenResumed { runCatching(block, callback, onError, complete = onComplete) }
     }
 }
 
@@ -175,11 +217,26 @@ fun <T> Fragment.launchWhenResumed(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> Fragment.apiWithLaunchResumed(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> Fragment.apiWithLaunchResumed(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenResumed {
             ApiModel<T>().apply(api).syncLaunch()
         }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> Fragment.apiWithLaunchResumed(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenResumed { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
 }
 
@@ -196,9 +253,9 @@ fun <T> Fragment.launch(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        runCatching(block, callback, onError,complete = onComplete)
+): Job {
+    return lifecycleScope.launch {
+        runCatching(block, callback, onError, complete = onComplete)
     }
 }
 
@@ -208,9 +265,24 @@ fun <T> Fragment.launch(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> Fragment.apiWithLaunch(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> Fragment.apiWithLaunch(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         ApiModel<T>().apply(api).launch()
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> Fragment.apiWithLaunch(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch()
     }
 }
 
@@ -228,9 +300,9 @@ fun <T> Fragment.asyncWhenCreated(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenCreated { runCatching(block, callback, onError,Dispatchers.IO,onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenCreated { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
     }
 }
 
@@ -241,10 +313,27 @@ fun <T> Fragment.asyncWhenCreated(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> Fragment.apiWithAsyncCreated(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> Fragment.apiWithAsyncCreated(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenCreated {
             ApiModel<T>().apply(api).launch()
+        }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> Fragment.apiWithAsyncCreated(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenCreated {
+            ApiModel<T>(manager, isShowDialog).apply(api).launch()
         }
     }
 }
@@ -263,9 +352,9 @@ fun <T> Fragment.asyncWhenStart(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenStarted { runCatching(block, callback, onError,Dispatchers.IO,onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenStarted { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
     }
 }
 
@@ -276,10 +365,27 @@ fun <T> Fragment.asyncWhenStart(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> Fragment.apiWithAsyncStarted(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> Fragment.apiWithAsyncStarted(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenStarted {
             ApiModel<T>().apply(api).launch()
+        }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> Fragment.apiWithAsyncStarted(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenStarted {
+            ApiModel<T>(manager, isShowDialog).apply(api).launch()
         }
     }
 }
@@ -298,25 +404,40 @@ fun <T> Fragment.asyncWhenResumed(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenResumed { runCatching(block, callback, onError,Dispatchers.IO,onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenResumed { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
     }
 }
 
 /**
  * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[block]。
- * @param block 阻塞执行代码块
- * @param callback 结果回调
- * @param onError 错误回调
+ * @param api 阻塞执行代码块
  * @author dingpeihua
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> Fragment.apiWithAsyncResumed(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> Fragment.apiWithAsyncResumed(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenResumed {
             ApiModel<T>().apply(api).launch()
+        }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> Fragment.apiWithAsyncResumed(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenResumed {
+            ApiModel<T>(manager, isShowDialog).apply(api).launch()
         }
     }
 }

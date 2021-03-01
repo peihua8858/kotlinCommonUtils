@@ -2,6 +2,7 @@
 
 package com.fz.common.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.ClipData
@@ -14,10 +15,13 @@ import android.provider.Settings
 import android.view.View
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
+import com.fz.common.text.isNonEmpty
+import java.util.*
 
+@SuppressLint("StaticFieldLeak")
 internal var mContext: Context? = null
 fun initContext(context: Context) {
-    mContext = context
+    mContext = context.applicationContext
 }
 
 /**
@@ -118,8 +122,27 @@ fun Context?.isEnabledNotification(): Boolean {
  * 跳转到通知设置页面
  * 需要有回调
  */
+fun Activity.startNotificationSettingsForResult(requestCode: Int) {
+    startActivityForResult(buildIntent(this), requestCode)
+}
+
+/**
+ * 跳转到通知设置页面
+ * 需要有回调
+ */
 fun Any?.startNotificationSettingsForResult(context: Activity, requestCode: Int) {
     context.startActivityForResult(buildIntent(context), requestCode)
+}
+
+/**
+ * 跳转到通知设置页面
+ *
+ * @author dingpeihua
+ * @date 2019/12/17 16:27
+ * @version 1.0
+ */
+fun Context.startNotificationSettings() {
+    startActivity(buildIntent(this))
 }
 
 /**
@@ -188,4 +211,53 @@ fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)
             }
         })
     }
+}
+
+/**
+ * 判断当前用户系统使用的语言为阿拉伯语，true表示为阿拉伯语，false表示其它语言
+ *
+ * @return
+ */
+fun Locale?.isUsingArLanguage(): Boolean {
+    try {
+        val language = this?.language
+        return language.isNonEmpty() && language.equals("ar", ignoreCase = true)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return false
+}
+
+/**
+ * 判断当前用户系统使用的语言为阿拉伯语，true表示为阿拉伯语，false表示其它语言
+ *
+ * @return
+ */
+fun Any?.isUsingArLanguage(): Boolean {
+    try {
+        val context = checkContext(this)
+        return context?.isUsingArLanguage() ?: false
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return false
+}
+
+/**
+ * 判断当前用户系统使用的语言为阿拉伯语，true表示为阿拉伯语，false表示其它语言
+ *
+ * @return
+ */
+fun Context.isUsingArLanguage(): Boolean {
+    try {
+        val locale: Locale? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            resources.configuration.locales[0]
+        } else {
+            resources.configuration.locale
+        }
+        return locale.isUsingArLanguage()
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return false
 }

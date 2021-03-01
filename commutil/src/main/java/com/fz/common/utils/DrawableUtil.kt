@@ -7,6 +7,7 @@ import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.graphics.drawable.*
 import android.util.StateSet
 import androidx.annotation.ColorInt
@@ -17,6 +18,129 @@ fun Drawable?.setTint(@ColorInt color: Int): Drawable? {
         DrawableCompat.setTint(this, color)
     }
     return this
+}
+
+/**
+ * 设置图片可绘制大小
+ * @author dingpeihua
+ * @date 2021/2/24 10:37
+ * @version 1.0
+ */
+fun Drawable?.setDrawableBounds(width: Int, height: Int): Drawable? {
+    if (this != null) {
+        val scale = intrinsicHeight.toDouble() / intrinsicWidth.toDouble()
+        setBounds(0, 0, width, height)
+        val bounds: Rect = bounds
+        //高宽只给一个值时，自适应
+        if (bounds.right != 0 || bounds.bottom != 0) {
+            if (bounds.right == 0) {
+                bounds.right = ((bounds.bottom / scale).toInt())
+                this.bounds = bounds
+            }
+            if (bounds.bottom == 0) {
+                bounds.bottom = ((bounds.right * scale).toInt())
+                this.bounds = bounds
+            }
+        }
+    }
+    return this
+}
+
+/**
+ * 获取旋转指定角度后的Drawable
+ *
+ * @param d     源Drawable
+ * @param angle 角度
+ * @return 旋转指定角度后的Drawable
+ */
+fun Drawable?.getRotateDrawable(angle: Float): Drawable? {
+    if (this == null) {
+        return null
+    }
+    val arD = arrayOf(this)
+    val bound = this.bounds
+    return object : LayerDrawable(arD) {
+        override fun draw(canvas: Canvas) {
+            canvas.save()
+            canvas.rotate(angle, bound.width() / 2.toFloat(), bound.height() / 2.toFloat())
+            super.draw(canvas)
+            canvas.restore()
+        }
+    }
+}
+
+/**
+ * 获取旋转指定角度后的Drawable
+ *
+ * @param d     源Drawable
+ * @param angle 角度
+ * @param x     旋转中心x
+ * @param y     旋转中心y
+ * @return 旋转指定角度后的Drawable
+ */
+fun Drawable?.getRotateDrawable(angle: Float, x: Float, y: Float): Drawable? {
+    if (this == null) {
+        return null
+    }
+    val arD = arrayOf(this)
+    return object : LayerDrawable(arD) {
+        override fun draw(canvas: Canvas) {
+            canvas.save()
+            canvas.rotate(angle, x, y)
+            super.draw(canvas)
+            canvas.restore()
+        }
+    }
+}
+
+/**
+ * 获取平移后的Drawable
+ *
+ * @param d 源Drawable
+ * @param x 水平平移量
+ * @param y 垂直平移量
+ * @return 平移后的Drawable
+ */
+fun Drawable?.getTranslateDrawable(x: Float, y: Float): Drawable? {
+    if (this == null) {
+        return null
+    }
+    val arD = arrayOf(this)
+    return object : LayerDrawable(arD) {
+        override fun draw(canvas: Canvas) {
+            canvas.save()
+            canvas.translate(x, y)
+            super.draw(canvas)
+            canvas.restore()
+        }
+    }
+}
+
+/**
+ * 对drawable平滑tint
+ *
+ * @param drawable   drawable
+ * @param startColor 起始颜色
+ * @param endColor   结束颜色
+ * @param duration   过渡时长
+ */
+fun Drawable?.tintSmoothly(@ColorInt startColor: Int, @ColorInt endColor: Int, duration: Long) {
+    if (this != null) {
+        val anim = ValueAnimator()
+        anim.setIntValues(startColor, endColor)
+        anim.setEvaluator(ArgbEvaluator())
+        anim.addUpdateListener { valueAnimator: ValueAnimator -> DrawableCompat.setTint(this, (valueAnimator.animatedValue as Int)) }
+        anim.duration = duration
+        anim.start()
+    }
+}
+
+fun Any?.getStateListBgDrawable(normalColor: String?, pressedColor: String?): Drawable {
+    val normalColorInt = getColorInt(normalColor, Color.WHITE)
+    val pressedColorInt = getColorInt(pressedColor, Color.WHITE)
+    return if (normalColorInt != Int.MAX_VALUE && pressedColorInt != Int.MAX_VALUE) {
+        DrawableUtil.getStateListBgDrawable(normalColorInt, pressedColorInt)
+    } else ColorDrawable(Color.WHITE)
 }
 
 /**
@@ -99,12 +223,14 @@ object DrawableUtil {
      */
     @JvmStatic
     fun tintSmoothly(drawable: Drawable?, @ColorInt startColor: Int, @ColorInt endColor: Int, duration: Long) {
-        val anim = ValueAnimator()
-        anim.setIntValues(startColor, endColor)
-        anim.setEvaluator(ArgbEvaluator())
-        anim.addUpdateListener { valueAnimator: ValueAnimator -> DrawableCompat.setTint(drawable!!, (valueAnimator.animatedValue as Int)) }
-        anim.duration = duration
-        anim.start()
+        if (drawable != null) {
+            val anim = ValueAnimator()
+            anim.setIntValues(startColor, endColor)
+            anim.setEvaluator(ArgbEvaluator())
+            anim.addUpdateListener { valueAnimator: ValueAnimator -> DrawableCompat.setTint(drawable, (valueAnimator.animatedValue as Int)) }
+            anim.duration = duration
+            anim.start()
+        }
     }
 
     @JvmStatic

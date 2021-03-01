@@ -8,9 +8,10 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.*
-import com.fz.common.model.ApiModel
 import com.fz.common.coroutine.runCatching
+import com.fz.common.model.ApiModel
 import com.fz.common.utils.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -80,9 +81,9 @@ fun <T> DialogFragment.launchWithStart(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenStarted { runCatching(block, callback, onError,complete = onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenStarted { runCatching(block, callback, onError, complete = onComplete) }
     }
 }
 
@@ -93,11 +94,26 @@ fun <T> DialogFragment.launchWithStart(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> DialogFragment.apiWithLaunchStarted(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> DialogFragment.apiWithLaunchStarted(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenStarted {
             ApiModel<T>().apply(api).syncLaunch()
         }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> DialogFragment.apiWithLaunchStarted(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenStarted { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
 }
 
@@ -114,9 +130,9 @@ fun <T> DialogFragment.launchWhenCreated(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenCreated { runCatching(block, callback, onError,complete = onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenCreated { runCatching(block, callback, onError, complete = onComplete) }
     }
 }
 
@@ -127,11 +143,26 @@ fun <T> DialogFragment.launchWhenCreated(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> DialogFragment.apiWithLaunchCreated(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> DialogFragment.apiWithLaunchCreated(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenCreated {
             ApiModel<T>().apply(api).syncLaunch()
         }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> DialogFragment.apiWithLaunchCreated(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenCreated { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
 }
 
@@ -148,9 +179,9 @@ fun <T> DialogFragment.launchWhenResumed(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        whenResumed { runCatching(block, callback, onError,complete = onComplete) }
+): Job {
+    return lifecycleScope.launch {
+        whenResumed { runCatching(block, callback, onError, complete = onComplete) }
     }
 }
 
@@ -161,11 +192,26 @@ fun <T> DialogFragment.launchWhenResumed(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> DialogFragment.apiWithLaunchResumed(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> DialogFragment.apiWithLaunchResumed(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenResumed {
             ApiModel<T>().apply(api).syncLaunch()
         }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> DialogFragment.apiWithLaunchResumed(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenResumed { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
 }
 
@@ -182,9 +228,9 @@ fun <T> DialogFragment.launch(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
-        runCatching(block, callback, onError,complete = onComplete)
+): Job {
+    return lifecycleScope.launch {
+        runCatching(block, callback, onError, complete = onComplete)
     }
 }
 
@@ -194,9 +240,24 @@ fun <T> DialogFragment.launch(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> DialogFragment.apiWithLaunch(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> DialogFragment.apiWithLaunch(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         ApiModel<T>().apply(api).launch()
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> DialogFragment.apiWithLaunch(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch()
     }
 }
 
@@ -214,8 +275,8 @@ fun <T> DialogFragment.asyncWhenCreated(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
+): Job {
+    return lifecycleScope.launch {
         whenCreated { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
     }
 }
@@ -227,10 +288,27 @@ fun <T> DialogFragment.asyncWhenCreated(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> DialogFragment.apiWithAsyncCreated(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> DialogFragment.apiWithAsyncCreated(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenCreated {
             ApiModel<T>().apply(api).launch()
+        }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> DialogFragment.apiWithAsyncCreated(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenCreated {
+            ApiModel<T>(manager, isShowDialog).apply(api).launch()
         }
     }
 }
@@ -249,8 +327,8 @@ fun <T> DialogFragment.asyncWhenStart(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
+): Job {
+    return lifecycleScope.launch {
         whenStarted { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
     }
 }
@@ -262,10 +340,27 @@ fun <T> DialogFragment.asyncWhenStart(
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> DialogFragment.apiWithAsyncStarted(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> DialogFragment.apiWithAsyncStarted(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenStarted {
             ApiModel<T>().apply(api).launch()
+        }
+    }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> DialogFragment.apiWithAsyncStarted(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenStarted {
+            ApiModel<T>(manager, isShowDialog).apply(api).launch()
         }
     }
 }
@@ -284,25 +379,51 @@ fun <T> DialogFragment.asyncWhenResumed(
         callback: (T) -> Unit = {},
         onError: (Throwable) -> Unit = {},
         onComplete: () -> Unit = {},
-) {
-    lifecycleScope.launch {
+): Job {
+    return lifecycleScope.launch {
         whenResumed { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
     }
 }
 
 /**
  * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[block]。
- * @param block 阻塞执行代码块
- * @param callback 结果回调
- * @param onError 错误回调
+ * @param api 阻塞执行代码块
  * @author dingpeihua
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> DialogFragment.apiWithAsyncResumed(api: ApiModel<T>.() -> Unit) {
-    lifecycleScope.launch {
+fun <T> DialogFragment.apiWithAsyncResumed(api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
         whenResumed {
             ApiModel<T>().apply(api).launch()
         }
     }
+}
+
+/**
+ * 当[LifecycleOwner]的[Lifecycle]至少处于[Lifecycle.State.RESUMED]状态时，运行给定的块[api]。
+ * @param isShowDialog 是否显示loading 弹窗
+ * @param manager fragment 管理器
+ * @param api 错误回调
+ * @author dingpeihua
+ * @date 2021/2/17 10:58
+ * @version 1.0
+ */
+fun <T> DialogFragment.apiWithAsyncResumed(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+    return lifecycleScope.launch {
+        whenResumed {
+            ApiModel<T>(manager, isShowDialog).apply(api).launch()
+        }
+    }
+}
+
+/**
+ * 跳转到通知设置页面
+ *
+ * @author dingpeihua
+ * @date 2019/12/17 16:27
+ * @version 1.0
+ */
+fun Dialog.startNotificationSettings() {
+    context.startNotificationSettings()
 }

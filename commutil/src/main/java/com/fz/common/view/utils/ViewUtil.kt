@@ -30,6 +30,16 @@ fun ViewGroup.getItemView(@LayoutRes layoutResId: Int): View {
 }
 
 /**
+ * 扩展方法，用于获取View
+ * @receiver ViewGroup parent
+ * @param layoutResId Int
+ * @return View
+ */
+fun Context.getItemView(@LayoutRes layoutResId: Int): View {
+    return LayoutInflater.from(this).inflate(layoutResId, null)
+}
+
+/**
  * 布局方向是从右到左
  *
  * @author dingpeihua
