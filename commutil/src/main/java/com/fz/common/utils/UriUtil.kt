@@ -1,5 +1,4 @@
 @file:JvmName("UriUtil")
-
 package com.fz.common.utils
 
 import android.content.ContentResolver

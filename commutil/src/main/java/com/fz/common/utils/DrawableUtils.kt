@@ -1,5 +1,4 @@
 @file:JvmName("DrawableUtils")
-
 package com.fz.common.utils
 
 import android.animation.ArgbEvaluator

@@ -1,5 +1,4 @@
 @file:JvmName("ActivityUtil")
-
 package com.fz.common.activity
 
 import android.app.Activity

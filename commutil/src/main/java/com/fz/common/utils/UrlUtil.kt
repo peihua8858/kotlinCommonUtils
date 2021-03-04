@@ -1,5 +1,4 @@
 @file:JvmName("UrlUtil")
-
 package com.fz.common.utils
 
 import android.net.Uri

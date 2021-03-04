@@ -1,5 +1,4 @@
 @file:JvmName("ColorUtil")
-
 package com.fz.common.utils
 
 import android.content.Context

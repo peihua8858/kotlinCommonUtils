@@ -1,6 +1,5 @@
 package com.fz.commutils.demo.api;
 
-import com.fz.common.utils.ResponseUtils;
 import com.fz.commutils.demo.model.HttpResponse;
 import com.fz.commutils.demo.model.HttpResponseAdapter;
 import com.fz.network.remote.BasicDataManager;

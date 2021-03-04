@@ -1,5 +1,6 @@
 @file:JvmName("BaseViewHolderUtil")
-package com.fz.common.utils
+@file:JvmMultifileClass
+package com.fz.common.adapter
 
 import android.graphics.Typeface
 import android.text.util.Linkify

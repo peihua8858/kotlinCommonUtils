@@ -3,17 +3,13 @@ package com.fz.commutils.demo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.fz.common.activity.apiWithAsyncResumed
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.coroutine.asyncApi
 import com.fz.common.model.ViewModelState
 import com.fz.common.text.isNonEmpty
-import com.fz.common.utils.dLog
-import com.fz.common.utils.eLog
-import com.fz.common.utils.isMainThread
-import com.fz.commutils.demo.model.MainViewModel
-import com.fz.commutils.demo.model.RequestParam
-import com.fz.commutils.demo.model.setDrawableStart
+import com.fz.common.utils.*
+import com.fz.commutils.demo.model.*
+import com.socks.library.KLog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -21,6 +17,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.util.*
 
 /**
  * 测试验证activity
@@ -54,12 +51,82 @@ class MainActivity : AppCompatActivity() {
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
         btnExecute.setOnClickListener {
 //            viewModel.onRequest(1, 20)
-            textView.text = editText.text.emailMask()
-            apiWithAsyncResumed<Unit> {
-                onRequest {
+//            textView.text = editText.text.emailMask()
+            copyTest()
+//            val pointBean = PointBean()
+//            pointBean.adddate = "ssss"
+//            pointBean.balance = "aaaa"
+//            pointBean.income = "bbbb"
+//            pointBean.json_data = "{ssss}"
+//            pointBean.note = "cccc"
+//            val pointBean1 = PointBean()
+//            pointBean1.adddate = "ssss33"
+//            pointBean1.balance = "aaaa33"
+//            pointBean1.income = "bbbb33"
+//            pointBean1.json_data = "{ssss33}"
+//            pointBean1.note = "cccc33"
+//            val map: MutableMap<String, MutableList<PointBean>> = mutableMapOf<String, MutableList<PointBean>>()
+//            map["2222"] = mutableListOf(pointBean)
+//            map["4444"] = mutableListOf(pointBean1)
+//            val p = hashMapOf<String, MutableList<PointBean>>()
+//            p.putAll(map)
+//            KLog.d(">>>>>>" + (map == p))
+//            KLog.d(">>>>>>map:$map")
+//            KLog.d(">>>>>>p:$p")
+//            if (p != null) {
+//                for (entry in p) {
+////                    entry.value[0].note = "45454545454"
+//                    entry.value.removeAt(0)
+//                }
+//            }
+//            KLog.d(">>>>>>map:$map")
+//            KLog.d(">>>>>>p:$p")
 
-                }
-            }
+//            val list = arrayListOf(pointBean)
+//            val list1 = list.deepCloneParcelableList()
+//            KLog.d(">>>>>>" + (list1 == list))
+//            KLog.d(">>>>>>list:$list")
+//            KLog.d(">>>>>>list1:$list1")
+//            if (list1 != null) {
+//                for (entry in list1) {
+//                    entry.note = "45454545454"
+//                }
+//            }
+//            KLog.d(">>>>>>list:$list")
+//            KLog.d(">>>>>>list1:$list1")
+
+//            val set:Set<PointBean> = setOf(pointBean)
+//            val set1 = set.deepCloneParcelableSet()
+//            KLog.d(">>>>>>" + (set == set1))
+//            KLog.d(">>>>>>set:$set")
+//            KLog.d(">>>>>>set1:$set1")
+//            if (set1 != null) {
+//                for (entry in set1) {
+//                    entry.note = "45454545454"
+//                }
+//            }
+//            KLog.d(">>>>>>set:$set")
+//            KLog.d(">>>>>>set1:$set1")
+
+//            val array:Array<PointBean>? = arrayOf(pointBean)
+//            val array1 = array?.deepCloneParcelableArray()
+//            KLog.d(">>>>>>" + (array == array1))
+//            KLog.d(">>>>>>array:${Arrays.toString(array)}")
+//            KLog.d(">>>>>>set1:${Arrays.toString(array1)}")
+//            if (array1 != null) {
+//                for (entry in array1) {
+//                    entry.note = "45454545454"
+//                }
+//            }
+//            KLog.d(">>>>>>array:${Arrays.toString(array)}")
+//            KLog.d(">>>>>>array1:${Arrays.toString(array1)}")
+
+//            val map2 = mutableMapOf<String, PointBean>()
+//            map2["12222"] = pointBean
+//            val p2 = map2.deepCloneMapOfParcelable()
+//            p2["12222"]?.note = "5646456464"
+//            KLog.d(">>>>>>map2:$map2")
+//            KLog.d(">>>>>>p:$p2")
 //            apiWithAsyncCreated<String> {
 //                val dialog = processDialog
 //                onStart {
@@ -141,6 +208,39 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 
+    }
+
+    private fun copyTest() {
+        val productBean = ProductBean()
+        productBean.activityIcon = "ssss"
+        productBean.atmos = "aaaa"
+        val cateLevel=GoodCatInfoBean()
+        cateLevel.first_cat_name="11111"
+        cateLevel.snd_cat_name="22222"
+        cateLevel.four_cat_name="33333"
+        productBean.cat_level_column = cateLevel
+        val tags= arrayListOf<TagsBean>()
+        tags.add(TagsBean("color","222"))
+        tags.add(TagsBean("color","333"))
+        productBean.tags = tags
+        val products= arrayListOf<ProductBean>()
+        products.add(productBean.deepCloneParcelable()!!)
+        productBean.groupGoodsList = products
+        val map: MutableMap<String, MutableList<ProductBean>> = mutableMapOf()
+        map["2222"] = mutableListOf(productBean)
+        val p = hashMapOf<String, MutableList<ProductBean>>()
+        p.putAll(map)
+        KLog.d(">>>>>>" + (map == p))
+        KLog.d(">>>>>>map:$map")
+        KLog.d(">>>>>>p:$p")
+        if (p != null) {
+            for (entry in p) {
+//                    entry.value[0].note = "45454545454"
+                entry.value.removeAt(0)
+            }
+        }
+        KLog.d(">>>>>>map:$map")
+        KLog.d(">>>>>>p:$p")
     }
 
     /**

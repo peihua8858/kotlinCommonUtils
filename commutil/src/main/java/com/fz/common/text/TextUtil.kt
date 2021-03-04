@@ -1,5 +1,4 @@
 @file:JvmName("TextUtil")
-
 package com.fz.common.text
 
 import android.content.ClipData

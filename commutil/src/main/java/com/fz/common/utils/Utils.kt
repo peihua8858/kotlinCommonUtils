@@ -1,16 +1,16 @@
 @file:JvmName("Utils")
-
 package com.fz.common.utils
 
 import android.os.Looper
-import android.webkit.WebView
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.javaField
+
+fun Any?.isMainThread(): Boolean {
+    return Looper.myLooper() == Looper.getMainLooper()
+}
 
 fun isMainThread(): Boolean {
     return Looper.myLooper() == Looper.getMainLooper()
@@ -111,91 +111,10 @@ fun Any?.checkNotNull(msg: String?): Boolean {
     throw NullPointerException(msg)
 }
 
-fun Array<Any?>?.checkNotNull(msg: String?): Boolean {
-    if (isNotNull() && isNotEmpty()) {
-        return true
-    }
-    throw NullPointerException(msg)
-}
-
-
 fun Any.rangeArray(min: Int, length: Int): Array<String?> {
     val data: Array<String?> = arrayOfNulls(length)
     for (i in 0 until length) {
         data[i] = ((min + i).toString())
     }
     return data
-}
-
-/**
- * 处理webview漏洞，删除危险API
- *
- * @param webView
- */
-fun WebView?.dealJavascriptLeak() {
-    if (this == null) {
-        return
-    }
-    try {
-        removeJavascriptInterface("searchBoxJavaBridge_")
-        removeJavascriptInterface("accessibility")
-        removeJavascriptInterface("accessibilityTraversal")
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-}
-
-/**
- * 深度拷贝，性能不佳
- * @author dingpeihua
- * @date 2021/2/26 11:01
- * @version 1.0
- */
-fun <T : Any> T.deepCopy(): T {
-    val objClassJava = this::class.java
-    // 基本数据类型直接返回
-    if (objClassJava.isPrimitive) {
-        return this
-    } else {
-        val objClass = this::class
-        if (objClass.javaPrimitiveType != null) {
-            return this
-        }
-        return when (this) {
-            is String -> {
-                String(this.toByteArray(), Charsets.UTF_8) as T
-            }
-            is Array<*> -> {
-                this.deepCopyOfArray() as T
-            }
-            is Set<*> -> {
-                this.deepCopyOfSet() as T
-            }
-            is Collection<*> -> {
-                this.deepCopyOfCollection() as T
-            }
-            is Map<*, *> -> {
-                this.deepCopyOfMap() as T
-            }
-            is Date -> {
-                Date(time) as T
-            }
-            else -> {
-                val properties = objClass.memberProperties
-                val newCopy = objClassJava.newInstance()
-                properties.forEach { prop ->
-                    val field = prop.javaField
-                    if (field != null) {
-                        field.isAccessible = true
-                        val value = field.get(this)
-                        if (value == null)
-                            field.set(newCopy, value)
-                        else
-                            field.set(newCopy, value.deepCopy())
-                    }
-                }
-                newCopy
-            }
-        }
-    }
 }

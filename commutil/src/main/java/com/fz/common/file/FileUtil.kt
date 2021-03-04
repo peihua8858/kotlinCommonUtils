@@ -1,5 +1,4 @@
 @file:JvmName("FileUtil")
-
 package com.fz.common.file
 
 import android.annotation.SuppressLint

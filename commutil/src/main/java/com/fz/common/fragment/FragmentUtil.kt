@@ -1,5 +1,4 @@
 @file:JvmName("FragmentUtil")
-
 package com.fz.common.fragment
 
 import android.content.Context

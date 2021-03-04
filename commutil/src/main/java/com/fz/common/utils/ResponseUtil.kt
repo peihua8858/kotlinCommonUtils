@@ -1,4 +1,4 @@
-@file:JvmName("ResponseUtils")
+@file:JvmName("ResponseUtil")
 package com.fz.common.utils
 
 import com.fz.common.entity.IHttpResponse

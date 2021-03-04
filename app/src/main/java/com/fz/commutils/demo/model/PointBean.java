@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.chad.library.adapter.base.entity.MultiItemEntity;
 
+import java.io.Serializable;
+
 /**
  * 积分列表数据对象
  *
@@ -13,8 +15,7 @@ import com.chad.library.adapter.base.entity.MultiItemEntity;
  * @date 2016/8/31
  * @since 1.0
  */
-public class PointBean implements Parcelable, MultiItemEntity {
-
+public class PointBean implements Parcelable, MultiItemEntity,Serializable {
     private String adddate;
     private String balance;
     private String income;

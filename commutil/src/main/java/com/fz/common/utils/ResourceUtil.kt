@@ -1,5 +1,4 @@
 @file:JvmName("ResourceUtil")
-
 package com.fz.common.utils
 
 import android.app.Activity

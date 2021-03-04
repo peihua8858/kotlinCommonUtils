@@ -1,5 +1,4 @@
 @file:JvmName("ParseUtil")
-
 package com.fz.common.utils
 
 import android.content.Context

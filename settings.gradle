@@ -1,1 +1,2 @@
-include ':app', ':commutil'
+include ':app'
+include ':commutil'
