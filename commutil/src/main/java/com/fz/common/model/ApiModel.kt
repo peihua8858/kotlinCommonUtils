@@ -4,10 +4,7 @@ import androidx.fragment.app.FragmentManager
 import com.fz.common.utils.eLog
 import com.fz.common.utils.getStackTraceMessage
 import com.fz.dialog.LoadingDialogFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 /**
  * api 方法封装
@@ -18,7 +15,7 @@ import kotlinx.coroutines.withContext
 class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, private val isShowDialog: Boolean = false) {
 
     private var processDialog: LoadingDialogFragment? = null
-    internal lateinit var request: suspend () -> Response?
+    internal lateinit var request: suspend CoroutineScope.() -> Response?
 
     private var onStart: (() -> Unit?)? = null
 
@@ -51,7 +48,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
         return this
     }
 
-    infix fun onRequest(request: suspend () -> Response?): ApiModel<Response> {
+    infix fun onRequest(request: suspend CoroutineScope.() -> Response?): ApiModel<Response> {
         this.request = request
         return this
     }
@@ -83,7 +80,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
             processDialog!!.isCancelable = isCancelable
             processDialog!!.setCanceledOnTouchOutside(isCancelable)
         }
-        if (processDialog != null && processDialog!!.isShowing) {
+        if (processDialog != null && !processDialog!!.isShowing) {
             processDialog!!.show(fragmentManager, "ApiLoadingDialog")
         }
     }
@@ -100,17 +97,19 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
     }
 
     internal suspend fun syncLaunch() {
-        showProcessDialog()
-        onStart?.invoke()
-        try {
-            val response = request()
-            onResponse?.invoke(response)
-        } catch (e: Exception) {
-            eLog { e.getStackTraceMessage() }
-            onError?.invoke(e)
-        } finally {
-            onComplete?.invoke()
-            dismissProcessDialog()
+        coroutineScope {
+            showProcessDialog()
+            onStart?.invoke()
+            try {
+                val response = request()
+                onResponse?.invoke(response)
+            } catch (e: Exception) {
+                eLog { e.getStackTraceMessage() }
+                onError?.invoke(e)
+            } finally {
+                onComplete?.invoke()
+                dismissProcessDialog()
+            }
         }
     }
 

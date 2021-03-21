@@ -7,6 +7,7 @@ import com.fz.common.entity.IHttpResponse
 import com.fz.common.utils.eLog
 import com.fz.common.utils.getStackTraceMessage
 import com.fz.common.utils.isSuccessFull
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -134,7 +135,7 @@ fun <T> ViewModel.apiRequestLimit(
  */
 fun <T> ViewModel.request(
         viewState: MutableLiveData<ViewModelState<T>>,
-        request: suspend () -> T?,
+        request: suspend CoroutineScope.()-> T?,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
         viewState.parseStaring()
@@ -157,7 +158,7 @@ fun <T> ViewModel.request(
  */
 fun <T> ViewModel.requestLimit(
         viewState: MutableLiveData<ViewModelState<T>>,
-        request: suspend () -> IHttpResponse<T?>?,
+        request: suspend CoroutineScope.() -> IHttpResponse<T?>?,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
         viewState.parseStaring()
@@ -179,7 +180,7 @@ fun <T> ViewModel.requestLimit(
  * [ViewModel]开启协程扩展
  */
 fun <T> ViewModel.request(
-        request: suspend () -> T,
+        request: suspend CoroutineScope.()  -> T,
         onSuccess: (T) -> Unit,
         onStart: () -> Unit = { },
         onError: (Throwable) -> Unit = { },

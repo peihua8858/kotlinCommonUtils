@@ -14,7 +14,6 @@ import android.provider.Settings
 import android.view.View
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.fz.common.text.isNonEmpty
 import java.util.*
 

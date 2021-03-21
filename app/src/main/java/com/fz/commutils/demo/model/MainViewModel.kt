@@ -2,13 +2,11 @@ package com.fz.commutils.demo.model
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.fz.common.model.ViewModelState
-import com.fz.common.model.apiRequestLimit
-import com.fz.common.model.parseComplete
-import com.fz.common.model.parseResult
+import com.fz.common.model.*
 import com.fz.common.utils.dLog
 import com.fz.common.utils.eLog
 import com.fz.common.utils.isMainThread
+import kotlinx.coroutines.async
 
 class MainViewModel : ViewModel() {
     val viewState: MutableLiveData<ViewModelState<PointResponse?>> = MutableLiveData()
