@@ -1,14 +1,22 @@
 package com.fz.commutils.demo
 
+import android.Manifest
 import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.coroutine.asyncApi
 import com.fz.common.model.ViewModelState
+import com.fz.common.permissions.PermissionRequestDsl
+import com.fz.common.permissions.PermissionResult
+import com.fz.common.permissions.requestPermissions
+import com.fz.common.permissions.requestPermissionsDsl
 import com.fz.common.text.isNonEmpty
 import com.fz.common.utils.*
 import com.fz.commutils.demo.model.*
+import com.fz.toast.showToast
 import com.socks.library.KLog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Job
@@ -182,6 +190,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
         textView.setOnClickListener {
+            requestPermissions(Manifest.permission.READ_CONTACTS) {
+                requestCode = 22
+                resultCallback = {
+                    when (this) {
+                        is PermissionResult.PermissionGranted -> {
+                            showToast("Granted!")
+                        }
+                        is PermissionResult.PermissionDenied -> {
+                            val data = deniedPermissions.toString().replace("android.permission.", "")
+                            showToast("Denied:$data")
+                        }
+                        is PermissionResult.ShowRational -> {
+                            showToast("ShowRational")
+                            showRational(this)
+                        }
+                        is PermissionResult.PermissionDeniedPermanently -> {
+                            val data = permanentlyDeniedPermissions.toString().replace("android.permission.", "")
+                            showToast("Denied permanently:$data")
+                        }
+                    }
+                }
+            }
+
 //            if (NetworkUtil.isConnected(this,true)) {
 //                KLog.d("result>>>yes>>有网络")
 //            }
@@ -190,6 +221,26 @@ class MainActivity : AppCompatActivity() {
 //            }, {
 //                ToastCompat.showMessage(this, if (it) "拷贝成功" else "拷贝失败")
 //            })
+        }
+        textView1.setOnClickListener {
+            this.requestPermissionsDsl(Manifest.permission.READ_CONTACTS) {
+                onDenied {
+                    val result = it.toString().replace("android.permission.", "")
+                    showToast("Denied:$result")
+                }
+                onGranted {
+                    showToast("Granted!")
+                }
+                onNeverAskAgain {
+                    val result = it.toString().replace("android.permission.", "")
+                    showToast("NeverAskAgain:$result")
+                }
+                onShowRationale {
+                    val result = it.toString().replace("android.permission.", "")
+                    showToast("ShowRationale:$result")
+                    showRational(it)
+                }
+            }
         }
 //        checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
 //            val result = isChecked.yes {
@@ -210,20 +261,95 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun handlePermission(result: PermissionResult) {
+        when (result) {
+            is PermissionResult.PermissionGranted -> {
+                showToast("Granted!")
+            }
+            is PermissionResult.PermissionDenied -> {
+                val data = result.deniedPermissions.toString().replace("android.permission.", "")
+                showToast("Denied:$data")
+            }
+            is PermissionResult.ShowRational -> {
+                showToast("ShowRational")
+                showRational(result)
+            }
+            is PermissionResult.PermissionDeniedPermanently -> {
+                val data = result.permanentlyDeniedPermissions.toString().replace("android.permission.", "")
+                showToast("Denied permanently:$data")
+            }
+        }
+    }
+
+    fun showRational(result: PermissionRequestDsl) {
+        AlertDialog.Builder(this)
+                .setMessage("We need permission")
+                .setTitle("Rational")
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton("OK") { _, _ ->
+                    result.retry()
+                }
+                .create()
+                .show()
+    }
+
+    fun showRational(result: PermissionResult) {
+        AlertDialog.Builder(this)
+                .setMessage("We need permission")
+                .setTitle("Rational")
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton("OK") { _, _ ->
+                    val permissions = when (result.requestCode) {
+                        1 -> {
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+                        2 -> {
+                            arrayOf(Manifest.permission.READ_CONTACTS)
+                        }
+                        3 -> {
+                            arrayOf(Manifest.permission.CAMERA)
+                        }
+                        22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        4 -> {
+                            arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.READ_CONTACTS,
+                                    Manifest.permission.CAMERA
+                            )
+                        }
+                        else -> {
+                            arrayOf()
+                        }
+                    }
+                    requestPermissions(*permissions) {
+                        requestCode = result.requestCode
+                        resultCallback = {
+                            handlePermission(this)
+                        }
+                    }
+                }
+                .create()
+                .show()
+    }
+
     private fun copyTest() {
         val productBean = ProductBean()
         productBean.activityIcon = "ssss"
         productBean.atmos = "aaaa"
-        val cateLevel=GoodCatInfoBean()
-        cateLevel.first_cat_name="11111"
-        cateLevel.snd_cat_name="22222"
-        cateLevel.four_cat_name="33333"
+        val cateLevel = GoodCatInfoBean()
+        cateLevel.first_cat_name = "11111"
+        cateLevel.snd_cat_name = "22222"
+        cateLevel.four_cat_name = "33333"
         productBean.cat_level_column = cateLevel
-        val tags= arrayListOf<TagsBean>()
-        tags.add(TagsBean("color","222"))
-        tags.add(TagsBean("color","333"))
+        val tags = arrayListOf<TagsBean>()
+        tags.add(TagsBean("color", "222"))
+        tags.add(TagsBean("color", "333"))
         productBean.tags = tags
-        val products= arrayListOf<ProductBean>()
+        val products = arrayListOf<ProductBean>()
         products.add(productBean.deepCloneParcelable()!!)
         productBean.groupGoodsList = products
         val map: MutableMap<String, MutableList<ProductBean>> = mutableMapOf()

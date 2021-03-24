@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 
+import com.fz.toast.ToastCompat;
+
 public class MainApplication extends MultiDexApplication {
     private static MainApplication instance;
 
@@ -21,5 +23,6 @@ public class MainApplication extends MultiDexApplication {
         super.onCreate();
         instance = this;
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+        ToastCompat.initialize(this);
     }
 }
