@@ -2,12 +2,13 @@ package com.fz.common.permissions
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 
 /**
  * @param permissions vararg of all the permissions for request.
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
-inline fun AppCompatActivity.requestPermissions(
+inline fun FragmentActivity.requestPermissions(
         vararg permissions: String,
         requestBlock: PermissionRequest.() -> Unit,
 ) {
@@ -18,7 +19,7 @@ inline fun AppCompatActivity.requestPermissions(
  * @param permissions vararg of all the permissions for request.
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
-inline fun AppCompatActivity.requestPermissionsDsl(
+inline fun FragmentActivity.requestPermissionsDsl(
         vararg permissions: String,
         requestBlock: PermissionCallbacksDSL.() -> Unit,
 ) {

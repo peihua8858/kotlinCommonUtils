@@ -5,6 +5,7 @@ import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 
 /**
  * A headless fragment which wraps the boilerplate code for checking and requesting permission.
@@ -66,7 +67,7 @@ class DslPermissionManager : BasePermissionManager() {
         @JvmStatic
         @MainThread
         inline fun requestPermissions(
-                activity: AppCompatActivity,
+                activity: FragmentActivity,
                 vararg permissions: String,
                 requestBlock: PermissionCallbacksDSL.() -> Unit,
         ) {
@@ -107,7 +108,7 @@ class DslPermissionManager : BasePermissionManager() {
                 vararg permissions: String,
         ) {
             val fragmentManager = when (activityOrFragment) {
-                is AppCompatActivity -> {
+                is FragmentActivity -> {
                     activityOrFragment.supportFragmentManager
                 }
                 is Fragment -> {
