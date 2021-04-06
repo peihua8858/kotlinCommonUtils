@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         textView.setOnClickListener {
-            requestPermissions(Manifest.permission.READ_CONTACTS) {
+            requestPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_CONTACTS) {
                 requestCode = 22
                 resultCallback = {
                     when (this) {
@@ -223,7 +223,7 @@ class MainActivity : AppCompatActivity() {
 //            })
         }
         textView1.setOnClickListener {
-            this.requestPermissionsDsl(Manifest.permission.READ_CONTACTS) {
+            this.requestPermissionsDsl(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_CONTACTS) {
                 onDenied {
                     val result = it.toString().replace("android.permission.", "")
                     showToast("Denied:$result")
