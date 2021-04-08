@@ -1,4 +1,5 @@
 @file:JvmName("ActivityUtil")
+
 package com.fz.common.activity
 
 import android.app.Activity
@@ -30,6 +31,16 @@ fun Activity?.getDrawable(@DrawableRes drawableRes: Int): Drawable? {
 fun Activity?.getDimens(@DimenRes resId: Int): Int {
     val context: Context = checkContext(this) ?: return 0.eLog { "Context  is null." }
     return context.getDimens(resId)
+}
+
+fun Activity?.getString(@StringRes resourceId: Int, vararg formatArgs: Any?): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId, *formatArgs)
+}
+
+fun Activity?.getString(@StringRes resourceId: Int): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId)
 }
 
 /**

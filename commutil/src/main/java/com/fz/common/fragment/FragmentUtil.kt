@@ -1,6 +1,7 @@
 @file:JvmName("FragmentUtil")
 package com.fz.common.fragment
 
+import android.app.Dialog
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.annotation.*
@@ -29,7 +30,15 @@ fun Fragment?.getDimens(@DimenRes resId: Int): Int {
     val context: Context = checkContext(this) ?: return 0.eLog { "Context  is null." }
     return context.getDimens(resId)
 }
+fun Fragment?.getString(@StringRes resourceId: Int, vararg formatArgs: Any?): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId, *formatArgs)
+}
 
+fun Fragment?.getString(@StringRes resourceId: Int): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId)
+}
 /**
  * 跳转到通知设置页面
  *

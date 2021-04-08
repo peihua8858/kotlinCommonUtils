@@ -13,10 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import com.fz.common.listener.OnNoDoubleClickListener
-import com.fz.common.utils.checkContext
-import com.fz.common.utils.getDimens
-import com.fz.common.utils.getResourceId
-import com.fz.common.utils.resolveAttribute
+import com.fz.common.utils.*
 import java.util.*
 
 /**
@@ -128,6 +125,16 @@ fun View?.getDrawable(@DrawableRes drawableRes: Int): Drawable? {
 fun View?.getDimens(@DimenRes resId: Int): Int {
     val context: Context = checkContext(this) ?: return 0
     return context.getDimens(resId)
+}
+
+fun View?.getString(@StringRes resourceId: Int, vararg formatArgs: Any?): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId, *formatArgs)
+}
+
+fun View?.getString(@StringRes resourceId: Int): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId)
 }
 
 /**

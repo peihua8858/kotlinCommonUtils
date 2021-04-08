@@ -4,6 +4,7 @@ package com.fz.common.dialog
 import android.app.Dialog
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
@@ -30,7 +31,15 @@ fun Dialog?.getDimens(@DimenRes resId: Int): Int {
     val context: Context = checkContext(this) ?: return 0.eLog { "Context  is null." }
     return context.getDimens(resId)
 }
+fun Dialog?.getString(@StringRes resourceId: Int, vararg formatArgs: Any?): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId, *formatArgs)
+}
 
+fun Dialog?.getString(@StringRes resourceId: Int): String {
+    val context: Context = checkContext(this) ?: return ""
+    return context.getString(resourceId)
+}
 /**
  * 获取资源id
  *
