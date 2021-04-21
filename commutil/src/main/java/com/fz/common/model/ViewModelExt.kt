@@ -18,11 +18,54 @@ import kotlinx.coroutines.withContext
  * @date 2021/2/20 11:28
  * @version 1.0
  */
-sealed class ViewModelState<out T> {
-    object Starting : ViewModelState<Nothing>()
-    data class Success<out T>(val data: T?) : ViewModelState<T>()
-    data class Error(val error: Throwable) : ViewModelState<Nothing>()
-    object Complete : ViewModelState<Nothing>()
+class ViewModelState<T> {
+    var data: T? = null
+    var error: Throwable? = null
+    var state: Int = STARTING
+
+
+    /**
+     * 失败
+     */
+    fun isStarting(): Boolean {
+        return state == STARTING
+    }
+
+    /**
+     * 成功
+     */
+    fun isSuccess(): Boolean {
+        return state == SUCCESS
+    }
+
+    /**
+     * 错误
+     */
+    fun isError(): Boolean {
+        return state == ERROR
+    }
+
+    /**
+     * 完成
+     */
+    fun isComplete(): Boolean {
+        return state == COMPLETE
+    }
+
+    companion object {
+        const val STARTING = 11
+        const val SUCCESS = 12
+        const val ERROR = 13
+        const val COMPLETE = 14
+    }
+}
+
+/**
+ * 异常转换异常处理
+ */
+fun <T> ViewModelState<T>.parseStaring(liveData: MutableLiveData<ViewModelState<T>>) {
+    this.state = ViewModelState.STARTING
+    liveData.value = this
 }
 
 /**
@@ -30,8 +73,10 @@ sealed class ViewModelState<out T> {
  *
  * @param result 请求结果
  */
-fun <T> MutableLiveData<ViewModelState<T>>.parseResponse(result: T?) {
-    value = ViewModelState.Success(result)
+fun <T> ViewModelState<T>.parseResponse(liveData: MutableLiveData<ViewModelState<T>>, result: T?) {
+    this.data = result
+    this.state = ViewModelState.SUCCESS
+    liveData.value = this
 }
 
 /**
@@ -39,30 +84,35 @@ fun <T> MutableLiveData<ViewModelState<T>>.parseResponse(result: T?) {
  *
  * @param result 请求结果
  */
-fun <T> MutableLiveData<ViewModelState<T>>.parseResult(result: IHttpResponse<T?>?) {
-    value = if (result.isSuccessFull()) ViewModelState.Success(result.getData()) else
-        ViewModelState.Error(Throwable(result?.msg ?: "Unknown"))
+fun <T> ViewModelState<T>.parseResult(liveData: MutableLiveData<ViewModelState<T>>, result: IHttpResponse<T?>?) {
+    liveData.value = if (result.isSuccessFull()) {
+        this.state = ViewModelState.SUCCESS
+        this.data = result.getData()
+        this
+    } else {
+        this.state = ViewModelState.ERROR
+        this.error = Throwable(result?.msg ?: "Unknown")
+        this.data = null
+        this
+    }
 }
 
 /**
  * 异常转换异常处理
  */
-fun <T> MutableLiveData<ViewModelState<T>>.parseError(e: Throwable) {
-    this.value = ViewModelState.Error(e)
+fun <T> ViewModelState<T>.parseError(liveData: MutableLiveData<ViewModelState<T>>, e: Throwable) {
+    this.state = ViewModelState.ERROR
+    this.error = e
+    this.data = null
+    liveData.value = this
 }
 
 /**
  * 异常转换异常处理
  */
-fun <T> MutableLiveData<ViewModelState<T>>.parseComplete() {
-    this.value = ViewModelState.Complete
-}
-
-/**
- * 异常转换异常处理
- */
-fun <T> MutableLiveData<ViewModelState<T>>.parseStaring() {
-    this.value = ViewModelState.Starting
+fun <T> ViewModelState<T>.parseComplete(liveData: MutableLiveData<ViewModelState<T>>) {
+    this.state = ViewModelState.COMPLETE
+    liveData.value = this
 }
 
 /**
@@ -86,33 +136,35 @@ fun <T> ViewModel.apiRequest(
 }
 
 internal fun <T> ApiModel<T>.parseMethod(viewState: MutableLiveData<ViewModelState<T>>): ApiModel<T> {
+    val state = ViewModelState<T>()
     if (!isOnStart()) {
-        onStart { viewState.parseStaring() }
+        onStart { state.parseStaring(viewState) }
     }
     if (!isOnError()) {
-        onError { viewState.parseError(it) }
+        onError { state.parseError(viewState, it) }
     }
     if (!isOnResponse()) {
-        onResponse { viewState.parseResponse(it) }
+        onResponse { state.parseResponse(viewState, it) }
     }
     if (!isOnComplete()) {
-        onComplete { viewState.parseComplete() }
+        onComplete { state.parseComplete(viewState) }
     }
     return this
 }
 
 internal fun <T> ApiModel<IHttpResponse<T?>>.parseMethodLimit(viewState: MutableLiveData<ViewModelState<T>>): ApiModel<IHttpResponse<T?>> {
+    val state = ViewModelState<T>()
     if (!isOnStart()) {
-        onStart { viewState.parseStaring() }
+        onStart { state.parseStaring(viewState) }
     }
     if (!isOnError()) {
-        onError { viewState.parseError(it) }
+        onError { state.parseError(viewState, it) }
     }
     if (!isOnResponse()) {
-        onResponse { viewState.parseResult(it) }
+        onResponse { state.parseResult(viewState, it) }
     }
     if (!isOnComplete()) {
-        onComplete { viewState.parseComplete() }
+        onComplete { state.parseComplete(viewState) }
     }
     return this
 }
@@ -135,20 +187,21 @@ fun <T> ViewModel.apiRequestLimit(
  */
 fun <T> ViewModel.request(
         viewState: MutableLiveData<ViewModelState<T>>,
-        request: suspend CoroutineScope.()-> T?,
+        request: suspend CoroutineScope.() -> T?,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
-        viewState.parseStaring()
+        val state = ViewModelState<T>()
+        state.parseStaring(viewState)
         try {
             val response = withContext(Dispatchers.IO) {
                 request()
             }
-            viewState.parseResponse(response)
+            state.parseResponse(viewState, response)
         } catch (e: Throwable) {
             eLog { e.getStackTraceMessage() }
-            viewState.parseError(e)
+            state.parseError(viewState, e)
         } finally {
-            viewState.parseComplete()
+            state.parseComplete(viewState)
         }
     }
 }
@@ -161,17 +214,18 @@ fun <T> ViewModel.requestLimit(
         request: suspend CoroutineScope.() -> IHttpResponse<T?>?,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
-        viewState.parseStaring()
+        val state = ViewModelState<T>()
+        state.parseStaring(viewState)
         try {
             val response = withContext(Dispatchers.IO) {
                 request()
             }
-            viewState.parseResult(response)
+            state.parseResult(viewState, response)
         } catch (e: Throwable) {
             eLog { e.getStackTraceMessage() }
-            viewState.parseError(e)
+            state.parseError(viewState, e)
         } finally {
-            viewState.parseComplete()
+            state.parseComplete(viewState)
         }
     }
 }
@@ -180,7 +234,7 @@ fun <T> ViewModel.requestLimit(
  * [ViewModel]开启协程扩展
  */
 fun <T> ViewModel.request(
-        request: suspend CoroutineScope.()  -> T,
+        request: suspend CoroutineScope.() -> T,
         onSuccess: (T) -> Unit,
         onStart: () -> Unit = { },
         onError: (Throwable) -> Unit = { },
