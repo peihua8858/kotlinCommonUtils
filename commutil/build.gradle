@@ -47,7 +47,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.fz.multistateview:MultiStateView:1.0.2'
-    implementation 'com.fz.dialog:Dialog:1.0.2'
+    implementation 'com.fz.dialog:Dialog:1.0.3'
     implementation "org.jetbrains.kotlin:kotlin-reflect"
 }
 
