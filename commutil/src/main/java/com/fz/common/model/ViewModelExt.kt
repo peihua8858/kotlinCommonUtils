@@ -45,18 +45,10 @@ class ViewModelState<T> {
         return state == ERROR
     }
 
-    /**
-     * 完成
-     */
-    fun isComplete(): Boolean {
-        return state == COMPLETE
-    }
-
     companion object {
         const val STARTING = 11
         const val SUCCESS = 12
         const val ERROR = 13
-        const val COMPLETE = 14
     }
 }
 
@@ -108,14 +100,6 @@ fun <T> ViewModelState<T>.parseError(liveData: MutableLiveData<ViewModelState<T>
 }
 
 /**
- * 异常转换异常处理
- */
-fun <T> ViewModelState<T>.parseComplete(liveData: MutableLiveData<ViewModelState<T>>) {
-    this.state = ViewModelState.COMPLETE
-    liveData.value = this
-}
-
-/**
  * [ViewModel]开启协程扩展
  */
 fun <T> ViewModel.apiRequest(apiDSL: ApiModel<T>.() -> Unit) {
@@ -146,9 +130,6 @@ internal fun <T> ApiModel<T>.parseMethod(viewState: MutableLiveData<ViewModelSta
     if (!isOnResponse()) {
         onResponse { state.parseResponse(viewState, it) }
     }
-    if (!isOnComplete()) {
-        onComplete { state.parseComplete(viewState) }
-    }
     return this
 }
 
@@ -162,9 +143,6 @@ internal fun <T> ApiModel<IHttpResponse<T?>>.parseMethodLimit(viewState: Mutable
     }
     if (!isOnResponse()) {
         onResponse { state.parseResult(viewState, it) }
-    }
-    if (!isOnComplete()) {
-        onComplete { state.parseComplete(viewState) }
     }
     return this
 }
@@ -200,8 +178,6 @@ fun <T> ViewModel.request(
         } catch (e: Throwable) {
             eLog { e.getStackTraceMessage() }
             state.parseError(viewState, e)
-        } finally {
-            state.parseComplete(viewState)
         }
     }
 }
@@ -224,8 +200,6 @@ fun <T> ViewModel.requestLimit(
         } catch (e: Throwable) {
             eLog { e.getStackTraceMessage() }
             state.parseError(viewState, e)
-        } finally {
-            state.parseComplete(viewState)
         }
     }
 }

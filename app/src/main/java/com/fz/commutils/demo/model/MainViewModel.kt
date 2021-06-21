@@ -23,10 +23,10 @@ class MainViewModel : ViewModel() {
             }
             onComplete {
                 eLog { "执行自定》》》》onComplete" }
-                viewState.parseComplete()
+//                viewState.parseComplete()
             }
             onResponse {
-                viewState.parseResult(it)
+//                viewState.parseResult(it)
             }
         }
     }

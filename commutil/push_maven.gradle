@@ -1,12 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 apply plugin: 'maven'
-def buildType = "SNAPSHOT" /*"release"*/
+def buildType = /*"SNAPSHOT" */"release"
 def mavenUrl = "http://" + String.valueOf(maven_ip) + ":8989/repository/globalegrow/"
 def mavenUrlSnapshot = "http://" + String.valueOf(maven_ip) + ":8989/repository/globalegrow-snapshot/"
 def mavenUserName = "longxl"
 def mavenPwd = "longxl123"
 def sdkVersionName = "1.0.0"
-def sdkVersionNameSnapshot = "1.0.56-SNAPSHOT"
+def sdkVersionNameSnapshot = "1.0.58-SNAPSHOT"
 def pomName = "commutil"
 def pomGroupId = "com.fz.commutil"
 def pomArtifactId = "commutil"

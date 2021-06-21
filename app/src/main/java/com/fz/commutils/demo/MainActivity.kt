@@ -2,6 +2,7 @@ package com.fz.commutils.demo
 
 import android.Manifest
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -19,10 +20,7 @@ import com.fz.commutils.demo.model.*
 import com.fz.toast.showToast
 import com.socks.library.KLog
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.*
@@ -32,24 +30,25 @@ import java.util.*
  */
 class MainActivity : AppCompatActivity() {
     private val viewModel = MainViewModel()
+    private val handler = Handler()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewModel.viewState.observe(this, {
-            when (it) {
-                ViewModelState.Starting -> {
+            when (it.state) {
+                ViewModelState.STARTING -> {
                     dLog { "Starting:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "开始请求..." }
                 }
-                ViewModelState.Complete -> {
-                    dLog { "Complete:" + if (isMainThread()) "在主线程" else "在子线程" }
-                    dLog { "请求完成" }
-                }
-                is ViewModelState.Error -> {
+//                ViewModelState.Complete -> {
+//                    dLog { "Complete:" + if (isMainThread()) "在主线程" else "在子线程" }
+//                    dLog { "请求完成" }
+//                }
+                ViewModelState.ERROR -> {
                     dLog { "Error:" + if (isMainThread()) "在主线程" else "在子线程" }
                     eLog { "请求失败" }
                 }
-                is ViewModelState.Success -> {
+                ViewModelState.SUCCESS -> {
                     dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "请求成功" }
                     val response = it.data
@@ -58,9 +57,10 @@ class MainActivity : AppCompatActivity() {
         })
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
         btnExecute.setOnClickListener {
+            lifecycleScope.cancel()
 //            viewModel.onRequest(1, 20)
 //            textView.text = editText.text.emailMask()
-            copyTest()
+//            copyTest()
 //            val pointBean = PointBean()
 //            pointBean.adddate = "ssss"
 //            pointBean.balance = "aaaa"
@@ -157,40 +157,63 @@ class MainActivity : AppCompatActivity() {
 //            }
         }
         btnExecute1.setOnClickListener {
-//            request()
             lifecycleScope.launch {
-                asyncApi<String> {
-                    onRequest {
-                        coroutineScope {
-                            eLog { "onRequest:" + if (isMainThread()) "在主线程中" else "在子线程中" }
-                            val callResult = async {
-                                eLog { "onRequest>>async:" + if (isMainThread()) "在主线程中" else "在子线程中" }
-                                val client = OkHttpClient.Builder().build()
-                                val call = client.newCall(Request.Builder()
-                                        .url("https://www.baidu.com")
-                                        .post(RequestParam().createRequestBody())
-                                        .build())
-                                call.execute()
-                            }
-                            val response = callResult.await()
-                            eLog { if (response.isSuccessful) "网络请求成功" else "网络请求失败" }
-                            "请求网络成功>>>"
-                        }
+                asyncApi<Unit> {
+                    onStart {
+                        dLog { ">>>>>>>>>>>>onStart" }
+                        showProcessDialog(supportFragmentManager)
                     }
-                    onError {
-                        eLog { "异常结果：${it.message}" }
+                    onRequest {
+                        dLog { "onRequest>>>>>>>>>>start" }
+                        delay(5000)
+                        dLog { "onRequest>>>>>>>>>>end" }
+                        null
                     }
                     onResponse {
-                        dLog { "请求结果：$it" }
-                    }
-                    onComplete {
-                        dLog { "执行完成" }
+                        dLog { "onResponse>>>>>>>>>>" }
                     }
                 }
             }
+//            handler.postDelayed({
+//                lifecycleScope.cancel()
+//            },1000)
+//            request()
+//            lifecycleScope.launch {
+//                asyncApi<String> {
+//                    onRequest {
+//                        coroutineScope {
+//                            eLog { "onRequest:" + if (isMainThread()) "在主线程中" else "在子线程中" }
+//                            val callResult = async {
+//                                eLog { "onRequest>>async:" + if (isMainThread()) "在主线程中" else "在子线程中" }
+//                                val client = OkHttpClient.Builder().build()
+//                                val call = client.newCall(Request.Builder()
+//                                        .url("https://www.baidu.com")
+//                                        .post(RequestParam().createRequestBody())
+//                                        .build())
+//                                call.execute()
+//                            }
+//                            val response = callResult.await()
+//                            eLog { if (response.isSuccessful) "网络请求成功" else "网络请求失败" }
+//                            "请求网络成功>>>"
+//                        }
+//                    }
+//                    onError {
+//                        eLog { "异常结果：${it.message}" }
+//                    }
+//                    onResponse {
+//                        dLog { "请求结果：$it" }
+//                    }
+//                    onComplete {
+//                        dLog { "执行完成" }
+//                    }
+//                }
+//            }
         }
         textView.setOnClickListener {
-            requestPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_CONTACTS) {
+            requestPermissions(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_CONTACTS
+            ) {
                 requestCode = 22
                 resultCallback = {
                     when (this) {
@@ -198,7 +221,8 @@ class MainActivity : AppCompatActivity() {
                             showToast("Granted!")
                         }
                         is PermissionResult.PermissionDenied -> {
-                            val data = deniedPermissions.toString().replace("android.permission.", "")
+                            val data =
+                                deniedPermissions.toString().replace("android.permission.", "")
                             showToast("Denied:$data")
                         }
                         is PermissionResult.ShowRational -> {
@@ -206,7 +230,8 @@ class MainActivity : AppCompatActivity() {
                             showRational(this)
                         }
                         is PermissionResult.PermissionDeniedPermanently -> {
-                            val data = permanentlyDeniedPermissions.toString().replace("android.permission.", "")
+                            val data = permanentlyDeniedPermissions.toString()
+                                .replace("android.permission.", "")
                             showToast("Denied permanently:$data")
                         }
                     }
@@ -223,7 +248,10 @@ class MainActivity : AppCompatActivity() {
 //            })
         }
         textView1.setOnClickListener {
-            this.requestPermissionsDsl(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_CONTACTS) {
+            this.requestPermissionsDsl(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_CONTACTS
+            ) {
                 onDenied {
                     val result = it.toString().replace("android.permission.", "")
                     showToast("Denied:$result")
@@ -275,7 +303,8 @@ class MainActivity : AppCompatActivity() {
                 showRational(result)
             }
             is PermissionResult.PermissionDeniedPermanently -> {
-                val data = result.permanentlyDeniedPermissions.toString().replace("android.permission.", "")
+                val data = result.permanentlyDeniedPermissions.toString()
+                    .replace("android.permission.", "")
                 showToast("Denied permanently:$data")
             }
         }
@@ -283,57 +312,57 @@ class MainActivity : AppCompatActivity() {
 
     fun showRational(result: PermissionRequestDsl) {
         AlertDialog.Builder(this)
-                .setMessage("We need permission")
-                .setTitle("Rational")
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setPositiveButton("OK") { _, _ ->
-                    result.retry()
-                }
-                .create()
-                .show()
+            .setMessage("We need permission")
+            .setTitle("Rational")
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton("OK") { _, _ ->
+                result.retry()
+            }
+            .create()
+            .show()
     }
 
     fun showRational(result: PermissionResult) {
         AlertDialog.Builder(this)
-                .setMessage("We need permission")
-                .setTitle("Rational")
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setPositiveButton("OK") { _, _ ->
-                    val permissions = when (result.requestCode) {
-                        1 -> {
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-                        }
-                        2 -> {
-                            arrayOf(Manifest.permission.READ_CONTACTS)
-                        }
-                        3 -> {
-                            arrayOf(Manifest.permission.CAMERA)
-                        }
-                        22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        4 -> {
-                            arrayOf(
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.READ_CONTACTS,
-                                    Manifest.permission.CAMERA
-                            )
-                        }
-                        else -> {
-                            arrayOf()
-                        }
+            .setMessage("We need permission")
+            .setTitle("Rational")
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton("OK") { _, _ ->
+                val permissions = when (result.requestCode) {
+                    1 -> {
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
-                    requestPermissions(*permissions) {
-                        requestCode = result.requestCode
-                        resultCallback = {
-                            handlePermission(this)
-                        }
+                    2 -> {
+                        arrayOf(Manifest.permission.READ_CONTACTS)
+                    }
+                    3 -> {
+                        arrayOf(Manifest.permission.CAMERA)
+                    }
+                    22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    4 -> {
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.CAMERA
+                        )
+                    }
+                    else -> {
+                        arrayOf()
                     }
                 }
-                .create()
-                .show()
+                requestPermissions(*permissions) {
+                    requestCode = result.requestCode
+                    resultCallback = {
+                        handlePermission(this)
+                    }
+                }
+            }
+            .create()
+            .show()
     }
 
     private fun copyTest() {
@@ -400,10 +429,12 @@ class MainActivity : AppCompatActivity() {
             val callResult = async {
                 eLog { "onRequest>>async:" + if (isMainThread()) "在主线程中" else "在子线程中" }
                 val client = OkHttpClient.Builder().build()
-                val call = client.newCall(Request.Builder()
+                val call = client.newCall(
+                    Request.Builder()
                         .url("https://www.baidu.com")
                         .post(RequestParam().createRequestBody())
-                        .build())
+                        .build()
+                )
                 call.execute()
             }
             val response = callResult.await()
