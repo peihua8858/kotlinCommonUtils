@@ -68,13 +68,13 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
         return this
     }
 
-    private fun showProcessDialog() {
+    private fun showLoadingDialog() {
         if (fragmentManager != null && isShowDialog) {
-            showProcessDialog(fragmentManager)
+            showLoadingDialog(fragmentManager)
         }
     }
 
-    fun showProcessDialog(fragmentManager: FragmentManager, isCancelable: Boolean = false) {
+    fun showLoadingDialog(fragmentManager: FragmentManager, isCancelable: Boolean = false) {
         if (processDialog == null) {
             processDialog = LoadingDialogFragment()
             processDialog!!.isCancelable = isCancelable
@@ -85,11 +85,11 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
         }
     }
 
-    fun showProcessDialog(fragmentManager: FragmentManager) {
-        showProcessDialog(fragmentManager, false)
+    fun showLoadingDialog(fragmentManager: FragmentManager) {
+        showLoadingDialog(fragmentManager, false)
     }
 
-    fun dismissProcessDialog() {
+    fun dismissLoadingDialog() {
         if (processDialog != null) {
             processDialog!!.dismissAllowingStateLoss()
             processDialog = null
@@ -98,7 +98,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
 
     internal suspend fun syncLaunch() {
         coroutineScope {
-            showProcessDialog()
+            showLoadingDialog()
             onStart?.invoke()
             try {
                 val response = request()
@@ -108,13 +108,13 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
-                dismissProcessDialog()
+                dismissLoadingDialog()
             }
         }
     }
 
     internal suspend fun launch() {
-        showProcessDialog()
+        showLoadingDialog()
         onStart?.invoke()
         try {
             val response = withContext(Dispatchers.IO) {
@@ -126,13 +126,13 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
             onError?.invoke(e)
         } finally {
             onComplete?.invoke()
-            dismissProcessDialog()
+            dismissLoadingDialog()
         }
     }
 
     internal fun syncLaunch(viewModelScope: CoroutineScope) {
         viewModelScope.launch(Dispatchers.Main) {
-            showProcessDialog()
+            showLoadingDialog()
             onStart?.invoke()
             try {
                 val response = request()
@@ -142,14 +142,14 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
-                dismissProcessDialog()
+                dismissLoadingDialog()
             }
         }
     }
 
     internal fun launch(viewModelScope: CoroutineScope) {
         viewModelScope.launch(Dispatchers.Main) {
-            showProcessDialog()
+            showLoadingDialog()
             onStart?.invoke()
             try {
                 val response = withContext(Dispatchers.IO) {
@@ -161,7 +161,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
-                dismissProcessDialog()
+                dismissLoadingDialog()
             }
         }
     }
