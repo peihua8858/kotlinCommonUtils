@@ -29,7 +29,8 @@ internal object Connectivity {
      * @version 1.0
      */
     fun isConnected(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             isConnectedM(connectivityManager)
         } else {
@@ -42,12 +43,20 @@ internal object Connectivity {
         val nw = connectivityManager.activeNetwork ?: return false
         val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
         return when {
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            //Indicates this network uses a Cellular transport
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            //Indicates this network uses a Wi-Fi transport.
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
             //for other device how are able to connect with Ethernet
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
             //for check internet over Bluetooth
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
+            //Indicates this network uses a VPN transport.
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> true
+            //Indicates this network uses a Wi-Fi Aware transport.
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE) -> true
+            //Indicates this network uses a LoWPAN transport.
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_LOWPAN) -> true
             else -> false
         }
     }
@@ -91,11 +100,11 @@ internal object Connectivity {
      */
     fun isConnectionFast(context: Context): Boolean {
         val networkType: NetworkType =
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                    getNetworkTypeM(context)
-                } else {
-                    getNetworkTypeL(context)
-                }
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                getNetworkTypeM(context)
+            } else {
+                getNetworkTypeL(context)
+            }
         return when (networkType) {
             NetworkType.NETWORK_3G,
             NetworkType.NETWORK_4G,
@@ -134,7 +143,8 @@ internal object Connectivity {
     }
 
     private fun getNetworkTypeL(context: Context): NetworkType {
-        val cm: ConnectivityManager? = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        val cm: ConnectivityManager? =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         val networkInfo: NetworkInfo? = cm?.activeNetworkInfo
         if (networkInfo != null && networkInfo.isAvailable && networkInfo.isConnected) {
             return when (networkInfo.type) {
@@ -146,8 +156,9 @@ internal object Connectivity {
                     if (type == NetworkType.NETWORK_CELLULAR) {
                         val subtypeName = networkInfo.subtypeName
                         if (subtypeName.equals("TD-SCDMA", ignoreCase = true)
-                                || subtypeName.equals("WCDMA", ignoreCase = true)
-                                || subtypeName.equals("CDMA2000", ignoreCase = true)) {
+                            || subtypeName.equals("WCDMA", ignoreCase = true)
+                            || subtypeName.equals("CDMA2000", ignoreCase = true)
+                        ) {
                             NetworkType.NETWORK_3G
                         } else {
                             NetworkType.NETWORK_CELLULAR
@@ -166,14 +177,18 @@ internal object Connectivity {
     @TargetApi(Build.VERSION_CODES.M)
     private fun getNetworkTypeM(context: Context): NetworkType {
         val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nw = connectivityManager.activeNetwork ?: return NetworkType.NETWORK_NO
         val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return NetworkType.NETWORK_NO
         return when {
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> NetworkType.NETWORK_WIFI
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> NetworkType.NETWORK_ETHERNET
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
-                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.READ_PHONE_STATE
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
                     val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                     tm.networkOperatorName
                     return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
