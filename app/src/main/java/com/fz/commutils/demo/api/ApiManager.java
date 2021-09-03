@@ -4,6 +4,8 @@ import com.fz.commutils.demo.model.HttpResponse;
 import com.fz.commutils.demo.model.HttpResponseAdapter;
 import com.fz.network.remote.BasicDataManager;
 
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
+
 
 /**
  * @author tp
@@ -11,23 +13,17 @@ import com.fz.network.remote.BasicDataManager;
  * 管理product所有的接口列表
  */
 public class ApiManager extends BasicDataManager {
-
     protected ApiManager() {
-        super(OkHttpManager.okHttpClient(), "");
+        super(OkHttpManager.okHttpClient(), "https://app.zaful.com/api_android/7.3.0/",
+                RxJava3CallAdapterFactory.create(),
+                null);
     }
-
     static class InnerHelper {
         static ApiManager dataManager = new ApiManager();
     }
 
     public static ApiManager newInstance() {
         return InnerHelper.dataManager;
-    }
-
-    public static void removeAllApi() {
-        newInstance().removeAllRetrofit();
-        newInstance().removeAllService();
-        newInstance().newRetrofit(OkHttpManager.okHttpClient(), "");
     }
 
 
@@ -45,7 +41,7 @@ public class ApiManager extends BasicDataManager {
 
     @Override
     public <T> T createApi(Class<T> clazz) {
-        return createApi("", clazz);
+        return createApi("https://app.zaful.com/api_android/7.3.0/", clazz);
     }
 
     public static UserApi userApi() {

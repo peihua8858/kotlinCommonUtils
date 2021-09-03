@@ -24,30 +24,45 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+        //Apache HttpCore meta info
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/*.kotlin_module'
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.13.1'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation project(path: ':commutil')
 //    implementation 'com.fz.commutil:commutil:1.0.35-SNAPSHOT'
-    implementation 'com.fz.toast:ToastCompat:1.0.13'
+//    implementation 'com.fz.toast:ToastCompat:1.0.13'
 //    implementation "com.fz.okhttp:OkHttpWrapper:1.0.6-SNAPSHOT"
-    implementation 'com.fz.dialog:Dialog:1.0.3'
+//    implementation 'com.fz.dialog:Dialog:1.0.3'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation "io.reactivex.rxjava3:rxjava:3.0.6"
-    implementation ("com.fz.network:Network:1.4.0"){
-        exclude module: 'commutil'
-    }
+//    implementation ("com.fz.network:Network:1.4.0"){
+//        exclude module: 'commutil'
+//    }
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+    implementation 'com.github.peihua8858:ToastCompat:1.0.1'
+    implementation 'com.github.peihua8858:KLog:1.0.0'
+    implementation 'com.github.peihua8858:DialogFragment:1.0.0'
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation 'com.github.peihua8858:RetrofitUtils:1.0.1'
+    implementation 'com.github.peihua8858:NetWorkLog:1.0.1'
+    implementation 'com.github.peihua8858:OkHttpWrapper:1.0.1'
+    implementation 'com.github.peihua8858:GsonAdapter:1.0.0'
+    implementation "com.google.code.gson:gson:2.8.6"
 }

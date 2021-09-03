@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity() {
         })
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
         btnExecute.setOnClickListener {
-            lifecycleScope.cancel()
-//            viewModel.onRequest(1, 20)
+//            lifecycleScope.cancel()
+            viewModel.onRequest(1, 20)
 //            textView.text = editText.text.emailMask()
 //            copyTest()
 //            val pointBean = PointBean()
@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                 asyncApi<Unit> {
                     onStart {
                         dLog { ">>>>>>>>>>>>onStart" }
-                        showProcessDialog(supportFragmentManager)
+                        null
                     }
                     onRequest {
                         dLog { "onRequest>>>>>>>>>>start" }

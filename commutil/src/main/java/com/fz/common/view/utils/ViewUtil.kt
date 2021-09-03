@@ -105,9 +105,9 @@ fun Any?.calcViewScreenLocation(view: View): RectF {
     // 获取控件在屏幕中的位置，返回的数组分别为控件左顶点的 x、y 的值
     view.getLocationOnScreen(location)
     return RectF(
-            location[0].toFloat(), location[1]
+        location[0].toFloat(), location[1]
             .toFloat(), (location[0] + view.width).toFloat(),
-            (location[1] + view.height).toFloat()
+        (location[1] + view.height).toFloat()
     )
 }
 
@@ -151,7 +151,6 @@ fun View?.getResourceId(attrId: Int): Int {
 /**
  * 解析当前上下文主题，获取主题样式
  *
- * @param context    当前上下文
  * @param resId      资源ID
  * @param defaultRes 默认主题样式
  * @author dingpeihua
@@ -161,4 +160,24 @@ fun View?.getResourceId(attrId: Int): Int {
 fun View?.resolveAttribute(resId: Int, @StyleRes defaultRes: Int): Int {
     val context: Context = checkContext(this) ?: return 0
     return context.resolveAttribute(resId, defaultRes)
+}
+
+fun View?.setMarginBottom(bottom: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin = bottom
+}
+
+fun View?.setMarginTop(top: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin = top
+}
+
+fun View?.setMarginEnd(end: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.marginEnd = end
+}
+
+fun View?.setMarginStart(start: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.marginStart = start
 }

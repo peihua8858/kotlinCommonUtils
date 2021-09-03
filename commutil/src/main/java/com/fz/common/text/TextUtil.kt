@@ -1,4 +1,5 @@
 @file:JvmName("TextUtil")
+
 package com.fz.common.text
 
 import android.content.ClipData
@@ -9,9 +10,9 @@ import android.util.Base64
 import android.util.Patterns
 import android.widget.EditText
 import android.widget.TextView
-import com.fz.common.utils.copyToClipBoard
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
+import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.contracts.ExperimentalContracts
@@ -23,7 +24,7 @@ import kotlin.contracts.contract
  * @return 输入字符串
  */
 fun EditText?.editToString(block: (CharSequence) -> Unit) {
-    block(editTextToString() ?: "")
+    block(editTextToString())
 }
 
 /**
@@ -32,7 +33,7 @@ fun EditText?.editToString(block: (CharSequence) -> Unit) {
  * @return 输入字符串
  */
 fun EditText?.getEditToString(block: (CharSequence) -> Unit) {
-    block(editTextToString() ?: "")
+    block(editTextToString())
 }
 
 /**
@@ -41,8 +42,8 @@ fun EditText?.getEditToString(block: (CharSequence) -> Unit) {
  * @param editText 输入框
  * @return 输入字符串
  */
-fun EditText?.editTextToString(): String? {
-    return this?.text?.toString()?.trim { it <= ' ' }
+fun EditText?.editTextToString(): String {
+    return this?.text?.toString()?.trim { it <= ' ' } ?: ""
 }
 
 /**
@@ -51,7 +52,7 @@ fun EditText?.editTextToString(): String? {
  * @param editText 输入框
  * @return 输入字符串
  */
-fun EditText?.getEditToString(): String? {
+fun EditText?.getEditToString(): String {
     return editTextToString()
 }
 
@@ -61,12 +62,12 @@ fun EditText?.getEditToString(): String? {
  * @param editText 输入框
  * @return 输入字符串
  */
-fun Any?.getEditToString(editText: EditText?): String? {
+fun Any?.getEditToString(editText: EditText?): String {
     return editText.editTextToString()
 }
 
 fun TextView?.textViewToString(block: (CharSequence) -> Unit) {
-    block(textViewToString() ?: "")
+    block(textViewToString())
 }
 
 /**
@@ -75,13 +76,14 @@ fun TextView?.textViewToString(block: (CharSequence) -> Unit) {
  * @param textView 输入框
  * @return 输入字符串
  */
-fun Any.getTextToString(textView: TextView?): String? {
+fun Any.getTextToString(textView: TextView?): String {
     return textView.textViewToString()
 }
 
-fun TextView?.textViewToString(): String? {
-    return this?.text?.toString()?.trim { it <= ' ' }
+fun TextView?.textViewToString(): String {
+    return this?.text?.toString()?.trim { it <= ' ' } ?: ""
 }
+
 fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
     if (this == null) {
         return false
@@ -197,7 +199,7 @@ fun Any?.isNonEmpty(text: CharSequence?): Boolean {
 fun conValidate(con: CharSequence?): Boolean {
     if (null != con && "" != con) {
         if ((con.isChinese() || con.matches(Regex("^[A-Za-z]+$")))
-                && con.length <= 10
+            && con.length <= 10
         ) {
             return true
         }
@@ -337,7 +339,7 @@ fun CharSequence?.phoneMask(): String {
 }
 
 const val MOBILE_PHONE =
-        "^((\\+86)?(13\\d|14[5-9]|15[0-35-9]|16[5-6]|17[0-8]|18\\d|19[158-9])\\d{8})$"
+    "^((\\+86)?(13\\d|14[5-9]|15[0-35-9]|16[5-6]|17[0-8]|18\\d|19[158-9])\\d{8})$"
 
 val MOBILE_PHONE_PATTERN: Pattern = Pattern.compile(MOBILE_PHONE)
 fun CharSequence?.isPhoneNumber(): Boolean {
@@ -363,6 +365,21 @@ fun Any?.generatePrivacyNickname(originNickname: String, defaultName: String): S
             originNickname[originNickname.length - 1]
 }
 
+/**
+ * 首字母大写
+ *
+ * @return 成功返回true，失败返回false
+ */
+fun CharSequence?.firstLetterUpperCase(local: Locale): String {
+    if (this.isEmptyOrBlank()) {
+        return ""
+    }
+    if (length <= 1) {
+        return this.toString().uppercase(local)
+    }
+    val firstLetter = substring(0, 1).uppercase(local)
+    return firstLetter + substring(1)
+}
 
 /**
  * 首字母大写
@@ -374,9 +391,9 @@ fun CharSequence?.firstLetterUpperCase(): String {
         return ""
     }
     if (length <= 1) {
-        return this.toString().toUpperCase()
+        return this.toString().uppercase()
     }
-    val firstLetter = substring(0, 1).toUpperCase()
+    val firstLetter = substring(0, 1).uppercase()
     return firstLetter + substring(1)
 }
 
@@ -391,4 +408,33 @@ fun CharSequence?.splitSpu(): CharSequence? {
         return substring(0, 7)
     }
     return this
+}
+
+/**
+ * 字符串拼接，
+ * @param text 拼接字符串
+ * @param separator 分隔符
+ * @author dingpeihua
+ * @date 2021/8/31 14:09
+ * @version 1.0
+ */
+fun CharSequence?.splice(text: String?, separator: String): CharSequence {
+    if (this.isNonEmpty()) {
+        if (text.isNonEmpty()) {
+            return "$this$separator$text"
+        }
+        return this
+    }
+    return ""
+}
+
+/**
+ * 字符串拼接，以逗号分隔
+ * @param text
+ * @author dingpeihua
+ * @date 2021/8/31 14:09
+ * @version 1.0
+ */
+fun CharSequence?.splice(text: String?): CharSequence {
+    return splice(text, ",")
 }

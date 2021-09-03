@@ -55,28 +55,8 @@ public class RequestParam extends VpRequestParams {
     }
 
 
-    boolean checkValue(Object value) {
-        if (value instanceof org.json.JSONArray || value instanceof org.json.JSONObject) {
-            throw new IllegalArgumentException("Value can not be org.json.JSONArray or org.json.JSONObject");
-        }
-        return true;
-    }
-
-
-    private void clearNull() {
-        Iterator<String> it = urlParams.keySet().iterator();
-        while (it.hasNext()) {
-            String key = it.next();
-            Object value = urlParams.get(key);
-            if (value == null) {
-                urlParams.remove(key);
-            }
-        }
-    }
-
     @Override
     public MultipartBody createFileRequestBody() {
-        urlParams.putAll(publicParams);
         return super.createFileRequestBody();
     }
 

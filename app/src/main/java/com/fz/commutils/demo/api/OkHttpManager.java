@@ -15,7 +15,6 @@ public class OkHttpManager {
                 .writeTimeout(45_000, TimeUnit.MILLISECONDS)
                 .readTimeout(45_000, TimeUnit.MILLISECONDS)
                 .connectTimeout(45_000, TimeUnit.MILLISECONDS)
-                .setEnabledHttpLog(true)
                 .hostnameVerifier((hostname, session) -> true);
         socketFactory(httpClient, true);
         return httpClient.build();
@@ -54,7 +53,7 @@ public class OkHttpManager {
                 .connectTimeout(30_000, TimeUnit.MILLISECONDS)
                 .retryOnConnectionFailure(false)
                 .timeoutInterceptor()
-                .setEnabledHttpLog(true);
+                .addInterceptor(new SecurityInterceptor());
         socketFactory(httpClient, false);
         return httpClient.build();
     }
