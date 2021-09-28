@@ -1,4 +1,5 @@
 @file:JvmName("FileUtil")
+
 package com.fz.common.file
 
 import android.annotation.SuppressLint
@@ -15,10 +16,7 @@ import android.util.Base64
 import androidx.core.content.FileProvider
 import com.fz.common.R
 import com.fz.common.text.isNonEmpty
-import com.fz.common.utils.isNotNull
-import com.fz.common.utils.isNull
-import com.fz.common.utils.no
-import com.fz.common.utils.yes
+import com.fz.common.utils.*
 import com.socks.library.KLog
 import java.io.*
 import java.nio.charset.Charset
@@ -304,9 +302,9 @@ fun File?.copyToFile(dest: File?): Boolean {
 }
 
 fun File?.writeBitmapToFile(
-        bitmap: Bitmap?,
-        fileName: String?,
-        deleteParentAllFile: Boolean,
+    bitmap: Bitmap?,
+    fileName: String?,
+    deleteParentAllFile: Boolean,
 ): File? {
     if (fileName == null) {
         return null
@@ -329,9 +327,9 @@ fun File?.writeBitmapToFile(bitmap: Bitmap?): File? {
     try {
         FileOutputStream(this).use { outStream ->
             bitmap.compress(
-                    Bitmap.CompressFormat.JPEG,
-                    100,
-                    outStream
+                Bitmap.CompressFormat.JPEG,
+                100,
+                outStream
             )
         }
     } catch (e: Exception) {
@@ -383,9 +381,9 @@ fun writeImageToFile(data: ByteArray?, outFile: File, deleteFile: Boolean): File
 }
 
 fun File?.writeToFile(
-        data: ByteArray?,
-        fileName: String?,
-        deleteParentAllFile: Boolean,
+    data: ByteArray?,
+    fileName: String?,
+    deleteParentAllFile: Boolean,
 ): File? {
     if (fileName == null) {
         return null
@@ -578,89 +576,91 @@ fun Context.getFileNameByUri(uri: Uri): String? {
 }
 
 fun Context.getRealPathFromURI(contentUri: Uri): String? {
-    return contentResolver.query(contentUri,
-            null, null, null, null)
-            .use { cursor ->
-                if (cursor == null) {
-                    contentUri.path
-                } else {
-                    cursor.moveToFirst()
-                    val index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
-                    cursor.getString(index)
-                }
+    return contentResolver.query(
+        contentUri,
+        null, null, null, null
+    )
+        .use { cursor ->
+            if (cursor == null) {
+                contentUri.path
+            } else {
+                cursor.moveToFirst()
+                val index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+                cursor.getString(index)
             }
+        }
 }
 
 /**
  * 建立一个MIME类型与文件后缀名的匹配表
  */
 val MIME_MAP_TABLE = arrayOf(
-        arrayOf(".3gp", "video/3gpp"),
-        arrayOf(".apk", "application/vnd.android.package-archive"),
-        arrayOf(".asf", "video/x-ms-asf"),
-        arrayOf(".avi", "video/x-msvideo"),
-        arrayOf(".bin", "application/octet-stream"),
-        arrayOf(".bmp", "image/bmp"),
-        arrayOf(".c", "text/plain"),
-        arrayOf(".class", "application/octet-stream"),
-        arrayOf(".conf", "text/plain"),
-        arrayOf(".cpp", "text/plain"),
-        arrayOf(".doc", "application/msword"),
-        arrayOf(".docx", "application/msword"),
-        arrayOf(".exe", "application/octet-stream"),
-        arrayOf(".gif", "image/gif"),
-        arrayOf(".gtar", "application/x-gtar"),
-        arrayOf(".gz", "application/x-gzip"),
-        arrayOf(".h", "text/plain"),
-        arrayOf(".htm", "text/html"),
-        arrayOf(".html", "text/html"),
-        arrayOf(".jar", "application/java-archive"),
-        arrayOf(".java", "text/plain"),
-        arrayOf(".jpeg", "image/jpeg"),
-        arrayOf(".jpg", "image/jpeg"),
-        arrayOf(".js", "application/x-javascript"),
-        arrayOf(".log", "text/plain"),
-        arrayOf(".m3u", "audio/x-mpegurl"),
-        arrayOf(".m4a", "audio/mp4a-latm"),
-        arrayOf(".m4b", "audio/mp4a-latm"),
-        arrayOf(".m4p", "audio/mp4a-latm"),
-        arrayOf(".m4u", "video/vnd.mpegurl"),
-        arrayOf(".m4v", "video/x-m4v"),
-        arrayOf(".mov", "video/quicktime"),
-        arrayOf(".mp2", "audio/x-mpeg"),
-        arrayOf(".mp3", "audio/x-mpeg"),
-        arrayOf(".mp4", "video/mp4"),
-        arrayOf(".mpc", "application/vnd.mpohun.certificate"),
-        arrayOf(".mpe", "video/mpeg"),
-        arrayOf(".mpeg", "video/mpeg"),
-        arrayOf(".mpg", "video/mpeg"),
-        arrayOf(".mpg4", "video/mp4"),
-        arrayOf(".mpga", "audio/mpeg"),
-        arrayOf(".msg", "application/vnd.ms-outlook"),
-        arrayOf(".ogg", "audio/ogg"),
-        arrayOf(".pdf", "application/pdf"),
-        arrayOf(".png", "image/png"),
-        arrayOf(".pps", "application/vnd.ms-powerpoint"),
-        arrayOf(".ppt", "application/vnd.ms-powerpoint"),
-        arrayOf(".prop", "text/plain"),
-        arrayOf(".rar", "application/x-rar-compressed"),
-        arrayOf(".rc", "text/plain"),
-        arrayOf(".rmvb", "audio/x-pn-realaudio"),
-        arrayOf(".rtf", "application/rtf"),
-        arrayOf(".sh", "text/plain"),
-        arrayOf(".tar", "application/x-tar"),
-        arrayOf(".tgz", "application/x-compressed"),
-        arrayOf(".txt", "text/plain"),
-        arrayOf(".wav", "audio/x-wav"),
-        arrayOf(".wma", "audio/x-ms-wma"),
-        arrayOf(".wmv", "audio/x-ms-wmv"),
-        arrayOf(".wps", "application/vnd.ms-works"),
-        arrayOf(".xml", "text/plain"),
-        arrayOf(".z", "application/x-compress"),
-        arrayOf(".zip", "application/zip"),
-        arrayOf(".xlsx", "application/vnd.ms-excel"),
-        arrayOf(".xls", "application/vnd.ms-excel"),
-        arrayOf("", "*/*")
+    arrayOf(".3gp", "video/3gpp"),
+    arrayOf(".apk", "application/vnd.android.package-archive"),
+    arrayOf(".asf", "video/x-ms-asf"),
+    arrayOf(".avi", "video/x-msvideo"),
+    arrayOf(".bin", "application/octet-stream"),
+    arrayOf(".bmp", "image/bmp"),
+    arrayOf(".c", "text/plain"),
+    arrayOf(".class", "application/octet-stream"),
+    arrayOf(".conf", "text/plain"),
+    arrayOf(".cpp", "text/plain"),
+    arrayOf(".doc", "application/msword"),
+    arrayOf(".docx", "application/msword"),
+    arrayOf(".exe", "application/octet-stream"),
+    arrayOf(".gif", "image/gif"),
+    arrayOf(".gtar", "application/x-gtar"),
+    arrayOf(".gz", "application/x-gzip"),
+    arrayOf(".h", "text/plain"),
+    arrayOf(".htm", "text/html"),
+    arrayOf(".html", "text/html"),
+    arrayOf(".jar", "application/java-archive"),
+    arrayOf(".java", "text/plain"),
+    arrayOf(".jpeg", "image/jpeg"),
+    arrayOf(".jpg", "image/jpeg"),
+    arrayOf(".js", "application/x-javascript"),
+    arrayOf(".log", "text/plain"),
+    arrayOf(".m3u", "audio/x-mpegurl"),
+    arrayOf(".m4a", "audio/mp4a-latm"),
+    arrayOf(".m4b", "audio/mp4a-latm"),
+    arrayOf(".m4p", "audio/mp4a-latm"),
+    arrayOf(".m4u", "video/vnd.mpegurl"),
+    arrayOf(".m4v", "video/x-m4v"),
+    arrayOf(".mov", "video/quicktime"),
+    arrayOf(".mp2", "audio/x-mpeg"),
+    arrayOf(".mp3", "audio/x-mpeg"),
+    arrayOf(".mp4", "video/mp4"),
+    arrayOf(".mpc", "application/vnd.mpohun.certificate"),
+    arrayOf(".mpe", "video/mpeg"),
+    arrayOf(".mpeg", "video/mpeg"),
+    arrayOf(".mpg", "video/mpeg"),
+    arrayOf(".mpg4", "video/mp4"),
+    arrayOf(".mpga", "audio/mpeg"),
+    arrayOf(".msg", "application/vnd.ms-outlook"),
+    arrayOf(".ogg", "audio/ogg"),
+    arrayOf(".pdf", "application/pdf"),
+    arrayOf(".png", "image/png"),
+    arrayOf(".pps", "application/vnd.ms-powerpoint"),
+    arrayOf(".ppt", "application/vnd.ms-powerpoint"),
+    arrayOf(".prop", "text/plain"),
+    arrayOf(".rar", "application/x-rar-compressed"),
+    arrayOf(".rc", "text/plain"),
+    arrayOf(".rmvb", "audio/x-pn-realaudio"),
+    arrayOf(".rtf", "application/rtf"),
+    arrayOf(".sh", "text/plain"),
+    arrayOf(".tar", "application/x-tar"),
+    arrayOf(".tgz", "application/x-compressed"),
+    arrayOf(".txt", "text/plain"),
+    arrayOf(".wav", "audio/x-wav"),
+    arrayOf(".wma", "audio/x-ms-wma"),
+    arrayOf(".wmv", "audio/x-ms-wmv"),
+    arrayOf(".wps", "application/vnd.ms-works"),
+    arrayOf(".xml", "text/plain"),
+    arrayOf(".z", "application/x-compress"),
+    arrayOf(".zip", "application/zip"),
+    arrayOf(".xlsx", "application/vnd.ms-excel"),
+    arrayOf(".xls", "application/vnd.ms-excel"),
+    arrayOf("", "*/*")
 )
 
 /**
@@ -683,8 +683,8 @@ fun File?.openFile(context: Context, type: String?) {
         //判断是否是AndroidN以及更高的版本
         val contentUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { //android 7.0
             FileProvider.getUriForFile(
-                    context, context.packageName + ".fileProvider",
-                    it
+                context, context.packageName + ".fileProvider",
+                it
             )
         } else {
             Uri.fromFile(it)
@@ -712,9 +712,10 @@ fun Any.openFile(context: Context, type: String?, contentUri: Uri?) {
     intent.setDataAndType(contentUri, type)
     //跳转
     context.startActivity(
-            Intent.createChooser(intent,
-                    context.getString(R.string.text_choose_application)
-            )
+        Intent.createChooser(
+            intent,
+            context.getString(R.string.text_choose_application)
+        )
     )
 }
 
@@ -761,7 +762,7 @@ fun Any.downLoadFile(context: Context, url: String, mimeType: String?, fileName:
     var downloadId: Long = 0
     try {
         // 获取下载服务
-        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val manager = context.downloadManager
         // 创建下载请求
         val down = DownloadManager.Request(Uri.parse(url))
         // 设置允许使用的网络类型，这里是移动网络和wifi都可以
@@ -777,7 +778,7 @@ fun Any.downLoadFile(context: Context, url: String, mimeType: String?, fileName:
         // 设置下载后文件存放的位置
         down.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
         // 将下载请求放入队列
-        downloadId = manager.enqueue(down)
+        downloadId = manager?.enqueue(down) ?: 0
     } catch (e: java.lang.Exception) {
         e.printStackTrace()
     }

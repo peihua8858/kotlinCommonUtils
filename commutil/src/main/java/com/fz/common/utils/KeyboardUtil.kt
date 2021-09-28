@@ -27,9 +27,8 @@ fun View?.showSoftKeyboard() {
 fun Any?.showSoftKeyboard(context: Context?, view: View?) {
     if (context != null && view != null) {
         try {
-            val imm:InputMethodManager =
-                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(view,0)
+            val imm =context.inputMethodManager
+            imm?.showSoftInput(view,0)
         } catch (e: Throwable) {
             e.printStackTrace()
         }
@@ -57,9 +56,8 @@ fun View?.hideSoftKeyboard() {
 fun Any?.hideSoftKeyboard(context: Context?, view: View?) {
     if (context != null && view != null) {
         try {
-            val imm =
-                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
+            val imm =context.inputMethodManager
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
         } catch (e: Throwable) {
             e.printStackTrace()
         }

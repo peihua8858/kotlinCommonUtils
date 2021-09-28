@@ -1,17 +1,24 @@
 @file:JvmName("ContextUtils")
+
 package com.fz.common.utils
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Dialog
+import android.app.*
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.hardware.camera2.CameraManager
+import android.hardware.display.DisplayManager
+import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.telephony.TelephonyManager
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import com.fz.common.text.isNonEmpty
@@ -22,6 +29,114 @@ internal var mContext: Context? = null
 fun initContext(context: Context) {
     mContext = context.applicationContext
 }
+
+/**
+ * 网络链接管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:24
+ * @version 1.0
+ */
+val Context?.connectivityManager: ConnectivityManager?
+    get() = this?.applicationContext?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+
+/**
+ * 剪贴板管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:40
+ * @version 1.0
+ */
+val Context?.clipboardManager: ClipboardManager?
+    get() = this?.applicationContext?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+
+/**
+ * 下载管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:41
+ * @version 1.0
+ */
+val Context?.downloadManager: DownloadManager?
+    get() = this?.applicationContext?.getSystemService(Context.DOWNLOAD_SERVICE) as? DownloadManager
+
+/**
+ * 电话管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:41
+ * @version 1.0
+ */
+val Context?.telephonyManager: TelephonyManager?
+    get() = this?.applicationContext?.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
+
+/**
+ * 输入管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:41
+ * @version 1.0
+ */
+val Context?.inputMethodManager: InputMethodManager?
+    get() = this?.applicationContext?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+
+/**
+ *位置管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:54
+ * @version 1.0
+ */
+val Context?.locationManager: LocationManager?
+    get() = this?.applicationContext?.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+
+/**
+ *显示管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:55
+ * @version 1.0
+ */
+val Context?.displayManager: DisplayManager?
+    get() = this?.applicationContext?.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
+
+/**
+ *相机管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:55
+ * @version 1.0
+ */
+val Context?.cameraManager: CameraManager?
+    get() = this?.applicationContext?.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
+
+/**
+ *窗口管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:55
+ * @version 1.0
+ */
+val Context?.windowManager: WindowManager?
+    get() = this?.applicationContext?.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+
+/**
+ * 通知管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:55
+ * @version 1.0
+ */
+val Context?.notificationManager: NotificationManager?
+    get() = this?.applicationContext?.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+
+/**
+ * 活动管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:56
+ * @version 1.0
+ */
+val Context?.activityManager: ActivityManager?
+    get() = this?.applicationContext?.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+
+/**
+ * 警报管理器
+ * @author dingpeihua
+ * @date 2021/9/28 16:56
+ * @version 1.0
+ */
+val Context?.alarmManager: AlarmManager?
+    get() = this?.applicationContext?.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
 /**
  * 检查当前[any]是否可转为[Context]
@@ -191,24 +306,29 @@ fun Context?.copyToClipBoard(lazyContent: () -> CharSequence) {
  */
 fun Context?.copyToClipBoard(lazyContent: () -> CharSequence, callback: (Boolean) -> Unit) {
     val content = lazyContent()
-    if (this != null) copyToClipBoard(content, callback) else callback(false).eLog { "Context  is null." }
+    if (this != null) copyToClipBoard(
+        content,
+        callback
+    ) else callback(false).eLog { "Context  is null." }
 }
 
 /**
  * 粘贴到系统剪贴板
  */
 fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)?) {
-    val context = this.applicationContext
-    val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val cm = clipboardManager
     val text = ClipData.newPlainText("url", content)
-    cm.setPrimaryClip(text)
-    callback?.let {
-        cm.addPrimaryClipChangedListener(object : ClipboardManager.OnPrimaryClipChangedListener {
-            override fun onPrimaryClipChanged() {
-                cm.removePrimaryClipChangedListener(this)
-                callback(true)
-            }
-        })
+    cm?.let {
+        cm.setPrimaryClip(text)
+        callback?.let {
+            cm.addPrimaryClipChangedListener(object :
+                ClipboardManager.OnPrimaryClipChangedListener {
+                override fun onPrimaryClipChanged() {
+                    cm.removePrimaryClipChangedListener(this)
+                    callback(true)
+                }
+            })
+        }
     }
 }
 

@@ -1,7 +1,6 @@
 package com.fz.common.network
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageManager
@@ -11,6 +10,8 @@ import android.net.NetworkInfo
 import android.os.Build
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
+import com.fz.common.utils.connectivityManager
+import com.fz.common.utils.telephonyManager
 
 /**
  * 网络连接工具
@@ -29,13 +30,14 @@ internal object Connectivity {
      * @version 1.0
      */
     fun isConnected(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            isConnectedM(connectivityManager)
-        } else {
-            isConnectedL(connectivityManager)
-        }
+        val connectivityManager = context.connectivityManager
+        return connectivityManager?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                isConnectedM(connectivityManager)
+            } else {
+                isConnectedL(connectivityManager)
+            }
+        } ?: false
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -143,8 +145,7 @@ internal object Connectivity {
     }
 
     private fun getNetworkTypeL(context: Context): NetworkType {
-        val cm: ConnectivityManager? =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        val cm = context.connectivityManager
         val networkInfo: NetworkInfo? = cm?.activeNetworkInfo
         if (networkInfo != null && networkInfo.isAvailable && networkInfo.isConnected) {
             return when (networkInfo.type) {
@@ -176,9 +177,8 @@ internal object Connectivity {
 
     @TargetApi(Build.VERSION_CODES.M)
     private fun getNetworkTypeM(context: Context): NetworkType {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val nw = connectivityManager.activeNetwork ?: return NetworkType.NETWORK_NO
+        val connectivityManager = context.connectivityManager
+        val nw = connectivityManager?.activeNetwork ?: return NetworkType.NETWORK_NO
         val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return NetworkType.NETWORK_NO
         return when {
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> NetworkType.NETWORK_WIFI
@@ -189,13 +189,14 @@ internal object Connectivity {
                         Manifest.permission.READ_PHONE_STATE
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                    tm.networkOperatorName
-                    return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-                        getNetworkType(tm.dataNetworkType)
-                    } else {
-                        getNetworkType(tm.networkType)
-                    }
+                    val tm = context.telephonyManager
+                    return tm?.let {
+                        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+                            getNetworkType(tm.dataNetworkType)
+                        } else {
+                            getNetworkType(tm.networkType)
+                        }
+                    } ?: NetworkType.NETWORK_UNKNOWN
                 }
                 return NetworkType.NETWORK_CELLULAR
             }

@@ -3,13 +3,13 @@
 package com.fz.common.text
 
 import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.text.TextUtils
 import android.util.Base64
 import android.util.Patterns
 import android.widget.EditText
 import android.widget.TextView
+import com.fz.common.utils.clipboardManager
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.*
@@ -88,9 +88,9 @@ fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
     if (this == null) {
         return false
     }
-    val c = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val c = context.clipboardManager
     val clipData = ClipData.newPlainText("text label", this)
-    c.setPrimaryClip(clipData)
+    c?.setPrimaryClip(clipData)
     return true
 }
 
@@ -104,8 +104,8 @@ fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
  */
 fun Any?.pasteText(context: Context): CharSequence? {
     // 得到剪贴板管理器
-    val cmb = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    val clip = cmb.primaryClip
+    val cmb = context.clipboardManager
+    val clip = cmb?.primaryClip
     return if (clip != null && clip.itemCount > 0) {
         clip.getItemAt(0).coerceToText(context)
     } else null

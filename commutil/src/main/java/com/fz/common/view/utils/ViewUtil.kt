@@ -85,11 +85,13 @@ fun View?.setOnNoDoubleClickListener(listener: View.OnClickListener?) {
     if (this == null) {
         return
     }
-    setOnClickListener(object : OnNoDoubleClickListener() {
-        override fun onNoDoubleClick(view: View?) {
-            listener?.onClick(view)
-        }
-    })
+    listener?.let{
+        setOnClickListener(object : OnNoDoubleClickListener() {
+            override fun onNoDoubleClick(view: View?) {
+                it.onClick(view)
+            }
+        })
+    }
 }
 
 fun Any?.contains(view: View, x: Float, y: Float): Boolean {
