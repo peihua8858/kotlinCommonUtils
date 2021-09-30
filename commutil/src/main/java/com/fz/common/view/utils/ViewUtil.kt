@@ -13,7 +13,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import com.fz.common.listener.OnNoDoubleClickListener
-import com.fz.common.utils.*
+import com.fz.common.utils.checkContext
+import com.fz.common.utils.getDimens
+import com.fz.common.utils.getResourceId
+import com.fz.common.utils.resolveAttribute
 import java.util.*
 
 /**
@@ -47,6 +50,10 @@ fun Any?.isAppRtl(): Boolean {
     return TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
 }
 
+@Deprecated(
+    "Please use androidx.core.view.isVisible, This method will be removed in the next version",
+    replaceWith = ReplaceWith("androidx.core.view.isVisible")
+)
 fun View?.setVisible(isVisible: Boolean) {
     if (this == null) {
         return
@@ -54,6 +61,10 @@ fun View?.setVisible(isVisible: Boolean) {
     this.visibility = if (isVisible) View.VISIBLE else View.GONE
 }
 
+@Deprecated(
+    "Please use androidx.core.view.isVisible, This method will be removed in the next version",
+    replaceWith = ReplaceWith("androidx.core.view.isVisible")
+)
 fun View?.setGone(isGone: Boolean) {
     if (this == null) {
         return
@@ -85,7 +96,7 @@ fun View?.setOnNoDoubleClickListener(listener: View.OnClickListener?) {
     if (this == null) {
         return
     }
-    listener?.let{
+    listener?.let {
         setOnClickListener(object : OnNoDoubleClickListener() {
             override fun onNoDoubleClick(view: View?) {
                 it.onClick(view)
