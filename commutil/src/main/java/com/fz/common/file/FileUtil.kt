@@ -15,6 +15,7 @@ import android.provider.OpenableColumns
 import android.util.Base64
 import androidx.core.content.FileProvider
 import com.fz.common.R
+import com.fz.common.array.isNonEmpty
 import com.fz.common.text.isNonEmpty
 import com.fz.common.utils.*
 import com.socks.library.KLog
@@ -92,7 +93,7 @@ fun File?.deleteFile(): Boolean {
  */
 fun File?.deleteFileOrDir(): Boolean {
     return this?.let {
-        if (!path.exists()) {
+        if (!exists()) {
             return true
         }
         if (isFile) {
@@ -107,35 +108,36 @@ fun File?.deleteFileOrDir(): Boolean {
         return delete()
     } ?: false
 }
+
 /**
  * 删除指定目录下所有的文件
  *
  * @param file 目录文件对象
- * @return
- */
-/**
- * 删除指定目录下所有的文件
- *
- * @param file 目录文件对象
+ * @param isDeleteCurDir 是否删除当前目录
  * @return
  */
 @JvmOverloads
-fun File?.deleteDirectory(isDeleteParent: Boolean = true): Boolean {
-    if (isNotNull() && exists() && isDirectory) {
-        val files = listFiles()
-        if (files != null) {
-            // 先删除该目录下所有的文件
-            for (f: File? in files) {
-                f.delete()
+fun File?.deleteDirectory(isDeleteCurDir: Boolean = true): Boolean {
+    return this?.let {
+        if (exists()) {
+            if (isDirectory) {
+                val files = listFiles()
+                if (files.isNonEmpty()) {
+                    // 先删除该目录下所有的文件
+                    for (f: File? in files) {
+                        f.deleteDirectory(true)
+                    }
+                    return true
+                }
+            } else {
+                // 最后删除该目录
+                if (isDeleteCurDir) {
+                    return delete()
+                }
             }
-            // 最后删除该目录
-            if (isDeleteParent) {
-                deleteFile()
-            }
-            return true
         }
-    }
-    return false
+        return false
+    } ?: true
 }
 
 /**
