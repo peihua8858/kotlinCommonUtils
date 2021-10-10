@@ -1,7 +1,7 @@
 @file:JvmName("ResourceUtil")
+
 package com.fz.common.utils
 
-import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
@@ -31,9 +31,9 @@ fun Any?.getNameWithResId(@IdRes resourceId: Int): String? {
 fun Any?.getIdWithName(resourceTypeName: String, resourceName: String): Int {
     val context: Context = checkContext(this) ?: return 0.eLog { "Context  is null." }
     return context.resources.getIdentifier(
-            resourceName,
-            resourceTypeName,
-            context.packageName
+        resourceName,
+        resourceTypeName,
+        context.packageName
     )
 }
 
@@ -193,9 +193,9 @@ fun Any?.getDrawable(@DrawableRes resId: Int): Drawable? {
  * @version 1.0
  */
 fun Any?.resolveAttribute(
-        context: Context,
-        resId: Int,
-        @StyleRes defaultRes: Int,
+    context: Context,
+    resId: Int,
+    @StyleRes defaultRes: Int,
 ): Int {
     val resourceId = resolveAttribute(context, resId)
     return if (resourceId != 0) {
@@ -244,4 +244,19 @@ fun Context.getResourceId(attrId: Int): Int {
     val resourceId = ta.getResourceId(0, -1)
     ta.recycle()
     return resourceId
+}
+
+fun Any?.getColorCompat(@ColorRes resId: Int): Int {
+    val context: Context = checkContext(this) ?: return (-1).eLog { "Context  is null." }
+    return ContextCompat.getColor(context, resId)
+}
+
+fun Any?.getDrawableCompat(@DrawableRes resId: Int): Drawable? {
+    val context: Context = checkContext(this) ?: return null.eLog { "Context  is null." }
+    return ContextCompat.getDrawable(context, resId)
+}
+
+fun Any?.getDimensionPixelOffset(@DimenRes resId: Int): Int {
+    val resources = getResource()
+    return resources?.getDimensionPixelOffset(resId) ?: 0
 }

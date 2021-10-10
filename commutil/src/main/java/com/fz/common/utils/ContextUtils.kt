@@ -8,6 +8,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.hardware.camera2.CameraManager
 import android.hardware.display.DisplayManager
 import android.location.LocationManager
@@ -19,7 +20,11 @@ import android.telephony.TelephonyManager
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.fz.common.text.isNonEmpty
 import java.util.*
@@ -379,4 +384,23 @@ fun Context.isUsingArLanguage(): Boolean {
         e.printStackTrace()
     }
     return false
+}
+
+fun Context?.getColorCompat(@ColorRes resId: Int): Int {
+    val ctx = this ?: mContext
+    return ctx?.let {
+        ContextCompat.getColor(it, resId)
+    } ?: -1
+}
+
+fun Context?.getDrawableCompat(@DrawableRes resId: Int): Drawable? {
+    val ctx = this ?: mContext
+    return ctx?.let {
+        ContextCompat.getDrawable(it, resId)
+    }
+}
+
+fun Context?.getDimensionPixelOffset(@DimenRes resId: Int): Int {
+    val ctx = this ?: mContext
+    return ctx?.resources?.getDimensionPixelOffset(resId) ?: 0
 }
