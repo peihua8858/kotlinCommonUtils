@@ -51,8 +51,8 @@ fun Any?.isAppRtl(): Boolean {
 }
 
 @Deprecated(
-    "Please use androidx.core.view.isVisible, This method will be removed in the next version",
-    replaceWith = ReplaceWith("androidx.core.view.isVisible")
+        "Please use androidx.core.view.isVisible, This method will be removed in the next version",
+        replaceWith = ReplaceWith("androidx.core.view.isVisible")
 )
 fun View?.setVisible(isVisible: Boolean) {
     if (this == null) {
@@ -62,8 +62,8 @@ fun View?.setVisible(isVisible: Boolean) {
 }
 
 @Deprecated(
-    "Please use androidx.core.view.isVisible, This method will be removed in the next version",
-    replaceWith = ReplaceWith("androidx.core.view.isVisible")
+        "Please use androidx.core.view.isVisible, This method will be removed in the next version",
+        replaceWith = ReplaceWith("androidx.core.view.isVisible")
 )
 fun View?.setGone(isGone: Boolean) {
     if (this == null) {
@@ -97,11 +97,7 @@ fun View?.setOnNoDoubleClickListener(listener: View.OnClickListener?) {
         return
     }
     listener?.let {
-        setOnClickListener(object : OnNoDoubleClickListener() {
-            override fun onNoDoubleClick(view: View?) {
-                it.onClick(view)
-            }
-        })
+        setOnClickListener(OnNoDoubleClickListener(it))
     }
 }
 
@@ -118,9 +114,9 @@ fun Any?.calcViewScreenLocation(view: View): RectF {
     // 获取控件在屏幕中的位置，返回的数组分别为控件左顶点的 x、y 的值
     view.getLocationOnScreen(location)
     return RectF(
-        location[0].toFloat(), location[1]
+            location[0].toFloat(), location[1]
             .toFloat(), (location[0] + view.width).toFloat(),
-        (location[1] + view.height).toFloat()
+            (location[1] + view.height).toFloat()
     )
 }
 

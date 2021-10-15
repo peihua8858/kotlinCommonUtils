@@ -86,7 +86,7 @@ class LinearLayoutItemDecoration @JvmOverloads constructor(
         if (layoutManager is LinearLayoutManager) {
             val orientation = layoutManager.orientation
             val viewHolder = parent.getChildViewHolder(view)
-            val position = viewHolder.adapterPosition
+            val position = viewHolder.bindingAdapterPosition
             val adapter = parent.adapter
             val itemCount = adapter?.itemCount ?: 0
             if (orientation == LinearLayoutManager.HORIZONTAL) {

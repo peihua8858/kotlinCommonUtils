@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -29,8 +30,9 @@ class DividerItemDecoration : ItemDecoration {
      * 分割线
      */
     private var mDivider: Drawable?
-    var mOrientation = 0
+    private var mOrientation = VERTICAL_LIST
     private var dividerSize = 0
+    private var noDrawDividerPosition = -1
 
     constructor(context: Context) {
         val a = context.obtainStyledAttributes(ATTRS)
@@ -46,19 +48,30 @@ class DividerItemDecoration : ItemDecoration {
         setOrientation(orientation)
     }
 
-    private var noDrawDividerPosition = -1
-    fun setOrientation(orientation: Int) {
+
+    fun setOrientation(orientation: Int): DividerItemDecoration {
         require(!(orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST)) { "invalid orientation" }
         mOrientation = orientation
+        return this
     }
 
-    fun setNoDrawDividerPosition(noDrawDividerPosition: Int) {
+    fun setNoDrawDividerPosition(noDrawDividerPosition: Int): DividerItemDecoration {
         this.noDrawDividerPosition = noDrawDividerPosition
+        return this
     }
 
-    constructor(@DrawableRes drawable: Int, orientation: Int) {
+    fun setDividerSize(dividerSize: Int): DividerItemDecoration {
+        this.dividerSize = dividerSize
+        return this
+    }
+
+    fun setDivider(drawable: Drawable): DividerItemDecoration {
+        this.mDivider = drawable
+        return this
+    }
+
+    constructor(@DrawableRes drawable: Int) {
         mDivider = getDrawable(drawable)
-        mOrientation = orientation
         dividerSize = dip2px(1)
     }
 
@@ -68,38 +81,43 @@ class DividerItemDecoration : ItemDecoration {
         dividerSize = dividerHeight
     }
 
+    constructor(@ColorInt color: Int, dividerHeight: Int) {
+        mDivider = ColorDrawable(color)
+        dividerSize = dividerHeight
+    }
+
     override fun getItemOffsets(
             outRect: Rect,
             view: View,
             parent: RecyclerView,
             state: RecyclerView.State
     ) {
-        val childCount = parent.childCount
-        val itemPosition = parent.getChildAdapterPosition(view)
-        if (mOrientation == VERTICAL_LIST) {
-            val intrinsicHeight = mDivider!!.intrinsicHeight
-            outRect[0, 0, 0] =
-                    if (itemPosition < childCount - 1) if (intrinsicHeight > 0) intrinsicHeight else dividerSize else 0
-        } else {
-            val intrinsicWidth = mDivider!!.intrinsicWidth
-            outRect[0, 0, if (itemPosition < childCount - 1) if (intrinsicWidth > 0) intrinsicWidth else dividerSize else 0] =
-                    0
+        mDivider?.let {
+            val childCount = parent.childCount
+            val itemPosition = parent.getChildAdapterPosition(view)
+            if (mOrientation == VERTICAL_LIST) {
+                val intrinsicHeight = it.intrinsicHeight
+                outRect[0, 0, 0] =
+                        if (itemPosition < childCount - 1) if (intrinsicHeight > 0) intrinsicHeight else dividerSize else 0
+            } else {
+                val intrinsicWidth = it.intrinsicWidth
+                outRect[0, 0, if (itemPosition < childCount - 1) if (intrinsicWidth > 0) intrinsicWidth else dividerSize else 0] =
+                        0
+            }
         }
-    }
-
-    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        super.onDraw(c, parent, state)
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        if (mOrientation == LinearLayoutCompat.VERTICAL) {
-            drawVertical(c, parent)
-        } else {
-            drawHorizontal(c, parent)
+        mDivider?.let {
+            if (mOrientation == LinearLayoutCompat.VERTICAL) {
+                drawVertical(it, c, parent)
+            } else {
+                drawHorizontal(it, c, parent)
+            }
         }
     }
 
-    fun drawVertical(c: Canvas?, parent: RecyclerView) {
+    private fun drawVertical(drawable: Drawable, c: Canvas?, parent: RecyclerView) {
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
         val childCount = parent.childCount
@@ -110,14 +128,14 @@ class DividerItemDecoration : ItemDecoration {
             val child = parent.getChildAt(i)
             val params = child.layoutParams as RecyclerView.LayoutParams
             val top = child.bottom + params.bottomMargin
-            val intrinsicHeight = mDivider!!.intrinsicHeight
+            val intrinsicHeight = drawable.intrinsicHeight
             val bottom = top + if (intrinsicHeight > 0) intrinsicHeight else dividerSize
-            mDivider!!.setBounds(left, top, right, bottom)
-            mDivider!!.draw(c!!)
+            drawable.setBounds(left, top, right, bottom)
+            drawable.draw(c!!)
         }
     }
 
-    fun drawHorizontal(c: Canvas?, parent: RecyclerView) {
+    private fun drawHorizontal(drawable: Drawable, c: Canvas?, parent: RecyclerView) {
         val top = parent.paddingTop
         val bottom = parent.height - parent.paddingBottom
         val childCount = parent.childCount
@@ -125,10 +143,10 @@ class DividerItemDecoration : ItemDecoration {
             val child = parent.getChildAt(i)
             val params = child.layoutParams as RecyclerView.LayoutParams
             val left = child.right + params.rightMargin
-            val right = left + mDivider!!.intrinsicHeight
+            val right = left + drawable.intrinsicHeight
             KLog.d("LockCart>>>>left=$left,top=$top,right=$right,bottom=$bottom")
-            mDivider!!.setBounds(left, top, right, bottom)
-            mDivider!!.draw(c!!)
+            drawable.setBounds(left, top, right, bottom)
+            drawable.draw(c!!)
         }
     }
 

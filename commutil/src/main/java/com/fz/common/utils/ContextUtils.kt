@@ -26,7 +26,10 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.fz.common.file.deleteFileOrDir
+import com.fz.common.file.getFileSize
 import com.fz.common.text.isNonEmpty
+import java.io.File
 import java.util.*
 
 @SuppressLint("StaticFieldLeak")
@@ -173,7 +176,11 @@ fun checkContext(any: Any?): Context? {
             any.context
         }
         is Fragment -> {
-            any.context
+            try {
+                any.context
+            } catch (e: Exception) {
+                mContext
+            }
         }
         is Dialog -> {
             any.context
@@ -312,8 +319,8 @@ fun Context?.copyToClipBoard(lazyContent: () -> CharSequence) {
 fun Context?.copyToClipBoard(lazyContent: () -> CharSequence, callback: (Boolean) -> Unit) {
     val content = lazyContent()
     if (this != null) copyToClipBoard(
-        content,
-        callback
+            content,
+            callback
     ) else callback(false).eLog { "Context  is null." }
 }
 
@@ -327,7 +334,7 @@ fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)
         cm.setPrimaryClip(text)
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
-                ClipboardManager.OnPrimaryClipChangedListener {
+                    ClipboardManager.OnPrimaryClipChangedListener {
                 override fun onPrimaryClipChanged() {
                     cm.removePrimaryClipChangedListener(this)
                     callback(true)
@@ -403,4 +410,24 @@ fun Context?.getDrawableCompat(@DrawableRes resId: Int): Drawable? {
 fun Context?.getDimensionPixelOffset(@DimenRes resId: Int): Int {
     val ctx = this ?: mContext
     return ctx?.resources?.getDimensionPixelOffset(resId) ?: 0
+}
+
+fun Context.clearCacheFile() {
+    getDiskCacheDir().deleteFileOrDir()
+}
+
+fun Context.getCacheSize(): Long {
+    return getDiskCacheDir().getFileSize()
+}
+
+fun Context.getDiskCacheDir(): File? {
+    //如果SD卡存在通过getExternalCacheDir()获取路径，
+    //放在路径 /sdcard/Android/data/<application package>/cache/
+    val file = externalCacheDir
+    //如果SD卡不存在通过getCacheDir()获取路径，
+    //放在路径 /data/data/<application package>/cache/
+    if (file != null && file.exists()) {
+        return file
+    }
+    return cacheDir
 }

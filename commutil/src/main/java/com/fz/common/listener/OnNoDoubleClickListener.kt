@@ -8,8 +8,8 @@ import android.view.View
  * @date 2020/11/25 20:55
  * @version 1.0
  */
-abstract class OnNoDoubleClickListener(timeMillis: Long = 500) : View.OnClickListener {
-    constructor() : this(500)
+
+open class OnNoDoubleClickListener @JvmOverloads constructor(private val listener: View.OnClickListener? = null, timeMillis: Long = 500) : View.OnClickListener {
 
     /**
      * 两次单击时间间隔，默认500ms
@@ -21,13 +21,17 @@ abstract class OnNoDoubleClickListener(timeMillis: Long = 500) : View.OnClickLis
      * 上一次点击的时间
      */
 
-    override fun onClick(v: View) {
+    final override fun onClick(v: View) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - mLastClickTime > defaultDelayTime) {
             mLastClickTime = currentTime
-            onNoDoubleClick(v)
+            if (listener != null) {
+                listener.onClick(v)
+            } else {
+                onNoDoubleClick(v)
+            }
         }
     }
 
-    abstract fun onNoDoubleClick(view: View?)
+    open fun onNoDoubleClick(view: View?) {}
 }
