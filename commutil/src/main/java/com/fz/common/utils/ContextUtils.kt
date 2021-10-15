@@ -1,5 +1,5 @@
 @file:JvmName("ContextUtils")
-
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.annotation.SuppressLint
@@ -27,6 +27,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.fz.common.file.deleteFileOrDir
+import com.fz.common.file.formatSize
 import com.fz.common.file.getFileSize
 import com.fz.common.text.isNonEmpty
 import java.io.File
@@ -418,6 +419,10 @@ fun Context.clearCacheFile() {
 
 fun Context.getCacheSize(): Long {
     return getDiskCacheDir().getFileSize()
+}
+
+fun Context.getCacheFormatSize(): String {
+    return getDiskCacheDir().formatSize()
 }
 
 fun Context.getDiskCacheDir(): File? {

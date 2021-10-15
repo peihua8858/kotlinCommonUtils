@@ -1,4 +1,5 @@
 @file:JvmName("LogUtil")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import com.socks.library.KLog

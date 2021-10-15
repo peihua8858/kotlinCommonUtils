@@ -1,5 +1,5 @@
 @file:JvmName("TextViewUtil")
-
+@file:JvmMultifileClass
 package com.fz.common.view.utils
 
 import android.graphics.drawable.Drawable

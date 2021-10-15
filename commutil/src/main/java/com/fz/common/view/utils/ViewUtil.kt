@@ -1,5 +1,5 @@
 @file:JvmName("ViewUtil")
-
+@file:JvmMultifileClass
 package com.fz.common.view.utils
 
 import android.content.Context

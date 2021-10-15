@@ -1,4 +1,5 @@
 @file:JvmName("ToolbarUtil")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.graphics.drawable.Drawable
@@ -37,38 +38,6 @@ fun Toolbar?.setAppBarScrollFlags() {
             layoutParams.scrollFlags = (AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
                     or AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
                     or AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP)
-        }
-    }
-}
-
-fun Toolbar?.setToolbarTitleColor(@ColorInt titleColor: Int) {
-    if (this != null) {
-        val tvToolbarTitle = findViewById<TextView>(R.id.tv_toolbar_title)
-        if (tvToolbarTitle != null) {
-            tvToolbarTitle.setTextColor(titleColor)
-        } else {
-            setTitleTextColor(titleColor)
-        }
-    }
-}
-
-/**
- * 设置[Toolbar] 标题
- * @param title 标题文本
- * @author dingpeihua
- * @date 2021/1/14 10:07
- * @version 1.0
- */
-fun Toolbar?.setToolbarTitle(title: CharSequence?) {
-    if (this != null) {
-        val tvToolbarTitle = findViewById<TextView>(R.id.tv_toolbar_title)
-        if (tvToolbarTitle != null) {
-            setTitle("")
-            tvToolbarTitle.text = title
-        } else {
-            tvToolbarTitle?.text = ""
-            setTitle(title)
-            logo = null
         }
     }
 }

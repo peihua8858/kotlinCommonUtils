@@ -1,4 +1,5 @@
 @file:JvmName("IOUtil")
+@file:JvmMultifileClass
 package com.fz.common.file
 
 import android.database.Cursor

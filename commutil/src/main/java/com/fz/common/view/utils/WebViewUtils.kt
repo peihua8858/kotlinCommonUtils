@@ -1,4 +1,5 @@
 @file:JvmName("WebViewUtils")
+@file:JvmMultifileClass
 package com.fz.common.view.utils
 
 import android.webkit.WebView

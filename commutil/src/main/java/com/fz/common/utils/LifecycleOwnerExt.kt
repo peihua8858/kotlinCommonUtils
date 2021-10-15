@@ -1,3 +1,5 @@
+@file:JvmName("LifecycleOwnerExt")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import androidx.fragment.app.FragmentManager

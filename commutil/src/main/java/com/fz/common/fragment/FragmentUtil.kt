@@ -1,4 +1,5 @@
 @file:JvmName("FragmentUtil")
+@file:JvmMultifileClass
 package com.fz.common.fragment
 
 import android.app.Dialog

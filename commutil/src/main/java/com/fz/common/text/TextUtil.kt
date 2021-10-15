@@ -1,5 +1,5 @@
 @file:JvmName("TextUtil")
-
+@file:JvmMultifileClass
 package com.fz.common.text
 
 import android.content.ClipData

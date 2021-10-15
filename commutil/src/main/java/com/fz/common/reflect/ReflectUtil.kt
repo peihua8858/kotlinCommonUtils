@@ -1,4 +1,5 @@
 @file:JvmName("ReflectUtil")
+@file:JvmMultifileClass
 package com.fz.common.reflect
 
 import com.socks.library.KLog

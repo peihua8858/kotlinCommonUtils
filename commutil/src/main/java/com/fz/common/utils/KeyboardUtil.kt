@@ -1,4 +1,5 @@
 @file:JvmName("KeyboardUtil")
+@file:JvmMultifileClass
 package com.fz.common.utils
 
 import android.content.Context

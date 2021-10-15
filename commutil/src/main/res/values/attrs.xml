@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <attr format="reference" name="AppBarLayoutStyle"/>
-    <attr format="reference" name="SwipeBackLayoutStyle"/>
-    <attr format="reference" name="TabLayoutStyle"/>
-    <attr format="reference" name="ToolbarStyle"/>
-</resources>

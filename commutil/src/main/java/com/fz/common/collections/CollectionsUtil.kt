@@ -1,5 +1,5 @@
 @file:JvmName("CollectionsUtil")
-
+@file:JvmMultifileClass
 package com.fz.common.collections
 
 import android.os.Parcel

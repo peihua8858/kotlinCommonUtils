@@ -103,7 +103,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
             try {
                 val response = request()
                 onResponse?.invoke(response)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 eLog { e.getStackTraceMessage() }
                 onError?.invoke(e)
             } finally {
@@ -121,7 +121,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
                 request()
             }
             onResponse?.invoke(response)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             eLog { e.getStackTraceMessage() }
             onError?.invoke(e)
         } finally {
@@ -137,7 +137,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
             try {
                 val response = request()
                 onResponse?.invoke(response)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 eLog { e.getStackTraceMessage() }
                 onError?.invoke(e)
             } finally {
@@ -156,7 +156,7 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
                     request()
                 }
                 onResponse?.invoke(response)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 eLog { e.getStackTraceMessage() }
                 onError?.invoke(e)
             } finally {

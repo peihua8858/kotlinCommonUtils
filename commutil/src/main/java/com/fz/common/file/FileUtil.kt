@@ -1,5 +1,5 @@
 @file:JvmName("FileUtil")
-
+@file:JvmMultifileClass
 package com.fz.common.file
 
 import android.annotation.SuppressLint
@@ -834,6 +834,13 @@ fun String?.getFileSize(): Long {
     return File(this).getFileSize()
 }
 
+fun String?.formatSize(): String {
+    if (this.isNullOrEmpty()) {
+        return "0B"
+    }
+    return File(this).formatSize()
+}
+
 /**
  * 获取指定文件（包含文件夹及其子文件）大小
  *
@@ -849,13 +856,17 @@ fun File?.getFileSize(): Long {
         return length()
     }
     var size: Long = 0
-    val fList = listFiles()
-    if (fList != null) {
-        for (aFList in fList) {
-            size += getFileSize()
+    val files = listFiles()
+    if (files != null) {
+        for (file in files) {
+            size += file.getFileSize()
         }
     }
     return size
+}
+
+fun File?.formatSize(): String {
+    return getFileSize().formatFileSize()
 }
 
 /**

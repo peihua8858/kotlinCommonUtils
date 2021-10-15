@@ -1,5 +1,5 @@
 @file:JvmName("ArrayUtil")
-
+@file:JvmMultifileClass
 package com.fz.common.array
 
 import android.os.Parcel

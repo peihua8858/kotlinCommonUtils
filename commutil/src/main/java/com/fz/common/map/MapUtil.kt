@@ -1,5 +1,5 @@
 @file:JvmName("MapUtil")
-
+@file:JvmMultifileClass
 package com.fz.common.map
 
 import android.os.BadParcelableException
