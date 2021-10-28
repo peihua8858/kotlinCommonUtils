@@ -12,7 +12,6 @@ import android.provider.ContactsContract
 import android.provider.MediaStore
 import androidx.annotation.Nullable
 import com.socks.library.KLog
-import com.socks.library.eLog
 import java.io.File
 import java.net.MalformedURLException
 import java.net.URL

@@ -1,7 +1,9 @@
 @file:JvmName("LogUtil")
 @file:JvmMultifileClass
 
-package com.socks.library
+package com.fz.common.utils
+
+import com.socks.library.KLog
 
 private const val STACK_TRACE_INDEX = 6
 fun <T> T?.aLog(lazyMessage: () -> Any): T? {
