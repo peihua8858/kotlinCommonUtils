@@ -1,5 +1,6 @@
 @file:JvmName("UriUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.content.ContentResolver
@@ -11,6 +12,7 @@ import android.provider.ContactsContract
 import android.provider.MediaStore
 import androidx.annotation.Nullable
 import com.socks.library.KLog
+import com.socks.library.eLog
 import java.io.File
 import java.net.MalformedURLException
 import java.net.URL
@@ -262,9 +264,10 @@ fun Uri?.getRealPathFromURI(context: Context): String? {
     return result
 }
 
-fun Context.getResourceUri(resourceId: Int): Uri? {
+fun Context?.getResourceUri(resourceId: Int): Uri? {
     return try {
-        val resources: Resources = resources
+        val context = checkContext(this) ?: return null.eLog { "Context  is null." }
+        val resources: Resources = context.resources
         Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
                 + resources.getResourcePackageName(resourceId) + '/'
                 + resources.getResourceTypeName(resourceId) + '/'
@@ -289,9 +292,9 @@ fun Int.getResourceUri(context: Context): Uri? {
  * @date 2016/5/28 17:46
  * @version 1.0
  */
-fun getUriParameter(uri: Uri, key: String?): String {
+fun Uri?.getUriParameter(key: String?): String {
     val parameter: String? = try {
-        uri.getQueryParameter(key)
+        this?.getQueryParameter(key)
     } catch (e: Exception) {
         ""
     }
