@@ -6,17 +6,14 @@ import android.content.Context
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.StringRes
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
-/**
- * 将Object对象转成boolean类型
- *
- * @param value
- * @return 如果value不能转成boolean，则默认false
- */
-inline fun Any?.toBoolean(block: (result: Boolean) -> Unit) = block(toBoolean())
+///**
+// * 将Object对象转成boolean类型
+// *
+// * @param value
+// * @return 如果value不能转成boolean，则默认false
+// */
+//inline fun Any?.toBoolean(block: (result: Boolean) -> Unit) = block(toBoolean())
 
 /**
  * 将Object对象转成boolean类型
@@ -53,12 +50,12 @@ fun Any?.toBoolean(value: Any?, defaultValue: Boolean = false): Boolean {
     return defaultValue
 }
 
-/**
- * 将Object对象转成Double类型
- *
- * @return 如果value不能转成Double，则默认0.00
- */
-inline fun Any?.toDouble(block: (result: Double) -> Unit) = block(toDouble())
+///**
+// * 将Object对象转成Double类型
+// *
+// * @return 如果value不能转成Double，则默认0.00
+// */
+//inline fun Any?.toDouble(block: (result: Double) -> Unit) = block(toDouble())
 
 /**
  * 将Object对象转成Double类型
@@ -103,12 +100,12 @@ fun Any?.toDouble(value: Any?, defaultValue: Double = 0.00): Double {
     return defaultValue
 }
 
-/**
- * 将Object对象转成Double类型
- *
- * @return 如果value不能转成Float，则默认0.00
- */
-inline fun Any?.toFloat(block: (result: Float) -> Unit) = block(toFloat())
+///**
+// * 将Object对象转成Double类型
+// *
+// * @return 如果value不能转成Float，则默认0.00
+// */
+//inline fun Any?.toFloat(block: (result: Float) -> Unit) = block(toFloat())
 
 /**
  * 将Object对象转成Float类型
@@ -153,12 +150,12 @@ fun Any?.toFloat(value: Any?, defaultValue: Float = 0.00f): Float {
     return defaultValue
 }
 
-/**
- * 将Object对象转成Integer类型
- *
- * @return 如果value不能转成Integer，则默认0
- */
-inline fun Any?.toInteger(block: (result: Int) -> Unit) = block(toInteger())
+///**
+// * 将Object对象转成Integer类型
+// *
+// * @return 如果value不能转成Integer，则默认0
+// */
+//inline fun Any?.toInteger(block: (result: Int) -> Unit) = block(toInteger())
 
 /**
  * 将Object对象转成Integer类型
@@ -204,12 +201,12 @@ fun Any?.toInteger(value: Any?, defaultValue: Int = 0): Int {
     return defaultValue
 }
 
-/**
- * 将Object对象转成Long类型
- *
- * @return 如果value不能转成Long，则默认0
- */
-inline fun Any?.toLong(block: (result: Long) -> Unit) = block(toLong())
+///**
+// * 将Object对象转成Long类型
+// *
+// * @return 如果value不能转成Long，则默认0
+// */
+//inline fun Any?.toLong(block: (result: Long) -> Unit) = block(toLong())
 
 /**
  * 将Object对象转成Long类型
@@ -255,12 +252,12 @@ fun Any?.toLong(value: Any?, defaultValue: Long = 0L): Long {
     return defaultValue
 }
 
-/**
- * 将Object对象转成String类型
- *
- * @return 如果value不能转成String，则默认""
- */
-inline fun Any?.toString(block: (result: String) -> Unit) = block(toString())
+///**
+// * 将Object对象转成String类型
+// *
+// * @return 如果value不能转成String，则默认""
+// */
+//inline fun Any?.toString(block: (result: String) -> Unit) = block(toString())
 
 /**
  * 将Object对象转成String类型
