@@ -50,7 +50,7 @@ dependencies {
 //    implementation 'com.fz.dialog:Dialog:1.0.3'
     implementation 'com.github.peihua8858:MultiStateView:1.0.0'
     implementation 'com.github.peihua8858:DialogFragment:1.0.0'
-    implementation 'com.github.peihua8858:KLog:1.0.2'
+    implementation 'com.github.peihua8858:KLog:1.0.3'
     implementation 'com.github.peihua8858:ToastCompat:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-reflect"
 }

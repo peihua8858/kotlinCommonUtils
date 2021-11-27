@@ -1,38 +1,29 @@
 @file:JvmName("AnimatorUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
+import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorListener
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
-
-/**
- * 动画相关工具类
- *
- * @author Shyky
- * @version 1.1
- * @date 2016/8/15
- * @since 1.0
- */
-val FAST_OUT_SLOW_IN_INTERPOLATOR = LinearOutSlowInInterpolator()
+import com.fz.common.text.isNonEmpty
 
 /**
  * 显示view
  *
- * @param view
  * @param viewPropertyAnimatorListener
  */
 fun View?.scaleShow(viewPropertyAnimatorListener: ViewPropertyAnimatorListener?) {
@@ -42,7 +33,7 @@ fun View?.scaleShow(viewPropertyAnimatorListener: ViewPropertyAnimatorListener?)
     this.visibility = View.VISIBLE
     ViewCompat.animate(this).scaleX(1.0f).scaleY(1.0f).alpha(1.0f)
             .setDuration(800).setListener(viewPropertyAnimatorListener).setInterpolator(
-                    FAST_OUT_SLOW_IN_INTERPOLATOR
+                    LinearOutSlowInInterpolator()
             )
             .start()
 }
@@ -50,7 +41,6 @@ fun View?.scaleShow(viewPropertyAnimatorListener: ViewPropertyAnimatorListener?)
 /**
  * 隐藏view
  *
- * @param view
  * @param viewPropertyAnimatorListener
  */
 fun View?.scaleHide(viewPropertyAnimatorListener: ViewPropertyAnimatorListener?) {
@@ -58,17 +48,51 @@ fun View?.scaleHide(viewPropertyAnimatorListener: ViewPropertyAnimatorListener?)
         return
     }
     ViewCompat.animate(this).scaleX(0.0f).scaleY(0.0f).alpha(0.0f)
-            .setDuration(800).setInterpolator(FAST_OUT_SLOW_IN_INTERPOLATOR)
+            .setDuration(800).setInterpolator(LinearOutSlowInInterpolator())
             .setListener(viewPropertyAnimatorListener)
             .start()
 }
 
-fun Context?.startActivityByShareElement(
-        bundle: Bundle?,
-        shareView: View?,
-        shareResource: Int,
-        target: Class<*>?
-) {
+/**
+ * 共享元素
+ *
+ * @param intent
+ * @param shareView
+ * @param transitionNameRes
+ */
+fun Activity?.startActivityByShareElement2(intent: Intent, shareView: View?, @StringRes transitionNameRes: Int) {
+    if (this != null) {
+        if (transitionNameRes != 0) {
+            startActivityByShareElement2(intent, shareView, getString(transitionNameRes))
+        } else {
+            startActivity(intent)
+        }
+    }
+}
+
+/**
+ * 共享元素
+ *
+ * @param intent
+ * @param shareView
+ * @param transitionName
+ */
+fun Activity?.startActivityByShareElement2(intent: Intent, shareView: View?, transitionName: String) {
+    if (this != null) {
+        if (shareView != null && transitionName.isNonEmpty()) {
+            shareView.transitionName = transitionName
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                    shareView, transitionName).toBundle()
+            if (options != null && !isFinishing) {
+                startActivity(intent, options)
+                return
+            }
+        }
+        startActivity(intent)
+    }
+}
+
+fun Context?.startActivityByShareElement(bundle: Bundle?, shareView: View?, shareResource: Int, target: Class<*>?) {
     if (this is Activity) {
         startActivityByShareElement(bundle, shareView, shareResource, target)
     } else {
@@ -80,17 +104,12 @@ fun Context?.startActivityByShareElement(
     }
 }
 
-fun Activity.startActivityByShareElement(
-        bundle: Bundle?,
-        shareView: View?,
-        shareResource: Int,
-        target: Class<*>?
-) {
+fun Activity.startActivityByShareElement(bundle: Bundle?, shareView: View?, shareResource: Int, target: Class<*>?) {
     val intent = Intent(this, target)
     if (bundle != null) {
         intent.putExtras(bundle)
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && shareView != null) {
+    if (shareView != null) {
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this, shareView,
                 getString(shareResource)
@@ -104,48 +123,8 @@ fun Activity.startActivityByShareElement(
 /**
  * 通过共享元素启动过渡
  */
-fun Activity.startActivityByShareElement(
-        shareView: View?,
-        shareResource: Int,
-        target: Class<*>?
-) {
+fun Activity.startActivityByShareElement(shareView: View?, shareResource: Int, target: Class<*>?) {
     startActivityByShareElement(null, shareView, shareResource, target)
-}
-
-/**
- * 共享元素
- *
- * @param activity
- * @param intent
- * @param shareView
- * @param shareResource
- */
-fun Activity?.startActivityByShareElement2(
-        intent: Intent?,
-        shareView: View?,
-        shareResource: Int
-) {
-    try {
-        if (this != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                    && shareView != null
-            ) {
-                val transitionName = getString(shareResource)
-                shareView.transitionName = transitionName
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        this,
-                        shareView, transitionName
-                ).toBundle()
-                if (options != null && !isFinishing) {
-                    startActivity(intent, options)
-                    return
-                }
-            }
-            startActivity(intent)
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
 }
 
 /**
@@ -156,99 +135,81 @@ fun Activity?.startActivityByShareElement2(
  * @param shareView
  * @param shareResource
  */
-fun Context.startActivityByShareElement(
-        intent: Intent?,
-        shareView: View?,
-        shareResource: Int
-) {
-    if (this is Activity) {
-        startActivityByShareElement2(intent, shareView, shareResource)
-    } else {
-        startActivity(intent)
+fun Context?.startActivityByShareElement(intent: Intent, shareView: View?, @StringRes shareResource: Int) {
+    this?.let {
+        if (this is Activity) {
+            startActivityByShareElement2(intent, shareView, shareResource)
+        } else {
+            it.startActivity(intent)
+        }
     }
 }
 
 /**
  * 共享元素动画
  *
- * @param activity
  * @param intent
  * @param shareView
- * @param shareResource
  */
-fun Activity?.startActivityByShareElement(
-        intent: Intent?,
-        shareView: View?,
-        shareResource: Int
-) {
-    try {
-        if (this != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && shareView != null) {
-                val compat = ActivityOptionsCompat.makeScaleUpAnimation(
-                        shareView,
-                        shareView.width / 2,
-                        shareView.height / 2,
-                        0,
-                        0
-                )
-                ActivityCompat.startActivity(this, intent!!, compat.toBundle())
-            } else {
-                startActivity(intent)
-            }
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
+fun Activity?.startActivityByShareElement(intent: Intent, shareView: View?) {
+    if (this != null && shareView != null) {
+        val compat = ActivityOptionsCompat.makeScaleUpAnimation(
+                shareView,
+                shareView.width / 2,
+                shareView.height / 2,
+                0,
+                0
+        )
+        ActivityCompat.startActivity(this, intent, compat.toBundle())
     }
 }
 
 fun Activity.startActivityForResultByShareElement(
         shareView: View?,
-        shareResource: Int,
+        @StringRes shareResource: Int,
         target: Class<*>?,
         requestCode: Int
 ) {
-    val options: Bundle
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        options = ActivityOptions.makeSceneTransitionAnimation(
+    val intent = Intent(this, target)
+    if (shareResource != 0) {
+        val options = ActivityOptions.makeSceneTransitionAnimation(
                 this, shareView,
                 getString(shareResource)
         ).toBundle()
-        startActivity(Intent(this, target), options)
+        startActivityForResult(intent, requestCode, options)
     } else {
-        startActivity(Intent(this, target))
+        startActivityForResult(intent, requestCode)
     }
 }
 
-fun startActivityForResultByShareElement(
-        activity: Activity,
-        intent: Intent?,
+fun Activity.startActivityForResultByShareElement(
+        intent: Intent,
         shareView: View?,
-        shareResource: Int,
+        @StringRes shareResource: Int,
         requestCode: Int
 ) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    if (shareResource != 0) {
         val options = ActivityOptions.makeSceneTransitionAnimation(
-                activity, shareView,
-                activity.getString(shareResource)
+                this, shareView,
+                getString(shareResource)
         ).toBundle()
-        activity.startActivityForResult(intent, requestCode, options)
+        startActivityForResult(intent, requestCode, options)
     } else {
-        activity.startActivityForResult(intent, requestCode)
+        startActivityForResult(intent, requestCode)
     }
 }
 
-fun startActivityForResultByShareElement(
-        fragment: Fragment, intent: Intent?, shareView: View?,
-        shareResource: Int, requestCode: Int
+fun Fragment.startActivityForResultByShareElement(intent: Intent, shareView: View?,
+                                                  @StringRes shareResource: Int, requestCode: Int
 ) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    if (shareResource != 0) {
         val options = ActivityOptions.makeSceneTransitionAnimation(
-                fragment.activity, shareView,
-                fragment.getString(shareResource)
+                activity, shareView,
+                getString(shareResource)
         ).toBundle()
-        fragment.startActivityForResult(intent, requestCode, options)
+        startActivityForResult(intent, requestCode, options)
     } else {
-        fragment.startActivityForResult(intent, requestCode)
+        startActivityForResult(intent, requestCode)
     }
 }
 
@@ -257,11 +218,7 @@ fun startActivityForResultByShareElement(
  */
 fun Activity.finishByElement() {
     try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            finishAfterTransition()
-        } else {
-            finish()
-        }
+        finishAfterTransition()
     } catch (e: Exception) {
         finish()
     }
@@ -275,7 +232,7 @@ fun Activity.finishByElement() {
  * @date 2019/10/31 15:29
  * @version 1.0
  */
-fun rotateArrow(arrow: View, flag: Boolean) {
+fun View.rotateArrow(flag: Boolean) {
     // flag为true则向上
     val fromDegrees = if (flag) 180f else 0f
     val toDegrees = if (flag) 360f else 180f
@@ -295,5 +252,5 @@ fun rotateArrow(arrow: View, flag: Boolean) {
     //执行前的等待时间
     animation.startOffset = 10
     //启动动画
-    arrow.startAnimation(animation)
+    startAnimation(animation)
 }

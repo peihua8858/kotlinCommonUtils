@@ -1,18 +1,23 @@
 @file:JvmName("ActivityUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.activity
 
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.annotation.*
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.app.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.*
-import com.fz.common.model.ApiModel
 import com.fz.common.coroutine.runCatching
+import com.fz.common.model.ApiModel
 import com.fz.common.utils.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -529,6 +534,23 @@ fun <T> ComponentActivity.apiWithAsyncResumed(manager: FragmentManager? = null, 
     return lifecycleScope.launch {
         whenResumed {
             ApiModel<T>(manager, isShowDialog).apply(api).launch()
+        }
+    }
+}
+
+/**
+ * 共享元素缩放动画
+ *
+ * @param intent
+ * @param shareView
+ */
+fun Context?.startActivityByShareElement(intent: Intent, shareView: View? = null) {
+    if (this != null) {
+        if (shareView != null) {
+            val compat = ActivityOptionsCompat.makeScaleUpAnimation(shareView, shareView.width / 2, shareView.height / 2, 0, 0)
+            ActivityCompat.startActivity(this, intent, compat.toBundle())
+        } else {
+            this.startActivity(intent)
         }
     }
 }
