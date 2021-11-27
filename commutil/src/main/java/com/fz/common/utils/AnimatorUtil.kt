@@ -151,16 +151,34 @@ fun Context?.startActivityByShareElement(intent: Intent, shareView: View?, @Stri
  * @param intent
  * @param shareView
  */
-fun Activity?.startActivityByShareElement(intent: Intent, shareView: View?) {
-    if (this != null && shareView != null) {
-        val compat = ActivityOptionsCompat.makeScaleUpAnimation(
-                shareView,
-                shareView.width / 2,
-                shareView.height / 2,
-                0,
-                0
-        )
-        ActivityCompat.startActivity(this, intent, compat.toBundle())
+fun Context?.startActivityByShareElement(intent: Intent, shareView: View? = null) {
+    if (this != null) {
+        if (shareView != null) {
+            val compat = ActivityOptionsCompat.makeScaleUpAnimation(shareView,
+                    shareView.width / 2, shareView.height / 2, 0, 0)
+            ActivityCompat.startActivity(this, intent, compat.toBundle())
+        } else {
+            startActivity(intent)
+        }
+    }
+}
+
+/**
+ * 共享元素动画
+ *
+ * @param intent
+ * @param shareView
+ */
+fun Fragment?.startActivityByShareElement(intent: Intent, shareView: View? = null) {
+    if (this != null) {
+        val context = context
+        if (shareView != null && context != null) {
+            val compat = ActivityOptionsCompat.makeScaleUpAnimation(shareView,
+                    shareView.width / 2, shareView.height / 2, 0, 0)
+            ActivityCompat.startActivity(context, intent, compat.toBundle())
+        } else {
+            startActivity(intent)
+        }
     }
 }
 
@@ -202,7 +220,8 @@ fun Activity.startActivityForResultByShareElement(
 fun Fragment.startActivityForResultByShareElement(intent: Intent, shareView: View?,
                                                   @StringRes shareResource: Int, requestCode: Int
 ) {
-    if (shareResource != 0) {
+    val activity = activity
+    if (shareResource != 0 && activity != null) {
         val options = ActivityOptions.makeSceneTransitionAnimation(
                 activity, shareView,
                 getString(shareResource)
