@@ -121,7 +121,7 @@ fun Any.checkData(): Boolean {
  */
 fun Class<*>.checkData(): Boolean {
     return this == String::class.java || this == Int::class.java
-            || this == Int::class.javaPrimitiveType
+            || this == Int::class.javaPrimitiveType || this == Integer::class.java
             || this == Byte::class.java || this == Byte::class.javaPrimitiveType
             || this == Long::class.java || this == Long::class.javaPrimitiveType
             || this == Double::class.java || this == Double::class.javaPrimitiveType
