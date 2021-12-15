@@ -99,19 +99,6 @@ fun <T : Any> T.copyField(source: T): T {
 }
 
 /**
- * 检查当前对象类型是否是基本数据类型（包括[Date]、
- * [BigDecimal]、[BigInteger]及[Character]）
- *
- * @param value
- * @author dingpeihua
- * @date 2019/4/1 14:29
- * @version 1.0
- */
-fun Any.checkData(): Boolean {
-    return this.javaClass.checkData()
-}
-
-/**
  * 检查当前类型是否是基本数据类型（包括[Date]、
  * [BigDecimal]、[BigInteger]及[Character]）
  *
@@ -119,16 +106,9 @@ fun Any.checkData(): Boolean {
  * @date 2019/4/1 14:29
  * @version 1.0
  */
-fun Class<*>.checkData(): Boolean {
-    return this == String::class.java || this == Int::class.java
-            || this == Int::class.javaPrimitiveType || this == Integer::class.java
-            || this == Byte::class.java || this == Byte::class.javaPrimitiveType
-            || this == Long::class.java || this == Long::class.javaPrimitiveType
-            || this == Double::class.java || this == Double::class.javaPrimitiveType
-            || this == Float::class.java || this == Float::class.javaPrimitiveType
-            || this == Char::class.java || this == Short::class.java
-            || this == Short::class.javaPrimitiveType || this == BigDecimal::class.java
-            || this == BigInteger::class.java || this == Boolean::class.java
-            || this == Boolean::class.javaPrimitiveType || this == Date::class.java
-            || this.isPrimitive
+fun Any?.checkData(): Boolean {
+    return this != null && (this is String || this is Int || this is Byte
+            || this is Long || this is Double || this is Float
+            || this is Char || this is Short || this is Boolean
+            || this is BigDecimal || this is BigInteger || this is Date)
 }

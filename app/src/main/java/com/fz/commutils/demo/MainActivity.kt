@@ -3,12 +3,12 @@ package com.fz.commutils.demo
 import android.Manifest
 import android.os.Bundle
 import android.os.Handler
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.coroutine.asyncApi
+import com.fz.common.encrypt.md5
 import com.fz.common.model.ViewModelState
 import com.fz.common.permissions.PermissionRequestDsl
 import com.fz.common.permissions.PermissionResult
@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.util.*
 
 /**
  * 测试验证activity
@@ -57,8 +56,10 @@ class MainActivity : AppCompatActivity() {
         })
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
         btnExecute.setOnClickListener {
-//            lifecycleScope.cancel()
-            viewModel.onRequest(1, 20)
+            val ss = "{\"deviceType\":\"android\",\"country\":\"United States\",\"appVersion\":\"5.6.1.1\",\"orderCount\":\"0\",\"language\":\"en\",\"apnsTopic\":\"rosegal\",\"userid\":\"0\",\"deviceId\":\"89467f85563da22e\",\"deviceName\":\"BLA-AL00\",\"pushToken\":\"ftM2C0foTtGJ38Z6t4hYKl:APA91bHPeUgcX7R8Xe1bo-74L7Y8ZXwWVT6WKLFU17bc2gQMqHArQ6kDJWMFYPnfy3R37DRyr3sDSyOc0ihJICeyYx21PzskRwDXhv-nTON6KDu87DxXMaYT-pq4D1VYDyUlpLjpRiSX\",\"pushType\":\"FCM\",\"appsFlyerid\":\"d85c04684f6d8364951850342fdda3c1\",\"pushPower\":\"1\",\"promotions\":\"YES\",\"osVersion\":\"Android 10\",\"orderMessages\":\"YES\",\"fcmtoken\":\"ftM2C0foTtGJ38Z6t4hYKl:APA91bHPeUgcX7R8Xe1bo-74L7Y8ZXwWVT6WKLFU17bc2gQMqHArQ6kDJWMFYPnfy3R37DRyr3sDSyOc0ihJICeyYx21PzskRwDXhv-nTON6KDu87DxXMaYT-pq4D1VYDyUlpLjpRiSX\",\"timestamp\":1639548715518}"
+            KLog.d("btnExecute>>>" + ss.md5())
+            //            lifecycleScope.cancel()
+//            viewModel.onRequest(1, 20)
 //            textView.text = editText.text.emailMask()
 //            copyTest()
 //            val pointBean = PointBean()
@@ -211,8 +212,8 @@ class MainActivity : AppCompatActivity() {
         }
         textView.setOnClickListener {
             requestPermissions(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_CONTACTS
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_CONTACTS
             ) {
                 requestCode = 22
                 resultCallback = {
@@ -222,7 +223,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         is PermissionResult.PermissionDenied -> {
                             val data =
-                                deniedPermissions.toString().replace("android.permission.", "")
+                                    deniedPermissions.toString().replace("android.permission.", "")
                             showToast("Denied:$data")
                         }
                         is PermissionResult.ShowRational -> {
@@ -231,7 +232,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         is PermissionResult.PermissionDeniedPermanently -> {
                             val data = permanentlyDeniedPermissions.toString()
-                                .replace("android.permission.", "")
+                                    .replace("android.permission.", "")
                             showToast("Denied permanently:$data")
                         }
                     }
@@ -249,8 +250,8 @@ class MainActivity : AppCompatActivity() {
         }
         textView1.setOnClickListener {
             this.requestPermissionsDsl(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_CONTACTS
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_CONTACTS
             ) {
                 onDenied {
                     val result = it.toString().replace("android.permission.", "")
@@ -304,7 +305,7 @@ class MainActivity : AppCompatActivity() {
             }
             is PermissionResult.PermissionDeniedPermanently -> {
                 val data = result.permanentlyDeniedPermissions.toString()
-                    .replace("android.permission.", "")
+                        .replace("android.permission.", "")
                 showToast("Denied permanently:$data")
             }
         }
@@ -312,57 +313,57 @@ class MainActivity : AppCompatActivity() {
 
     fun showRational(result: PermissionRequestDsl) {
         AlertDialog.Builder(this)
-            .setMessage("We need permission")
-            .setTitle("Rational")
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setPositiveButton("OK") { _, _ ->
-                result.retry()
-            }
-            .create()
-            .show()
+                .setMessage("We need permission")
+                .setTitle("Rational")
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton("OK") { _, _ ->
+                    result.retry()
+                }
+                .create()
+                .show()
     }
 
     fun showRational(result: PermissionResult) {
         AlertDialog.Builder(this)
-            .setMessage("We need permission")
-            .setTitle("Rational")
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setPositiveButton("OK") { _, _ ->
-                val permissions = when (result.requestCode) {
-                    1 -> {
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+                .setMessage("We need permission")
+                .setTitle("Rational")
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton("OK") { _, _ ->
+                    val permissions = when (result.requestCode) {
+                        1 -> {
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+                        2 -> {
+                            arrayOf(Manifest.permission.READ_CONTACTS)
+                        }
+                        3 -> {
+                            arrayOf(Manifest.permission.CAMERA)
+                        }
+                        22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        4 -> {
+                            arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.READ_CONTACTS,
+                                    Manifest.permission.CAMERA
+                            )
+                        }
+                        else -> {
+                            arrayOf()
+                        }
                     }
-                    2 -> {
-                        arrayOf(Manifest.permission.READ_CONTACTS)
-                    }
-                    3 -> {
-                        arrayOf(Manifest.permission.CAMERA)
-                    }
-                    22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    4 -> {
-                        arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.READ_CONTACTS,
-                            Manifest.permission.CAMERA
-                        )
-                    }
-                    else -> {
-                        arrayOf()
+                    requestPermissions(*permissions) {
+                        requestCode = result.requestCode
+                        resultCallback = {
+                            handlePermission(this)
+                        }
                     }
                 }
-                requestPermissions(*permissions) {
-                    requestCode = result.requestCode
-                    resultCallback = {
-                        handlePermission(this)
-                    }
-                }
-            }
-            .create()
-            .show()
+                .create()
+                .show()
     }
 
     private fun copyTest() {
@@ -430,10 +431,10 @@ class MainActivity : AppCompatActivity() {
                 eLog { "onRequest>>async:" + if (isMainThread()) "在主线程中" else "在子线程中" }
                 val client = OkHttpClient.Builder().build()
                 val call = client.newCall(
-                    Request.Builder()
-                        .url("https://www.baidu.com")
-                        .post(RequestParam().createRequestBody())
-                        .build()
+                        Request.Builder()
+                                .url("https://www.baidu.com")
+                                .post(RequestParam().createRequestBody())
+                                .build()
                 )
                 call.execute()
             }

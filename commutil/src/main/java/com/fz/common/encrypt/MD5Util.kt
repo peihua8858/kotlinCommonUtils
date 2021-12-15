@@ -7,6 +7,7 @@ import java.io.FileInputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
 fun File?.md5(): String {
@@ -33,7 +34,7 @@ fun Any?.md5(): String {
         val md5 = MessageDigest.getInstance("MD5")
         when (this) {
             is String -> {
-                md5.update(this.toByte())
+                md5.update(this.toByteArray(StandardCharsets.UTF_8))
             }
             is ByteBuffer -> {
                 md5.update(this)
@@ -42,7 +43,7 @@ fun Any?.md5(): String {
                 md5.update(this)
             }
             else -> {
-                md5.update(this.toString().toByte())
+                md5.update(this.toString().toByteArray(StandardCharsets.UTF_8))
             }
         }
         return md5.digest().toHex()
