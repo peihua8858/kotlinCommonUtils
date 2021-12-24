@@ -425,6 +425,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun request() {
+        apiWithAsyncCreated<String> {
+            onRequest {
+                ""
+            }
+            onResponse {
+
+            }
+        }
+
+
         val job: Job = asyncWhenStart({
             eLog { "onRequest:" + if (isMainThread()) "在主线程中" else "在子线程中" }
             val callResult = async {

@@ -15,11 +15,11 @@ import kotlinx.coroutines.*
 class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, private val isShowDialog: Boolean = false) {
 
     private var processDialog: LoadingDialogFragment? = null
-    internal lateinit var request: suspend CoroutineScope.() -> Response?
+    internal lateinit var request: suspend CoroutineScope.() -> Response
 
     private var onStart: (() -> Unit?)? = null
 
-    private var onResponse: ((Response?) -> Unit?)? = null
+    private var onResponse: ((Response) -> Unit?)? = null
 
     private var onError: ((Throwable) -> Unit?)? = null
 
@@ -48,12 +48,12 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
         return this
     }
 
-    infix fun onRequest(request: suspend CoroutineScope.() -> Response?): ApiModel<Response> {
+    infix fun onRequest(request: suspend CoroutineScope.() -> Response): ApiModel<Response> {
         this.request = request
         return this
     }
 
-    infix fun onResponse(onResponse: ((Response?) -> Unit)?): ApiModel<Response> {
+    infix fun onResponse(onResponse: ((Response) -> Unit)?): ApiModel<Response> {
         this.onResponse = onResponse
         return this
     }
