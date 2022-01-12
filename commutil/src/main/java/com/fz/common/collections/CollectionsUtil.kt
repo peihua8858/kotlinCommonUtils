@@ -1,5 +1,6 @@
 @file:JvmName("CollectionsUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.collections
 
 import android.os.Parcel
@@ -76,7 +77,7 @@ fun <T : Parcelable> Set<T>.deepCloneParcelableSet(): Set<T>? {
         val data = mutableSetOf<T>()
         val f = tClass.getField("CREATOR")
         val creator: Parcelable.Creator<T> = f[null] as Parcelable.Creator<T>?
-                ?: throw Exception("Parcelable protocol requires a non-null static Parcelable.Creator object called CREATOR on class $name")
+            ?: throw Exception("Parcelable protocol requires a non-null static Parcelable.Creator object called CREATOR on class $name")
         val a: Array<T>? = newSource.createTypedArray(creator)
         if (!a.isNullOrEmpty()) {
             for (v in a) {
@@ -136,7 +137,7 @@ fun <T : Parcelable> List<T>.deepCloneParcelableList(): List<T>? {
         val data = arrayListOf<T>()
         val f = tClass.getField("CREATOR")
         val creator: Parcelable.Creator<T> = f[null] as Parcelable.Creator<T>?
-                ?: throw Exception("Parcelable protocol requires a non-null static Parcelable.Creator object called CREATOR on class $name")
+            ?: throw Exception("Parcelable protocol requires a non-null static Parcelable.Creator object called CREATOR on class $name")
         newSource.readTypedList(data, creator)
         newSource.recycle()
         data
@@ -144,4 +145,11 @@ fun <T : Parcelable> List<T>.deepCloneParcelableList(): List<T>? {
         e.printStackTrace()
         null
     }
+}
+
+fun <T> Collection<T>?.toArrayList(): ArrayList<T> {
+    if (this == null) {
+        return arrayListOf()
+    }
+    return ArrayList(this)
 }

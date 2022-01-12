@@ -1,5 +1,6 @@
 @file:JvmName("TextUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.text
 
 import android.content.ClipData
@@ -437,4 +438,28 @@ fun CharSequence?.splice(text: String?, separator: String): CharSequence {
  */
 fun CharSequence?.splice(text: String?): CharSequence {
     return splice(text, ",")
+}
+
+/**
+ * 删除最后一个字符
+ * @author dingpeihua
+ * @date 2022/1/12 15:00
+ * @version 1.0
+ */
+fun StringBuilder.deleteEndChar(): StringBuilder {
+    return deleteEndChar(",")
+}
+
+/**
+ * 删除最后一个指定字符
+ * @author dingpeihua
+ * @date 2022/1/12 15:00
+ * @version 1.0
+ */
+fun StringBuilder.deleteEndChar(endChar: String): StringBuilder {
+    val index = lastIndexOf(endChar)
+    if (length > 0 && index == length - 1) {
+        deleteCharAt(index)
+    }
+    return this
 }
