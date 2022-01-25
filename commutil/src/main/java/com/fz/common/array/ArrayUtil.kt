@@ -1,5 +1,6 @@
 @file:JvmName("ArrayUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.array
 
 import android.os.Parcel
@@ -23,10 +24,22 @@ fun <T> Array<T>?.isNonEmpty(): Boolean {
  * @return 如果集合不为空返回输出字符串，否则返回""
 </T> */
 fun <T> Array<T>.string(): String {
+    return toString(",")
+}
+
+/**
+ * 集合转成String输出
+ *
+ * @param list      集合
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @param separator 分隔符
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+</T> */
+fun <T> Array<T>.toString(separator: String): String {
     if (size > 0) {
         val sb = StringBuilder()
         for (item in this) {
-            sb.append(item).append(",")
+            sb.append(item).append(separator)
         }
         return sb.deleteCharAt(sb.length - 1).toString()
     }
@@ -77,7 +90,7 @@ fun <T : Parcelable> Array<T>.deepCloneParcelableArray(): Array<T>? {
         val name = tClass.toString()
         val f = tClass.getField("CREATOR")
         val creator: Parcelable.Creator<T> = f[null] as Parcelable.Creator<T>?
-                ?: throw Exception("Parcelable protocol requires a non-null static Parcelable.Creator object called CREATOR on class $name")
+            ?: throw Exception("Parcelable protocol requires a non-null static Parcelable.Creator object called CREATOR on class $name")
         val data = newSource.createTypedArray(creator)
         newSource.recycle()
         data

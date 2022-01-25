@@ -5,7 +5,6 @@ package com.fz.common.collections
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.fz.common.utils.toString
 import java.io.*
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
@@ -26,7 +25,7 @@ fun <T> Collection<T>?.isNonEmpty(): Boolean {
  * @return 如果集合不为空返回输出字符串，否则返回"null"
 </T> */
 fun <T> Collection<T>.string(): String {
-    return toString(this, ",")
+    return toString( ",")
 }
 
 /**
@@ -37,10 +36,7 @@ fun <T> Collection<T>.string(): String {
  * @param separator 分隔符
  * @return 如果集合不为空返回输出字符串，否则返回"null"
 </T> */
-fun <T> Collection<T>.toString(separator: String?): String {
-    if (separator.isNullOrEmpty()) {
-        throw NullPointerException("separator is null.")
-    }
+fun <T> Collection<T>.toString(separator: String): String {
     if (size > 0) {
         val sb = StringBuilder()
         for (item in this) {
