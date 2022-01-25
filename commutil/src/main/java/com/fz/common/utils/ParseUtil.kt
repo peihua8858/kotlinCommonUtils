@@ -1,5 +1,6 @@
 @file:JvmName("ParseUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.content.Context
@@ -63,7 +64,7 @@ fun Any?.toBoolean(value: Any?, defaultValue: Boolean = false): Boolean {
  * @return 如果value不能转成Double，则默认0.00
  */
 fun Any?.toDouble(): Double {
-    return toDouble(this, 0.00)
+    return toDouble(0.00)
 }
 
 /**
@@ -73,26 +74,16 @@ fun Any?.toDouble(): Double {
  * @return 如果value不能转成Double，则默认0.00
  */
 fun Any?.toDouble(defaultValue: Double = 0.00): Double {
-    return toDouble(this, defaultValue)
-}
-
-/**
- * 将Object对象转成Double类型
- *
- * @param value
- * @return 如果value不能转成Double，则默认defaultValue
- */
-fun Any?.toDouble(value: Any?, defaultValue: Double = 0.00): Double {
-    when (value) {
+    when (this) {
         is Double -> {
-            return value
+            return this
         }
         is Number -> {
-            return value.toDouble()
+            return this.toDouble()
         }
         is String -> {
             try {
-                return java.lang.Double.valueOf((value as String?)!!)
+                return java.lang.Double.valueOf((this as String?)!!)
             } catch (ignored: Exception) {
             }
         }
@@ -113,7 +104,7 @@ fun Any?.toDouble(value: Any?, defaultValue: Double = 0.00): Double {
  * @return 如果value不能转成Float，则默认0.00
  */
 fun Any?.toFloat(): Float {
-    return toFloat(this, 0.00f)
+    return toFloat(0.00f)
 }
 
 /**
@@ -123,26 +114,16 @@ fun Any?.toFloat(): Float {
  * @return 如果value不能转成Float，则默认0.00
  */
 fun Any?.toFloat(defaultValue: Float = 0.00f): Float {
-    return toFloat(this, defaultValue)
-}
-
-/**
- * 将Object对象转成Float类型
- *
- * @param value
- * @return 如果value不能转成Float，则默认defaultValue
- */
-fun Any?.toFloat(value: Any?, defaultValue: Float = 0.00f): Float {
-    when (value) {
+    when (this) {
         is Double -> {
-            return value as Float
+            return this as Float
         }
         is Number -> {
-            return value.toFloat()
+            return this.toFloat()
         }
         is String -> {
             try {
-                return java.lang.Float.valueOf((value as String?)!!)
+                return java.lang.Float.valueOf((this as String?)!!)
             } catch (ignored: Exception) {
             }
         }
@@ -174,26 +155,16 @@ fun Any?.toInteger(): Int {
  * @return 如果value不能转成Integer，则默认0
  */
 fun Any?.toInteger(defaultValue: Int = 0): Int {
-    return toInteger(this, defaultValue)
-}
-
-/**
- * 将Object对象转成Integer类型
- *
- * @param value
- * @return 如果value不能转成Integer，则默认0
- */
-fun Any?.toInteger(value: Any?, defaultValue: Int = 0): Int {
-    when (value) {
+    when (this) {
         is Int -> {
-            return value
+            return this
         }
         is Number -> {
-            return value.toInt()
+            return this.toInt()
         }
         is String -> {
             try {
-                return value.toDouble().toInt()
+                return this.toDouble().toInt()
             } catch (ignored: Exception) {
             }
         }
@@ -215,7 +186,7 @@ fun Any?.toInteger(value: Any?, defaultValue: Int = 0): Int {
  * @return 如果value不能转成Long，则默认0
  */
 fun Any?.toLong(): Long {
-    return toLong(this, 0L)
+    return toLong(0L)
 }
 
 /**
@@ -225,26 +196,16 @@ fun Any?.toLong(): Long {
  * @return 如果value不能转成Long，则默认0
  */
 fun Any?.toLong(defaultValue: Long = 0L): Long {
-    return toLong(this, defaultValue)
-}
-
-/**
- * 将Object对象转成Long类型
- *
- * @param value
- * @return 如果value不能转成Long，则默认defaultValue
- */
-fun Any?.toLong(value: Any?, defaultValue: Long = 0L): Long {
-    when (value) {
+    when (this) {
         is Long -> {
-            return value
+            return this
         }
         is Number -> {
-            return value.toLong()
+            return this.toLong()
         }
         is String -> {
             try {
-                return java.lang.Long.valueOf((value as String?)!!)
+                return java.lang.Long.valueOf((this as String?)!!)
             } catch (ignored: NumberFormatException) {
             }
         }
@@ -264,7 +225,7 @@ fun Any?.toLong(value: Any?, defaultValue: Long = 0L): Long {
  *
  * @return 如果value不能转成String，则默认""
  */
-fun Any?.toString(): String = toString(this, "")
+fun Any?.toString(): String = toString( "")
 
 /**
  * 将Object对象转成String类型
@@ -288,16 +249,6 @@ fun Any?.toString(defaultValue: String = ""): String {
         }
         else -> defaultValue
     }
-}
-
-/**
- * 将Object对象转成String类型
- *
- * @param value
- * @return 如果value不能转成String，则默认defaultValue
- */
-fun Any?.toString(value: Any?, defaultValue: String = ""): String {
-    return value.toString(defaultValue)
 }
 
 /**
