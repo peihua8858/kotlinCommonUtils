@@ -12,7 +12,10 @@ import kotlinx.coroutines.*
  * @date 2021/2/19 17:45
  * @version 1.0
  */
-class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, private val isShowDialog: Boolean = false) {
+class ApiModel<Response>(
+    private val fragmentManager: FragmentManager? = null,
+    private val isShowDialog: Boolean = false
+) {
 
     private var processDialog: LoadingDialogFragment? = null
     internal lateinit var request: suspend CoroutineScope.() -> Response
@@ -164,5 +167,21 @@ class ApiModel<Response>(private val fragmentManager: FragmentManager? = null, p
                 dismissLoadingDialog()
             }
         }
+    }
+
+    fun invokeOnError(e: Throwable) {
+        this.onError?.invoke(e)
+    }
+
+    fun invokeOnResponse(response: Response) {
+        this.onResponse?.invoke(response)
+    }
+
+    fun invokeOnStart() {
+        this.onStart?.invoke()
+    }
+
+    fun invokeOnComplete() {
+        this.onComplete?.invoke()
     }
 }

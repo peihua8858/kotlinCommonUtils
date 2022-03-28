@@ -1,5 +1,6 @@
 @file:JvmName("ContextUtils")
 @file:JvmMultifileClass
+
 package com.fz.common.utils
 
 import android.annotation.SuppressLint
@@ -8,6 +9,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.hardware.camera2.CameraManager
 import android.hardware.display.DisplayManager
@@ -320,8 +322,8 @@ fun Context?.copyToClipBoard(lazyContent: () -> CharSequence) {
 fun Context?.copyToClipBoard(lazyContent: () -> CharSequence, callback: (Boolean) -> Unit) {
     val content = lazyContent()
     if (this != null) copyToClipBoard(
-            content,
-            callback
+        content,
+        callback
     ) else callback(false).eLog { "Context  is null." }
 }
 
@@ -335,7 +337,7 @@ fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)
         cm.setPrimaryClip(text)
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
-                    ClipboardManager.OnPrimaryClipChangedListener {
+                ClipboardManager.OnPrimaryClipChangedListener {
                 override fun onPrimaryClipChanged() {
                     cm.removePrimaryClipChangedListener(this)
                     callback(true)
@@ -435,4 +437,30 @@ fun Context.getDiskCacheDir(): File? {
         return file
     }
     return cacheDir
+}
+
+/**
+ * 根据key获取Manifest里面配置的值
+ *
+ * @author dingpeihua
+ * @date 2018/8/27 16:12
+ * @version 1.0
+ */
+fun Context?.getMetaData(key: String, default: String): String {
+    if (this == null) {
+        return default
+    }
+    try {
+        val packageManager = packageManager
+        val appInfo =
+            packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        val notifyChannel =
+            appInfo.metaData.getString(key)
+        if (notifyChannel.isNonEmpty()) {
+            return notifyChannel
+        }
+    } catch (e: PackageManager.NameNotFoundException) {
+        e.printStackTrace()
+    }
+    return default
 }

@@ -5,6 +5,7 @@ package com.fz.common.collections
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.fz.common.text.deleteEndChar
 import java.io.*
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
@@ -23,9 +24,20 @@ fun <T> Collection<T>?.isNonEmpty(): Boolean {
  *
  * @param <T>  泛型参数，集合中放置的元素数据类型
  * @return 如果集合不为空返回输出字符串，否则返回"null"
-</T> */
+ */
+@Deprecated("please use splicing method.", ReplaceWith("splicing()"))
 fun <T> Collection<T>.string(): String {
-    return toString( ",")
+    return splicing()
+}
+
+/**
+ * 集合转成String输出
+ *
+ * @param <T>  泛型参数，集合中放置的元素数据类型
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+fun <T> Collection<T>.splicing(): String {
+    return splicing(",")
 }
 
 /**
@@ -35,18 +47,53 @@ fun <T> Collection<T>.string(): String {
  * @param <T>       泛型参数，集合中放置的元素数据类型
  * @param separator 分隔符
  * @return 如果集合不为空返回输出字符串，否则返回"null"
-</T> */
+ */
+@Deprecated("please use splicing method.", ReplaceWith("splicing(separator)"))
 fun <T> Collection<T>.toString(separator: String): String {
-    if (size > 0) {
-        val sb = StringBuilder()
-        for (item in this) {
-            sb.append(item).append(separator)
-        }
-        return sb.deleteCharAt(sb.length - 1).toString()
-    }
-    return ""
+    return splicing(separator)
 }
 
+/**
+ * 集合转成String输出
+ *
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @param separator 分隔符
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+fun <T> Collection<T>.splicing(separator: String): String {
+    val sb = StringBuilder()
+    for (item in this) {
+        sb.append(item).append(separator)
+    }
+    return sb.deleteEndChar(separator).toString()
+}
+
+/**
+ * 集合转成String输出
+ *
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @param separator 分隔符
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+@Deprecated("please use splicing method.", ReplaceWith("splicing(separator, action)"))
+inline fun <T, R> Collection<T>.toString(separator: String, action: (T) -> R): String {
+    return splicing(separator, action)
+}
+
+/**
+ * 集合转成String输出
+ *
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @param separator 分隔符
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+inline fun <T, R> Collection<T>.splicing(separator: String, action: (T) -> R): String {
+    val sb = StringBuilder()
+    for (item in this) {
+        sb.append(action(item)).append(separator)
+    }
+    return sb.deleteEndChar(separator).toString()
+}
 
 /**
  * 对象深度拷贝

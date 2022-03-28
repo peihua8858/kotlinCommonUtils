@@ -1,10 +1,12 @@
 @file:JvmName("MapUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.map
 
 import android.os.BadParcelableException
 import android.os.Parcel
 import android.os.Parcelable
+import com.fz.common.text.deleteEndChar
 import java.io.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -161,4 +163,69 @@ fun <K : Any, V : Any> Map<K, V>.deepClone(): Map<K, V>? {
         e.printStackTrace()
         return null
     }
+}
+
+
+/**
+ * 集合转成String输出
+ *
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @param predicate 分隔符
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+inline fun <K, V> Map<K, V>.findKey(predicate: (Map.Entry<K, V>) -> Boolean): K? {
+    for (item in this) {
+        if (predicate(item)) {
+            return item.key
+        }
+    }
+    return null
+}
+
+/**
+ * 集合转成String输出
+ *
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @param predicate 分隔符
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+inline fun <K, V> Map<K, V>.findKeys(predicate: (Map.Entry<K, V>) -> Boolean): MutableList<K> {
+    return findTo(mutableListOf(), predicate)
+}
+
+inline fun <K, V, M : MutableList<in K>> Map<out K, V>.findTo(
+    destination: M,
+    predicate: (Map.Entry<K, V>) -> Boolean
+): M {
+    for (element in this) {
+        if (predicate(element)) {
+            destination.add(element.key)
+        }
+    }
+    return destination
+}
+
+/**
+ * 集合转成String输出
+ *
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+inline fun <K, V, R> Map<K, V>.splicing(action: (Map.Entry<K, V>) -> R): String {
+    return splicing(",", action)
+}
+
+/**
+ * 集合转成String输出
+ *
+ * @param <T>       泛型参数，集合中放置的元素数据类型
+ * @param separator 分隔符
+ * @return 如果集合不为空返回输出字符串，否则返回"null"
+ */
+inline fun <K, V, R> Map<K, V>.splicing(separator: String, action: (Map.Entry<K, V>) -> R): String {
+    val sb = StringBuilder()
+    for (item in this) {
+        sb.append(action(item)).append(separator)
+    }
+    return sb.deleteEndChar(separator).toString()
 }

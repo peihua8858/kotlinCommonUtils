@@ -356,7 +356,7 @@ fun CharSequence?.isPhoneNumber(): Boolean {
  * @date 2020/7/10 21:41
  * @version 1.0
  */
-fun Any?.generatePrivacyNickname(originNickname: String, defaultName: String): String? {
+fun Any?.generatePrivacyNickname(originNickname: String, defaultName: String): String {
     if (TextUtils.isEmpty(originNickname)) {
         return defaultName
     }
@@ -388,14 +388,7 @@ fun CharSequence?.firstLetterUpperCase(local: Locale): String {
  * @return 成功返回true，失败返回false
  */
 fun CharSequence?.firstLetterUpperCase(): String {
-    if (this.isEmptyOrBlank()) {
-        return ""
-    }
-    if (length <= 1) {
-        return this.toString().uppercase()
-    }
-    val firstLetter = substring(0, 1).uppercase()
-    return firstLetter + substring(1)
+    return firstLetterUpperCase(Locale.ROOT)
 }
 
 /**
