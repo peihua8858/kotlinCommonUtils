@@ -196,3 +196,18 @@ fun <T> Collection<T>?.toArrayList(): ArrayList<T> {
     }
     return ArrayList(this)
 }
+
+/**
+ * 返回匹配给定 [predicate] 的第一个元素，如果未找到元素，则返回默认返回索引[0]元素。
+ * @author dingpeihua
+ * @date 2022/4/19 14:26
+ * @version 1.0
+ */
+fun <T> MutableList<T>.findFirst(predicate: (T) -> Boolean): T {
+    for (item in this) {
+        if (predicate(item)) {
+            return item
+        }
+    }
+    return this[0]
+}
