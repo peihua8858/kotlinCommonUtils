@@ -5,7 +5,6 @@ package com.fz.common.utils
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.fz.common.reflect.getDeclaredField
 import java.io.*
 import java.lang.reflect.Field
 import java.math.BigDecimal

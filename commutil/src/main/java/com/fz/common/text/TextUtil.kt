@@ -456,3 +456,9 @@ fun StringBuilder.deleteEndChar(endChar: String): StringBuilder {
     }
     return this
 }
+inline fun <C:CharSequence> C?.ifNullOrEmpty(defaultValue: () -> C): C=
+    if (isNullOrEmpty()) defaultValue() else this
+
+@SinceKotlin("1.3")
+inline fun <C: CharSequence> C?.ifNullOrBlank(defaultValue: () -> C): C =
+    if (isNullOrBlank()) defaultValue() else this
