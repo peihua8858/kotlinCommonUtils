@@ -100,14 +100,34 @@ fun <T> ViewModelState<T>.parseError(liveData: MutableLiveData<ViewModelState<T>
 }
 
 /**
- * [ViewModel]开启协程扩展
+ * [ViewModel]在主线程中开启协程扩展
  */
-fun <T> ViewModel.apiRequest(apiDSL: ApiModel<T>.() -> Unit) {
+fun <T> ViewModel.apiSyncRequest(apiDSL: ApiModel<T>.() -> Unit) {
     ApiModel<T>().apply(apiDSL).syncLaunch(viewModelScope)
 }
 
 /**
- * [ViewModel]开启协程扩展
+ * [ViewModel]在IO线程中开启协程扩展
+ */
+fun <T> ViewModel.apiRequest(apiDSL: ApiModel<T>.() -> Unit) {
+    ApiModel<T>().apply(apiDSL).launch(viewModelScope)
+}
+
+/**
+ * [ViewModel]在主线程中开启协程扩展
+ */
+fun <T> ViewModel.apiSyncRequest(
+        viewState: MutableLiveData<ViewModelState<T>>,
+        apiDSL: ApiModel<T>.() -> Unit,
+) {
+    ApiModel<T>().apply(apiDSL)
+            .parseMethod(viewState)
+            .syncLaunch(viewModelScope)
+
+}
+
+/**
+ * [ViewModel]在IO线程中开启协程扩展
  */
 fun <T> ViewModel.apiRequest(
         viewState: MutableLiveData<ViewModelState<T>>,
@@ -115,7 +135,7 @@ fun <T> ViewModel.apiRequest(
 ) {
     ApiModel<T>().apply(apiDSL)
             .parseMethod(viewState)
-            .syncLaunch(viewModelScope)
+            .launch(viewModelScope)
 
 }
 
@@ -146,11 +166,10 @@ internal fun <T> ApiModel<IHttpResponse<T?>>.parseMethodLimit(viewState: Mutable
     }
     return this
 }
-
 /**
- * [ViewModel]开启协程扩展
+ * [ViewModel]在主线程中开启协程扩展
  */
-fun <T> ViewModel.apiRequestLimit(
+fun <T> ViewModel.apiSyncRequestLimit(
         viewState: MutableLiveData<ViewModelState<T>>,
         apiDSL: ApiModel<IHttpResponse<T?>>.() -> Unit,
 ) {
@@ -159,9 +178,21 @@ fun <T> ViewModel.apiRequestLimit(
             .parseMethodLimit(viewState)
             .syncLaunch(viewModelScope)
 }
+/**
+ * [ViewModel]在IO线程中开启协程扩展
+ */
+fun <T> ViewModel.apiRequestLimit(
+        viewState: MutableLiveData<ViewModelState<T>>,
+        apiDSL: ApiModel<IHttpResponse<T?>>.() -> Unit,
+) {
+    ApiModel<IHttpResponse<T?>>()
+            .apply(apiDSL)
+            .parseMethodLimit(viewState)
+            .launch(viewModelScope)
+}
 
 /**
- * [ViewModel]开启协程扩展
+ * [ViewModel]在IO线程中开启协程扩展
  */
 fun <T> ViewModel.request(
         viewState: MutableLiveData<ViewModelState<T>>,
@@ -183,7 +214,7 @@ fun <T> ViewModel.request(
 }
 
 /**
- * [ViewModel]开启协程扩展
+ * [ViewModel]在IO线程中开启协程扩展
  */
 fun <T> ViewModel.requestLimit(
         viewState: MutableLiveData<ViewModelState<T>>,
@@ -205,7 +236,7 @@ fun <T> ViewModel.requestLimit(
 }
 
 /**
- * [ViewModel]开启协程扩展
+ * [ViewModel]在IO线程中开启协程扩展
  */
 fun <T> ViewModel.request(
         request: suspend CoroutineScope.() -> T,
