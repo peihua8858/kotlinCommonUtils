@@ -5,6 +5,8 @@ package com.fz.common.utils
 import android.os.Looper
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
+import kotlinx.coroutines.delay
+import java.io.IOException
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -118,4 +120,26 @@ fun Any.rangeArray(min: Int, length: Int): Array<String?> {
         data[i] = ((min + i).toString())
     }
     return data
+}
+
+suspend fun <T> Any?.retryIO(
+        times: Int = Int.MAX_VALUE,
+        initialDelay: Long = 100, // 0.1 second
+        maxDelay: Long = 1000,    // 1 second
+        factor: Double = 2.0,
+        block: suspend () -> T): T
+{
+    var currentDelay = initialDelay
+    repeat(times - 1) {
+        try {
+            return block()
+        } catch (e: IOException) {
+            eLog { e.stackTraceToString() }
+            // you can log an error here and/or make a more finer-grained
+            // analysis of the cause to see if retry is needed
+        }
+        delay(currentDelay)
+        currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+    }
+    return block() // last attempt
 }

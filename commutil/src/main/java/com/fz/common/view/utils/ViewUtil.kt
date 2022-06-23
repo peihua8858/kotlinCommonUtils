@@ -2,6 +2,9 @@
 @file:JvmMultifileClass
 package com.fz.common.view.utils
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
@@ -18,6 +21,7 @@ import com.fz.common.utils.getDimens
 import com.fz.common.utils.getResourceId
 import com.fz.common.utils.resolveAttribute
 import java.util.*
+import kotlin.math.max
 
 /**
  * 扩展方法，用于获取View
@@ -189,4 +193,103 @@ fun View?.setMarginEnd(end: Int) {
 fun View?.setMarginStart(start: Int) {
     if (this == null) return
     (layoutParams as? ViewGroup.MarginLayoutParams)?.marginStart = start
+}
+
+
+/**
+ * 设置控件内边距
+ *
+ * @param view          目标视视图
+ * @param paddingStart  左边距
+ * @param paddingTop    上边距
+ * @param paddingEnd    右边距
+ * @param paddingBottom 下边距
+ * @author dingpeihua
+ * @date 2018/12/7 18:09
+ * @version 1.0
+ */
+fun View?.setViewPaddingPx(@Px paddingStart: Int, @Px paddingTop: Int, @Px paddingEnd: Int, @Px paddingBottom: Int) {
+    if (this == null) return
+    setPaddingRelative(max(paddingStart, 0), max(paddingTop, 0), max(paddingEnd, 0), max(paddingBottom, 0))
+}
+
+/**
+ * [View]宽度展开折叠动画
+ * @param   isExpend  true:展开  false:收起
+ * @param   width     展开时的宽度
+ * @param duration 动画时长
+ * @author dingpeihua
+ * @date 2022/5/14 19:12
+ * @version 1.0
+ */
+fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
+    val viewWrapper = ViewWrapper(this)
+    val animation = if (isExpend) ObjectAnimator.ofInt(
+            viewWrapper, "width", 0, width
+    )
+    else ObjectAnimator.ofInt(viewWrapper, "width", width, 0)
+    animation.duration = duration
+    animation.addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationStart(animation: Animator?) {
+            if (isExpend) this@animationWidth.visibility = View.VISIBLE
+        }
+
+        override fun onAnimationEnd(animation: Animator) {
+            if (!isExpend) this@animationWidth.visibility = View.GONE
+        }
+    })
+    animation.addUpdateListener {
+        viewWrapper.setWidth(it.animatedValue as Int)
+    }
+    animation.start()
+}
+
+private class ViewWrapper(val view: View) {
+
+    @Keep
+    fun setWidth(width: Int) {
+        view.layoutParams.width = width
+        view.requestLayout() //必须调用，否则宽度改变但UI没有刷新
+    }
+
+    fun getWidth(): Int {
+        return view.layoutParams.width
+    }
+}
+/**
+ * 设置控件内边距
+ *
+ * @param view          目标视视图
+ * @param paddingStart  左边距
+ * @param paddingTop    上边距
+ * @param paddingEnd    右边距
+ * @param paddingBottom 下边距
+ * @author dingpeihua
+ * @date 2018/12/7 18:09
+ * @version 1.0
+ */
+fun View?.setViewPaddingDp(paddingStart: Int, paddingTop: Int, paddingEnd: Int, paddingBottom: Int) {
+    if (this == null) return
+    setViewPaddingPx(dip2px(paddingStart), dip2px(paddingTop), dip2px(paddingEnd), dip2px(paddingBottom))
+}
+
+
+fun View?.setPaddingBottom(@Px bottom: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, paddingTop, paddingEnd, bottom)
+}
+
+fun View?.setPaddingTop(@Px top: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, top, paddingEnd, paddingBottom)
+}
+
+fun View?.setPaddingEnd(@Px end: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, paddingTop, end, paddingBottom)
+}
+
+fun View?.setPaddingStart(@Px start: Int) {
+    if (this == null) return
+    setViewPaddingPx(start, paddingTop, paddingEnd, paddingBottom)
 }
