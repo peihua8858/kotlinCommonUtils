@@ -87,6 +87,12 @@ fun Any?.toDouble(defaultValue: Double = 0.00): Double {
             } catch (ignored: Exception) {
             }
         }
+        else -> {
+            try {
+                return java.lang.Double.valueOf((this.toString()))
+            } catch (ignored: NumberFormatException) {
+            }
+        }
     }
     return defaultValue
 }
@@ -123,8 +129,14 @@ fun Any?.toFloat(defaultValue: Float = 0.00f): Float {
         }
         is String -> {
             try {
-                return java.lang.Float.valueOf((this as String?)!!)
+                return java.lang.Float.valueOf((this))
             } catch (ignored: Exception) {
+            }
+        }
+        else -> {
+            try {
+                return java.lang.Float.valueOf((this.toString()))
+            } catch (ignored: NumberFormatException) {
             }
         }
     }
@@ -168,6 +180,12 @@ fun Any?.toInteger(defaultValue: Int = 0): Int {
             } catch (ignored: Exception) {
             }
         }
+        else -> {
+            try {
+                return Integer.valueOf((this.toString()))
+            } catch (ignored: NumberFormatException) {
+            }
+        }
     }
     return defaultValue
 }
@@ -205,7 +223,13 @@ fun Any?.toLong(defaultValue: Long = 0L): Long {
         }
         is String -> {
             try {
-                return java.lang.Long.valueOf((this as String?)!!)
+                return java.lang.Long.valueOf(this)
+            } catch (ignored: NumberFormatException) {
+            }
+        }
+        else -> {
+            try {
+                return java.lang.Long.valueOf((this.toString()))
             } catch (ignored: NumberFormatException) {
             }
         }
@@ -225,7 +249,7 @@ fun Any?.toLong(defaultValue: Long = 0L): Long {
  *
  * @return 如果value不能转成String，则默认""
  */
-fun Any?.toString(): String = toString( "")
+fun Any?.toString(): String = toString("")
 
 /**
  * 将Object对象转成String类型
