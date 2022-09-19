@@ -1,9 +1,11 @@
 @file:JvmName("TextViewUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.view.utils
 
 import android.graphics.drawable.Drawable
 import android.text.Editable
+import android.text.InputFilter
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -11,6 +13,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.fz.common.listener.EditTextWatcher
 import com.fz.common.listener.IControlEnabledListener
+import com.fz.common.listener.MaxMinInputFilter
 import com.fz.common.utils.eLog
 import com.google.android.material.textfield.TextInputLayout
 
@@ -21,13 +24,13 @@ fun TextView?.setDrawableStart(start: Drawable?): Drawable? {
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
     if (start != null && start.bounds.isEmpty) {
         this.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                start, drawables[1],
-                drawables[2], drawables[3]
+            start, drawables[1],
+            drawables[2], drawables[3]
         )
     } else {
         this.setCompoundDrawablesRelative(
-                start, drawables[1],
-                drawables[2], drawables[3]
+            start, drawables[1],
+            drawables[2], drawables[3]
         )
     }
     return start
@@ -47,13 +50,13 @@ fun TextView?.setDrawableTop(top: Drawable?): Drawable? {
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
     if (top != null && top.bounds.isEmpty) {
         this.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                drawables[0], top,
-                drawables[2], drawables[3]
+            drawables[0], top,
+            drawables[2], drawables[3]
         )
     } else {
         this.setCompoundDrawablesRelative(
-                drawables[0], top,
-                drawables[2], drawables[3]
+            drawables[0], top,
+            drawables[2], drawables[3]
         )
     }
     return top
@@ -73,13 +76,13 @@ fun TextView?.setDrawableEnd(end: Drawable?): Drawable? {
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
     if (end != null && end.bounds.isEmpty) {
         this.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                drawables[0], drawables[1],
-                end, drawables[3]
+            drawables[0], drawables[1],
+            end, drawables[3]
         )
     } else {
         this.setCompoundDrawablesRelative(
-                drawables[0], drawables[1],
-                end, drawables[3]
+            drawables[0], drawables[1],
+            end, drawables[3]
         )
     }
     return end
@@ -99,13 +102,13 @@ fun TextView?.setDrawableBottom(bottom: Drawable?): Drawable? {
     val drawables: Array<Drawable> = this.compoundDrawablesRelative
     if (bottom != null && bottom.bounds.isEmpty) {
         this.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                drawables[0], drawables[1], drawables[2],
-                bottom
+            drawables[0], drawables[1], drawables[2],
+            bottom
         )
     } else {
         this.setCompoundDrawablesRelative(
-                drawables[0], drawables[1], drawables[2],
-                bottom
+            drawables[0], drawables[1], drawables[2],
+            bottom
         )
     }
     return bottom
@@ -115,7 +118,11 @@ fun TextView?.setDrawableBottom(@DrawableRes bottom: Int): Drawable? {
     if (this == null) {
         return null
     }
-    return setDrawableBottom(if (bottom != 0) ContextCompat.getDrawable(context, bottom) else null.eLog { "bottom  is 0." })
+    return setDrawableBottom(
+        if (bottom != 0) ContextCompat.getDrawable(
+            context,
+            bottom
+        ) else null.eLog { "bottom  is 0." })
 }
 
 fun Any?.setAfterTextChanged(listener: IControlEnabledListener?, vararg views: EditText?) {
@@ -133,8 +140,8 @@ fun EditText?.setAfterTextChanged(listener: IControlEnabledListener?) {
 }
 
 private class EditTextAfterWatcher(
-        val view: EditText,
-        val block: (CharSequence) -> Unit,
+    val view: EditText,
+    val block: (CharSequence) -> Unit,
 ) : EditTextWatcher {
     override fun afterTextChanged(s: Editable?) {
         block(if (s.isNullOrEmpty()) "" else s)
@@ -142,10 +149,10 @@ private class EditTextAfterWatcher(
 }
 
 private class AfterEditTextWatcher(
-        val view: EditText,
-        listeners: Array<out IControlEnabledListener?>,
+    val view: EditText,
+    listeners: Array<out IControlEnabledListener?>,
 ) :
-        EditTextWatcher {
+    EditTextWatcher {
     private val mListeners = listeners
 
     constructor(listener: IControlEnabledListener?, view: EditText) : this(view, arrayOf(listener))
@@ -183,8 +190,8 @@ fun EditText?.setOnFocusChangeListener(vararg listeners: IControlEnabledListener
 }
 
 private class FocusChangeListener(
-        val view: EditText?,
-        listeners: Array<out IControlEnabledListener?>,
+    val view: EditText?,
+    listeners: Array<out IControlEnabledListener?>,
 ) : View.OnFocusChangeListener {
     private val mListeners = listeners
 
@@ -203,4 +210,31 @@ private class FocusChangeListener(
             }
         }
     }
+}
+
+fun TextView?.addInputFilter(filter: InputFilter) {
+    if (this == null) {
+        return
+    }
+    val inputFilters = arrayListOf<InputFilter>(*filters)
+    inputFilters.add(filter)
+    filters = inputFilters.toTypedArray()
+}
+
+/**
+ * 限制TextView 输入从最小值[min]到最大值[max]，并允许保留指定位数[numOfDecimals]的小数
+ * @author dingpeihua
+ * @date 2022/8/11 9:45
+ * @version 1.0
+ */
+fun TextView?.limitMaxMin(min: Double, max: Double, numOfDecimals: Int = 2) {
+    addInputFilter(MaxMinInputFilter(min, max, numOfDecimals))
+}
+
+fun TextView.measureTextHeight(maxWidth: Int): Int {
+    val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    width = maxWidth
+    measure(widthSpec, heightSpec)
+    return measuredHeight
 }

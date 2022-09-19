@@ -203,7 +203,7 @@ fun <T> Collection<T>?.toArrayList(): ArrayList<T> {
  * @date 2022/4/19 14:26
  * @version 1.0
  */
-fun <T> MutableList<T>.findFirst(predicate: (T) -> Boolean): T {
+fun <T> MutableList<T>.findOrFirst(predicate: (T) -> Boolean): T {
     for (item in this) {
         if (predicate(item)) {
             return item

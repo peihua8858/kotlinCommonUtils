@@ -1,5 +1,6 @@
 @file:JvmName("ViewUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.view.utils
 
 import android.animation.Animator
@@ -8,6 +9,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,8 +57,8 @@ fun Any?.isAppRtl(): Boolean {
 }
 
 @Deprecated(
-        "Please use androidx.core.view.isVisible, This method will be removed in the next version",
-        replaceWith = ReplaceWith("androidx.core.view.isVisible")
+    "Please use androidx.core.view.isVisible, This method will be removed in the next version",
+    replaceWith = ReplaceWith("androidx.core.view.isVisible")
 )
 fun View?.setVisible(isVisible: Boolean) {
     if (this == null) {
@@ -66,8 +68,8 @@ fun View?.setVisible(isVisible: Boolean) {
 }
 
 @Deprecated(
-        "Please use androidx.core.view.isVisible, This method will be removed in the next version",
-        replaceWith = ReplaceWith("androidx.core.view.isVisible")
+    "Please use androidx.core.view.isVisible, This method will be removed in the next version",
+    replaceWith = ReplaceWith("androidx.core.view.isVisible")
 )
 fun View?.setGone(isGone: Boolean) {
     if (this == null) {
@@ -118,9 +120,9 @@ fun Any?.calcViewScreenLocation(view: View): RectF {
     // 获取控件在屏幕中的位置，返回的数组分别为控件左顶点的 x、y 的值
     view.getLocationOnScreen(location)
     return RectF(
-            location[0].toFloat(), location[1]
+        location[0].toFloat(), location[1]
             .toFloat(), (location[0] + view.width).toFloat(),
-            (location[1] + view.height).toFloat()
+        (location[1] + view.height).toFloat()
     )
 }
 
@@ -225,7 +227,7 @@ fun View?.setViewPaddingPx(@Px paddingStart: Int, @Px paddingTop: Int, @Px paddi
 fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
     val viewWrapper = ViewWrapper(this)
     val animation = if (isExpend) ObjectAnimator.ofInt(
-            viewWrapper, "width", 0, width
+        viewWrapper, "width", 0, width
     )
     else ObjectAnimator.ofInt(viewWrapper, "width", width, 0)
     animation.duration = duration
@@ -256,6 +258,7 @@ private class ViewWrapper(val view: View) {
         return view.layoutParams.width
     }
 }
+
 /**
  * 设置控件内边距
  *
@@ -292,4 +295,19 @@ fun View?.setPaddingEnd(@Px end: Int) {
 fun View?.setPaddingStart(@Px start: Int) {
     if (this == null) return
     setViewPaddingPx(start, paddingTop, paddingEnd, paddingBottom)
+}
+
+fun View.measureSize(): Size {
+    val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    measure(widthSpec, heightSpec)
+    return Size(measuredWidth, measuredHeight)
+}
+
+fun View.measureHeight(maxWidth: Int): Int {
+    val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    layoutParams.width = maxWidth
+    measure(widthSpec, heightSpec)
+    return measuredHeight
 }
