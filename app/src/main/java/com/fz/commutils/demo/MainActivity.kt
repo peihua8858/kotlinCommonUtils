@@ -1,11 +1,13 @@
 package com.fz.commutils.demo
 
 import android.Manifest
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.coroutine.asyncApi
 import com.fz.common.encrypt.md5
@@ -23,17 +25,17 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
 
 /**
  * 测试验证activity
  */
 class MainActivity : AppCompatActivity() {
     private val viewModel = MainViewModel()
-    private val handler = Handler()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewModel.viewState.observe(this, {
+        viewModel.viewState.observe(this) {
             when (it.state) {
                 ViewModelState.STARTING -> {
                     dLog { "Starting:" + if (isMainThread()) "在主线程" else "在子线程" }
@@ -53,10 +55,11 @@ class MainActivity : AppCompatActivity() {
                     val response = it.data
                 }
             }
-        })
+        }
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
         btnExecute.setOnClickListener {
-            val ss = "{\"deviceType\":\"android\",\"country\":\"United States\",\"appVersion\":\"5.6.1.1\",\"orderCount\":\"0\",\"language\":\"en\",\"apnsTopic\":\"rosegal\",\"userid\":\"0\",\"deviceId\":\"89467f85563da22e\",\"deviceName\":\"BLA-AL00\",\"pushToken\":\"ftM2C0foTtGJ38Z6t4hYKl:APA91bHPeUgcX7R8Xe1bo-74L7Y8ZXwWVT6WKLFU17bc2gQMqHArQ6kDJWMFYPnfy3R37DRyr3sDSyOc0ihJICeyYx21PzskRwDXhv-nTON6KDu87DxXMaYT-pq4D1VYDyUlpLjpRiSX\",\"pushType\":\"FCM\",\"appsFlyerid\":\"d85c04684f6d8364951850342fdda3c1\",\"pushPower\":\"1\",\"promotions\":\"YES\",\"osVersion\":\"Android 10\",\"orderMessages\":\"YES\",\"fcmtoken\":\"ftM2C0foTtGJ38Z6t4hYKl:APA91bHPeUgcX7R8Xe1bo-74L7Y8ZXwWVT6WKLFU17bc2gQMqHArQ6kDJWMFYPnfy3R37DRyr3sDSyOc0ihJICeyYx21PzskRwDXhv-nTON6KDu87DxXMaYT-pq4D1VYDyUlpLjpRiSX\",\"timestamp\":1639548715518}"
+            val ss =
+                "{\"deviceType\":\"android\",\"country\":\"United States\",\"appVersion\":\"5.6.1.1\",\"orderCount\":\"0\",\"language\":\"en\",\"apnsTopic\":\"rosegal\",\"userid\":\"0\",\"deviceId\":\"89467f85563da22e\",\"deviceName\":\"BLA-AL00\",\"pushToken\":\"ftM2C0foTtGJ38Z6t4hYKl:APA91bHPeUgcX7R8Xe1bo-74L7Y8ZXwWVT6WKLFU17bc2gQMqHArQ6kDJWMFYPnfy3R37DRyr3sDSyOc0ihJICeyYx21PzskRwDXhv-nTON6KDu87DxXMaYT-pq4D1VYDyUlpLjpRiSX\",\"pushType\":\"FCM\",\"appsFlyerid\":\"d85c04684f6d8364951850342fdda3c1\",\"pushPower\":\"1\",\"promotions\":\"YES\",\"osVersion\":\"Android 10\",\"orderMessages\":\"YES\",\"fcmtoken\":\"ftM2C0foTtGJ38Z6t4hYKl:APA91bHPeUgcX7R8Xe1bo-74L7Y8ZXwWVT6WKLFU17bc2gQMqHArQ6kDJWMFYPnfy3R37DRyr3sDSyOc0ihJICeyYx21PzskRwDXhv-nTON6KDu87DxXMaYT-pq4D1VYDyUlpLjpRiSX\",\"timestamp\":1639548715518}"
             KLog.d("btnExecute>>>" + ss.md5())
             //            lifecycleScope.cancel()
 //            viewModel.onRequest(1, 20)
@@ -136,45 +139,61 @@ class MainActivity : AppCompatActivity() {
 //            p2["12222"]?.note = "5646456464"
 //            KLog.d(">>>>>>map2:$map2")
 //            KLog.d(">>>>>>p:$p2")
-//            apiWithAsyncCreated<String> {
-//                val dialog = processDialog
-//                onStart {
-//                   showProcessDialog(supportFragmentManager)
-//                }
-//                onRequest {
-//                    try {
-//                        Thread.sleep(5000)
-//                    } catch (e: Exception) {
-//                        eLog { ">>>>>" + e.message }
-//                    }
-//                    "响应数据"
-//                }
-//                onResponse {
-//                    dLog { ">>>$it" }
-//                }
-//                onComplete {
-//                    dismissProcessDialog()
-//                }
-//            }
-        }
-        btnExecute1.setOnClickListener {
-            lifecycleScope.launch {
-                asyncApi<Unit> {
-                    onStart {
-                        dLog { ">>>>>>>>>>>>onStart" }
-                        null
+            apiWithAsyncCreated<String> {
+                val dialog = processDialog
+                onStart {
+                   showProcessDialog()
+                }
+                onRequest {
+                    try {
+                        Thread.sleep(5000)
+                    } catch (e: Exception) {
+                        eLog { ">>>>>" + e.message }
                     }
-                    onRequest {
-                        dLog { "onRequest>>>>>>>>>>start" }
-                        delay(5000)
-                        dLog { "onRequest>>>>>>>>>>end" }
-                        null
-                    }
-                    onResponse {
-                        dLog { "onResponse>>>>>>>>>>" }
-                    }
+                    "响应数据"
+                }
+                onResponse {
+                    dLog { ">>>$it" }
+                }
+                onComplete {
+                    dismissProgressDialog()
                 }
             }
+        }
+        btnSaveImage.setOnClickListener {
+            apiWithAsyncCreated<File> {
+                onStart { showLoadingDialog(supportFragmentManager) }
+                onRequest {
+                    val f = Glide.with(this@MainActivity).asFile()
+                        .load("http://img.daimg.com/uploads/allimg/220407/3-22040H31Z0.jpg").submit()
+                    f.get()
+                }
+                onResponse {
+                    val result = saveImageToGallery(it,  "测试保存文件")
+                    dLog { ">>>>>>>result:$result" }
+                }
+                onComplete { dismissLoadingDialog() }
+            }
+        }
+        btnExecute1.setOnClickListener {
+            request()
+//            lifecycleScope.launch {
+//                asyncApi<Unit> {
+//                    onStart {
+//                        dLog { ">>>>>>>>>>>>onStart" }
+//                        null
+//                    }
+//                    onRequest {
+//                        dLog { "onRequest>>>>>>>>>>start" }
+//                        delay(5000)
+//                        dLog { "onRequest>>>>>>>>>>end" }
+//                        null
+//                    }
+//                    onResponse {
+//                        dLog { "onResponse>>>>>>>>>>" }
+//                    }
+//                }
+//            }
 //            handler.postDelayed({
 //                lifecycleScope.cancel()
 //            },1000)
@@ -212,8 +231,8 @@ class MainActivity : AppCompatActivity() {
         }
         textView.setOnClickListener {
             requestPermissions(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_CONTACTS
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_CONTACTS
             ) {
                 requestCode = 22
                 resultCallback = {
@@ -223,7 +242,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         is PermissionResult.PermissionDenied -> {
                             val data =
-                                    deniedPermissions.toString().replace("android.permission.", "")
+                                deniedPermissions.toString().replace("android.permission.", "")
                             showToast("Denied:$data")
                         }
                         is PermissionResult.ShowRational -> {
@@ -232,7 +251,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         is PermissionResult.PermissionDeniedPermanently -> {
                             val data = permanentlyDeniedPermissions.toString()
-                                    .replace("android.permission.", "")
+                                .replace("android.permission.", "")
                             showToast("Denied permanently:$data")
                         }
                     }
@@ -250,8 +269,8 @@ class MainActivity : AppCompatActivity() {
         }
         textView1.setOnClickListener {
             this.requestPermissionsDsl(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_CONTACTS
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_CONTACTS
             ) {
                 onDenied {
                     val result = it.toString().replace("android.permission.", "")
@@ -305,7 +324,7 @@ class MainActivity : AppCompatActivity() {
             }
             is PermissionResult.PermissionDeniedPermanently -> {
                 val data = result.permanentlyDeniedPermissions.toString()
-                        .replace("android.permission.", "")
+                    .replace("android.permission.", "")
                 showToast("Denied permanently:$data")
             }
         }
@@ -313,57 +332,57 @@ class MainActivity : AppCompatActivity() {
 
     fun showRational(result: PermissionRequestDsl) {
         AlertDialog.Builder(this)
-                .setMessage("We need permission")
-                .setTitle("Rational")
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setPositiveButton("OK") { _, _ ->
-                    result.retry()
-                }
-                .create()
-                .show()
+            .setMessage("We need permission")
+            .setTitle("Rational")
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton("OK") { _, _ ->
+                result.retry()
+            }
+            .create()
+            .show()
     }
 
     fun showRational(result: PermissionResult) {
         AlertDialog.Builder(this)
-                .setMessage("We need permission")
-                .setTitle("Rational")
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setPositiveButton("OK") { _, _ ->
-                    val permissions = when (result.requestCode) {
-                        1 -> {
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-                        }
-                        2 -> {
-                            arrayOf(Manifest.permission.READ_CONTACTS)
-                        }
-                        3 -> {
-                            arrayOf(Manifest.permission.CAMERA)
-                        }
-                        22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        4 -> {
-                            arrayOf(
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.READ_CONTACTS,
-                                    Manifest.permission.CAMERA
-                            )
-                        }
-                        else -> {
-                            arrayOf()
-                        }
+            .setMessage("We need permission")
+            .setTitle("Rational")
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton("OK") { _, _ ->
+                val permissions = when (result.requestCode) {
+                    1 -> {
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
-                    requestPermissions(*permissions) {
-                        requestCode = result.requestCode
-                        resultCallback = {
-                            handlePermission(this)
-                        }
+                    2 -> {
+                        arrayOf(Manifest.permission.READ_CONTACTS)
+                    }
+                    3 -> {
+                        arrayOf(Manifest.permission.CAMERA)
+                    }
+                    22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    4 -> {
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.CAMERA
+                        )
+                    }
+                    else -> {
+                        arrayOf()
                     }
                 }
-                .create()
-                .show()
+                requestPermissions(*permissions) {
+                    requestCode = result.requestCode
+                    resultCallback = {
+                        handlePermission(this)
+                    }
+                }
+            }
+            .create()
+            .show()
     }
 
     private fun copyTest() {
@@ -425,26 +444,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun request() {
-        apiWithAsyncCreated<String> {
-            onRequest {
-                ""
-            }
-            onResponse {
-
-            }
-        }
-
-
         val job: Job = asyncWhenStart({
             eLog { "onRequest:" + if (isMainThread()) "在主线程中" else "在子线程中" }
             val callResult = async {
                 eLog { "onRequest>>async:" + if (isMainThread()) "在主线程中" else "在子线程中" }
                 val client = OkHttpClient.Builder().build()
                 val call = client.newCall(
-                        Request.Builder()
-                                .url("https://www.baidu.com")
-                                .post(RequestParam().createRequestBody())
-                                .build()
+                    Request.Builder()
+                        .url("https://www.baidu.com")
+                        .post(RequestParam().createRequestBody())
+                        .build()
                 )
                 call.execute()
             }

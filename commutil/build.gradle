@@ -2,14 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'maven-publish'
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
 
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -62,5 +63,17 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
 }
-apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.peihua8858'
+group = 'com.github.peihua8858'
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.peihua8858'
+                artifactId = 'kotlinCommonUtils'
+                version = '1.0.27'
+            }
+        }
+    }
+}
