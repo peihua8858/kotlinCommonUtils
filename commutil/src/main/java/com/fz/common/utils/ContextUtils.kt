@@ -32,6 +32,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.fz.common.file.createFileName
 import com.fz.common.file.deleteFileOrDir
 import com.fz.common.file.formatSize
 import com.fz.common.file.getFileSize
@@ -473,82 +474,30 @@ fun Context?.getMetaData(key: String, default: String): String {
     return default
 }
 
+/**
+ * 保存一个图片文件[source]到相册
+ * @param source 图片文件
+ * @param description 文件描述
+ */
 fun Context.saveImageToGallery(source: File, description: String): String? {
     return saveBitmapToGallery(BitmapFactory.decodeFile(source.absolutePath), source.name, description)
 }
 
-fun Context.saveBitmapToGallery(source: Bitmap, title: String, description: String): String? {
-    val values = ContentValues()
-    values.put(Images.Media.TITLE, title)
-    values.put(Images.Media.DISPLAY_NAME, title)
-    values.put(Images.Media.DESCRIPTION, description)
-    values.put(Images.Media.MIME_TYPE, "image/jpeg")
-    // Add the date meta data to ensure the image is added at the front of the gallery
-    values.put(Images.Media.DATE_ADDED, System.currentTimeMillis())
-    values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis())
-    val cr = contentResolver
-    try {
-        val uri = cr.insert(Images.Media.EXTERNAL_CONTENT_URI, values)
-        val imageOut = cr.openOutputStream(uri!!)
-        try {
-            source.compress(Bitmap.CompressFormat.JPEG, 100, imageOut)
-        } finally {
-            imageOut?.flush()
-            imageOut?.close()
-        }
-        val id = ContentUris.parseId(uri)
-        // Wait until MINI_KIND thumbnail is generated.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            cr.loadThumbnail(uri, Size(50, 50), CancellationSignal())
-        } else {
-            val miniThumb = Images.Thumbnails.getThumbnail(cr, id, Images.Thumbnails.MINI_KIND, null)
-            // This is for backward compatibility.
-            cr.storeThumbnail( miniThumb, id, 50f, 50f, Images.Thumbnails.MICRO_KIND)
-        }
-        // Everything went well above, publish it!
-        values.clear()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.MediaColumns.IS_PENDING, 0)
-        }
-        cr.update(uri, values, null, null);
-        return uri.toString()
-    } catch (e: java.lang.Exception) {
-        return null
-    }
+/**
+ * 根据路径[path]保存图片到相册
+ * @param path 图片路径
+ * @param description 文件描述
+ */
+fun Context.saveImageToGallery(path: String, description: String): String? {
+    return saveBitmapToGallery(BitmapFactory.decodeFile(path), path.createFileName("jpg"), description)
 }
 
-private fun ContentResolver.storeThumbnail(
-    source: Bitmap,
-    id: Long,
-    width: Float,
-    height: Float,
-    kind: Int
-): Bitmap? {
-    // create the matrix to scale it
-    val matrix = Matrix()
-    val scaleX = width / source.width
-    val scaleY = height / source.height
-    matrix.setScale(scaleX, scaleY)
-    val thumb = Bitmap.createBitmap(
-        source, 0, 0,
-        source.width,
-        source.height, matrix,
-        true
-    )
-    val values = ContentValues(4)
-    values.put(Images.Thumbnails.KIND, kind)
-    values.put(Images.Thumbnails.IMAGE_ID, id.toInt())
-    values.put(Images.Thumbnails.HEIGHT, thumb.height)
-    values.put(Images.Thumbnails.WIDTH, thumb.width)
-    val url = insert(Images.Thumbnails.EXTERNAL_CONTENT_URI, values)
-    return try {
-        val thumbOut = openOutputStream(url!!)
-        thumb.compress(Bitmap.CompressFormat.JPEG, 100, thumbOut)
-        thumbOut!!.close()
-        thumb
-    } catch (ex: FileNotFoundException) {
-        null
-    } catch (ex: IOException) {
-        null
-    }
+/**
+ * 保存一个图片[source]到相册
+ * @param source 图片对象
+ * @param title 文件显示名称
+ * @param description 文件描述
+ */
+fun Context.saveBitmapToGallery(source: Bitmap, title: String, description: String): String? {
+    return contentResolver.saveBitmapToGallery(source, title, description)
 }
