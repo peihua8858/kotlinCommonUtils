@@ -5,11 +5,13 @@ package com.fz.common.utils
 
 import android.annotation.SuppressLint
 import android.app.*
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.hardware.camera2.CameraManager
 import android.hardware.display.DisplayManager
@@ -17,12 +19,8 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
-import android.os.CancellationSignal
-import android.provider.MediaStore
-import android.provider.MediaStore.Images
 import android.provider.Settings
 import android.telephony.TelephonyManager
-import android.util.Size
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -38,16 +36,13 @@ import com.fz.common.file.formatSize
 import com.fz.common.file.getFileSize
 import com.fz.common.text.isNonEmpty
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.OutputStream
 import java.util.*
 
 
 @SuppressLint("StaticFieldLeak")
 internal var mContext: Context? = null
 fun initContext(context: Context) {
-    mContext = context.applicationContext
+    mContext = context
 }
 
 /**
