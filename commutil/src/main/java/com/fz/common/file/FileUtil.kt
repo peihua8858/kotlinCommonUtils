@@ -46,7 +46,23 @@ fun String.createFileName(extension: String): String {
  * 如提取：https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_ff e445^stock_photo.jpg!0x0.webp?astr
  * 则返回 free_ff e445^stock_photo.jpg!0x0.webp
  */
-fun String.fetchFileName(): String {
+fun String.fetchPhotoFileName(): String {
+    val result = fetchFileName()
+    if (result.isNonEmpty()) {
+        return result
+    }
+    return "IMG_".createFileName("jpg")
+}
+
+fun String.fetchMediaFileName(extension: String): String {
+    val result = fetchFileName()
+    if (result.isNonEmpty()) {
+        return result
+    }
+    return "Media_".createFileName(extension)
+}
+
+fun String.fetchFileName(): String? {
     if (isNonEmpty()) {
         val pat: Pattern = Pattern.compile("(/)(?!.*\\1)[^\\\\/*?:<>|]+[.][a-zA-Z]+") //正则判断
         val mc: Matcher = pat.matcher(this) //条件匹配
@@ -64,7 +80,7 @@ fun String.fetchFileName(): String {
             return substring(index + 1)
         }
     }
-    return "IMG_".createFileName("jpg")
+    return null
 }
 
 /**
