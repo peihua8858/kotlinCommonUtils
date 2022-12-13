@@ -64,7 +64,7 @@ fun String.fetchMediaFileName(extension: String): String {
 
 fun String.fetchFileName(): String? {
     if (isNonEmpty()) {
-        val pat: Pattern = Pattern.compile("(/)(?!.*\\1)[^\\\\/*?:<>|]+[.][a-zA-Z]+") //正则判断
+        val pat: Pattern = Pattern.compile("(/)(?!.*\\1)[^\\\\/*?:<>|]+[.][a-zA-Z0-9]+") //正则判断
         val mc: Matcher = pat.matcher(this) //条件匹配
         if (mc.find()) {
             val result = mc.group()//截取文件名后缀名
