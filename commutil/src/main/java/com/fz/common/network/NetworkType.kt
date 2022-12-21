@@ -7,11 +7,11 @@ package com.fz.common.network
  * @version 1.0
  * @date 2020/11/25 17:17
  */
-enum class NetworkType(private val desc: String) {
+enum class NetworkType(val value: String) {
     /**
      * ETHERNET
      */
-    NETWORK_ETHERNET("ETHERNET"),
+    NETWORK_ETHERNET("Ethernet"),
 
     /**
      * WiFi
@@ -41,7 +41,7 @@ enum class NetworkType(private val desc: String) {
     /**
      * 未知移动网络类型
      */
-    NETWORK_CELLULAR("CELLULAR"),
+    NETWORK_CELLULAR("Cellular"),
 
     /**
      * 未知网络类型
@@ -54,6 +54,6 @@ enum class NetworkType(private val desc: String) {
     NETWORK_NO("No network");
 
     override fun toString(): String {
-        return desc
+        return value
     }
 }
