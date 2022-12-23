@@ -62,10 +62,15 @@ fun <T> Collection<T>.toString(separator: String): String {
  */
 fun <T> Collection<T>.splicing(separator: String): String {
     val sb = StringBuilder()
-    for (item in this) {
-        sb.append(item).append(separator)
+    for ((index, item) in this.withIndex()) {
+        if (item != null) {
+            sb.append(item)
+            if (index < size - 1) {
+                sb.append(separator)
+            }
+        }
     }
-    return sb.deleteEndChar(separator).toString()
+    return sb.toString()
 }
 
 /**
@@ -89,10 +94,16 @@ inline fun <T, R> Collection<T>.toString(separator: String, action: (T) -> R): S
  */
 inline fun <T, R> Collection<T>.splicing(separator: String, action: (T) -> R): String {
     val sb = StringBuilder()
-    for (item in this) {
-        sb.append(action(item)).append(separator)
+    for ((index, item) in this.withIndex()) {
+        val result = action(item)
+        if (result != null) {
+            sb.append(result)
+            if (index < size - 1) {
+                sb.append(separator)
+            }
+        }
     }
-    return sb.deleteEndChar(separator).toString()
+    return sb.toString()
 }
 
 /**

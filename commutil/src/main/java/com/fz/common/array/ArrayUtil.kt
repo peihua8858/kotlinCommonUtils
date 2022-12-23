@@ -61,9 +61,12 @@ fun <T> Array<T>.splicing(): String {
 fun <T> Array<T>.splicing(separator: String): String {
     val sb = StringBuilder()
     for (index in indices) {
-        sb.append(this[index])
-        if (index < size - 1) {
-            sb.append(separator)
+        val result = this[index]
+        if (result != null) {
+            sb.append(result)
+            if (index < size - 1) {
+                sb.append(separator)
+            }
         }
     }
     return sb.toString()

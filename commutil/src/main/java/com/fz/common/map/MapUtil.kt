@@ -190,6 +190,7 @@ inline fun <K, V> Map<K, V>.findKey(predicate: (Map.Entry<K, V>) -> Boolean): K?
 inline fun <K, V> Map<K, V>.findKeys(predicate: (Map.Entry<K, V>) -> Boolean): MutableList<K> {
     return findTo(mutableListOf(), predicate)
 }
+
 /**
  * 返回匹配给定 [predicate] 的所有元素列表，如果没有找到这样的元素，则返回空列表。
  * @param <T>       泛型参数，集合中放置的元素数据类型
@@ -230,8 +231,14 @@ inline fun <K, V, R> Map<K, V>.splicing(action: (Map.Entry<K, V>) -> R): String 
  */
 inline fun <K, V, R> Map<K, V>.splicing(separator: String, action: (Map.Entry<K, V>) -> R): String {
     val sb = StringBuilder()
-    for (item in this) {
-        sb.append(action(item)).append(separator)
+    for ((index, item) in this.entries.withIndex()) {
+        val result = action(item)
+        if (result != null) {
+            sb.append(result)
+            if (index < size - 1) {
+                sb.append(separator)
+            }
+        }
     }
-    return sb.deleteEndChar(separator).toString()
+    return sb.toString()
 }
