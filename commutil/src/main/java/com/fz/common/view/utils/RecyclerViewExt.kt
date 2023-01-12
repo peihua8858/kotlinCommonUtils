@@ -226,18 +226,17 @@ fun RecyclerView?.smoothScrollToCenter(view: View, position: Int) {
     val layoutManager = layoutManager
     val firstPosition = getStartPosition()
     val centerView = getChildAt(position - firstPosition)
-    val orientation = when (layoutManager) {
-        is LinearLayoutManager -> {
-            layoutManager.orientation
-        }
-        is StaggeredGridLayoutManager -> {
-            layoutManager.orientation
-        }
-        else -> RecyclerView.VERTICAL
-    }
     //将点击的position转换为当前屏幕上可见的item的位置以便于计算距离顶部的高度，从而进行移动居中
-    val childAt = getChildAt(position - firstPosition)
-    if (childAt != null) {
+    if (centerView != null) {
+        val orientation = when (layoutManager) {
+            is LinearLayoutManager -> {
+                layoutManager.orientation
+            }
+            is StaggeredGridLayoutManager -> {
+                layoutManager.orientation
+            }
+            else -> RecyclerView.VERTICAL
+        }
         if (orientation == RecyclerView.VERTICAL) {
             val reHeight = rect.bottom - rect.top - view.height
             val top = centerView.top
@@ -261,8 +260,14 @@ fun RecyclerView?.smoothScrollToCenter(view: View, position: Int) {
  */
 fun RecyclerView?.smoothScrollToCenter(position: Int) {
     if (this == null) return
-    val curView = getChildAt(position)
-    smoothScrollToCenter(curView, position)
+    var curView = getChildAt(position)
+    if (curView == null) {
+        scrollToPosition(position)
+        curView = getChildAt(position)
+    }
+    if (curView != null) {
+        smoothScrollToCenter(curView, position)
+    }
 }
 
 /**
@@ -274,8 +279,14 @@ fun RecyclerView?.smoothScrollToCenter(position: Int) {
  */
 fun RecyclerView?.scrollToCenter(position: Int) {
     if (this == null) return
-    val curView = getChildAt(position)
-    scrollToCenter(curView, position)
+    var curView = getChildAt(position)
+    if (curView == null) {
+        scrollToPosition(position)
+        curView = getChildAt(position)
+    }
+    if (curView != null) {
+        scrollToCenter(curView, position)
+    }
 }
 
 /**
@@ -293,24 +304,26 @@ fun RecyclerView?.scrollToCenter(view: View, position: Int) {
     val layoutManager = layoutManager
     val firstPosition = getStartPosition()
     val centerView = getChildAt(position - firstPosition)
-    val orientation = when (layoutManager) {
-        is LinearLayoutManager -> {
-            layoutManager.orientation
+    if (centerView != null) {
+        val orientation = when (layoutManager) {
+            is LinearLayoutManager -> {
+                layoutManager.orientation
+            }
+            is StaggeredGridLayoutManager -> {
+                layoutManager.orientation
+            }
+            else -> RecyclerView.VERTICAL
         }
-        is StaggeredGridLayoutManager -> {
-            layoutManager.orientation
+        if (orientation == RecyclerView.VERTICAL) {
+            val reHeight = rect.bottom - rect.top - view.height
+            val top = centerView.top
+            val half = reHeight / 2
+            scrollBy(0, top - half)
+        } else if (orientation == RecyclerView.HORIZONTAL) {
+            val reWidth = rect.right - rect.left - view.width
+            val left = centerView.left
+            val half = reWidth / 2
+            scrollBy(left - half, 0)
         }
-        else -> RecyclerView.VERTICAL
-    }
-    if (orientation == RecyclerView.VERTICAL) {
-        val reHeight = rect.bottom - rect.top - view.height
-        val top = centerView.top
-        val half = reHeight / 2
-        scrollBy(0, top - half)
-    } else if (orientation == RecyclerView.HORIZONTAL) {
-        val reWidth = rect.right - rect.left - view.width
-        val left = centerView.left
-        val half = reWidth / 2
-        scrollBy(left - half, 0)
     }
 }
