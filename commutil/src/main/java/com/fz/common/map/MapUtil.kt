@@ -4,9 +4,10 @@
 package com.fz.common.map
 
 import android.os.BadParcelableException
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import com.fz.common.text.deleteEndChar
+import androidx.core.os.bundleOf
 import java.io.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -241,4 +242,15 @@ inline fun <K, V, R> Map<K, V>.splicing(separator: String, action: (Map.Entry<K,
         }
     }
     return sb.toString()
+}
+
+fun Map<String, Any?>.toBundle(): Bundle = bundleOf(*this.toList().toTypedArray())
+
+fun <K, V, T> Map<K, V>.convert(p: (Map.Entry<K, V>) -> Map.Entry<K, T>): Map<K, T> {
+    val result = mutableMapOf<K, T>()
+    for (item in this) {
+        val r = p(item)
+        result[r.key] = r.value
+    }
+    return result
 }

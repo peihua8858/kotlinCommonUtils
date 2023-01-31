@@ -222,3 +222,11 @@ fun <T> MutableList<T>.findOrFirst(predicate: (T) -> Boolean): T {
     }
     return this[0]
 }
+
+fun <I, T> List<I>.convert(p: (I) -> T): MutableList<T> {
+    val result = mutableListOf<T>()
+    for (item in this) {
+        result.add(p(item))
+    }
+    return result
+}

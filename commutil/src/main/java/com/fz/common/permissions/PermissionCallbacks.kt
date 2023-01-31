@@ -1,5 +1,8 @@
 package com.fz.common.permissions
 
+import android.content.pm.PackageManager
+import androidx.annotation.CheckResult
+
 interface PermissionCallbacks {
 
     /**
@@ -38,7 +41,7 @@ class PermissionCallbacksDSL : PermissionCallbacks {
     private var onDenied: (permissions: List<String>) -> Unit = {}
     private var onShowRationale: (permissionRequest: PermissionRequestDsl) -> Unit = {}
     private var onNeverAskAgain: (permissions: List<String>) -> Unit = {}
-
+    @CheckResult
     fun onGranted(func: () -> Unit) {
         onGranted = func
     }

@@ -1,5 +1,12 @@
 package com.fz.commutils.demo.model
 
+import android.Manifest
+import android.app.Activity
+import android.content.ContentValues
+import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.annotation.RequiresPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.fz.dialog.LoadingDialogFragment
@@ -26,3 +33,19 @@ val FragmentActivity.processDialog: LoadingDialogFragment
     }
 val Fragment.processDialog: LoadingDialogFragment
     get() = LoadingDialogFragment()
+
+
+@RequiresPermission(anyOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
+fun startCameraActivity(activity: Activity?, requestCode: Int): Uri? {
+    if (activity == null) {
+        return null
+    }
+    val mUri = activity.contentResolver.insert(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        ContentValues()
+    )
+    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri)
+    activity.startActivityForResult(intent, requestCode)
+    return mUri
+}

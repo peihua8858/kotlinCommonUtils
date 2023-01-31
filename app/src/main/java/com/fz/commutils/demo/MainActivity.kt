@@ -1,9 +1,15 @@
 package com.fz.commutils.demo
 
 import android.Manifest
+import android.app.Activity
+import android.content.ContentValues
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.provider.MediaStore
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -54,6 +60,11 @@ class MainActivity : AppCompatActivity() {
                     dLog { "请求成功" }
                     val response = it.data
                 }
+            }
+        }
+        requestPermissionsDsl(""){
+            onGranted {
+                startCameraActivity(this@MainActivity,11)
             }
         }
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
