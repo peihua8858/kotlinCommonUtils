@@ -34,18 +34,19 @@ val FragmentActivity.processDialog: LoadingDialogFragment
 val Fragment.processDialog: LoadingDialogFragment
     get() = LoadingDialogFragment()
 
-
-@RequiresPermission(anyOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
-fun startCameraActivity(activity: Activity?, requestCode: Int): Uri? {
-    if (activity == null) {
-        return null
+object AppUtils {
+    @JvmStatic
+    fun startCameraActivity(activity: Activity?, requestCode: Int): Uri? {
+        if (activity == null) {
+            return null
+        }
+        val mUri = activity.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            ContentValues()
+        )
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri)
+        activity.startActivityForResult(intent, requestCode)
+        return mUri
     }
-    val mUri = activity.contentResolver.insert(
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        ContentValues()
-    )
-    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri)
-    activity.startActivityForResult(intent, requestCode)
-    return mUri
 }

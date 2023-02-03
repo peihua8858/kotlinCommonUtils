@@ -316,29 +316,31 @@ private fun buildIntent(context: Context): Intent {
  * 粘贴到系统剪贴板
  */
 fun Context?.copyToClipBoard(lazyContent: () -> CharSequence) {
-    val content = lazyContent()
-    if (this != null) copyToClipBoard(content, null) else eLog { "Context  is null." }
+    copyToClipBoard(lazyContent){}
 }
 
 /**
  * 粘贴到系统剪贴板
  */
-fun Context?.copyToClipBoard(lazyContent: () -> CharSequence, callback: (Boolean) -> Unit) {
+@JvmOverloads
+fun Context?.copyToClipBoard(lazyContent: () -> CharSequence, callback: ((Boolean) -> Unit)? = null) {
     val content = lazyContent()
-    if (this != null) copyToClipBoard(
+    val context = checkContext(this)
+    if (context != null) context.copyToClipBoard(
         content,
         callback
-    ) else callback(false).eLog { "Context  is null." }
+    ) else callback?.invoke(false).eLog { "Context  is null." }
 }
 
 /**
  * 粘贴到系统剪贴板
  */
-fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)?) {
+@JvmOverloads
+fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)? = null) {
     val cm = clipboardManager
-    val text = ClipData.newPlainText("url", content)
+    val clipData = ClipData.newPlainText("text", content)
     cm?.let {
-        cm.setPrimaryClip(text)
+        cm.setPrimaryClip(clipData)
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
                 ClipboardManager.OnPrimaryClipChangedListener {
@@ -349,6 +351,83 @@ fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)
             })
         }
     }
+}
+
+@JvmOverloads
+fun Context.copyToClipBoard(intent: Intent, callback: ((Boolean) -> Unit)? = null) {
+    val cm = clipboardManager
+    val clipData = ClipData.newIntent("Intent", intent)
+    cm?.let {
+        cm.setPrimaryClip(clipData)
+        callback?.let {
+            cm.addPrimaryClipChangedListener(object :
+                ClipboardManager.OnPrimaryClipChangedListener {
+                override fun onPrimaryClipChanged() {
+                    cm.removePrimaryClipChangedListener(this)
+                    callback(true)
+                }
+            })
+        }
+    }
+}
+@JvmOverloads
+fun Context.copyToClipBoard(uri: Uri, callback: ((Boolean) -> Unit)? = null) {
+    val cm = clipboardManager
+    val clipData = ClipData.newUri(contentResolver, "URI", uri)
+    cm?.let {
+        cm.setPrimaryClip(clipData)
+        callback?.let {
+            cm.addPrimaryClipChangedListener(object :
+                ClipboardManager.OnPrimaryClipChangedListener {
+                override fun onPrimaryClipChanged() {
+                    cm.removePrimaryClipChangedListener(this)
+                    callback(true)
+                }
+            })
+        }
+    }
+}
+
+fun Context.pasteText(): CharSequence {
+    return pasteText(0)
+}
+
+fun Context.pasteText(index: Int): CharSequence {
+    val cm = clipboardManager
+    if (cm != null && cm.hasPrimaryClip()) {
+        val primaryClip = cm.primaryClip
+        val result = primaryClip?.getItemAt(index)?.text
+        if (result.isNonEmpty()) {
+            return result
+        }
+    }
+    return ""
+}
+
+fun Context.pasteIntent(): Intent? {
+    return pasteIntent(0)
+}
+
+fun Context.pasteIntent(index: Int): Intent? {
+    val cm = clipboardManager
+    if (cm != null && cm.hasPrimaryClip()) {
+        val primaryClip = cm.primaryClip
+        return primaryClip?.getItemAt(index)?.intent
+    }
+    return null
+}
+
+fun Context.pasteUri(): Uri? {
+    return pasteUri(0)
+}
+
+fun Context.pasteUri(index: Int): Uri? {
+    val cm = clipboardManager
+    if (cm != null && cm.hasPrimaryClip()) {
+        val primaryClip = cm.primaryClip
+        return primaryClip?.getItemAt(index)?.uri
+    }
+    return null
 }
 
 /**

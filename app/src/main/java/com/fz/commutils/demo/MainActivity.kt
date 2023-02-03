@@ -1,21 +1,11 @@
 package com.fz.commutils.demo
 
 import android.Manifest
-import android.app.Activity
-import android.content.ContentValues
-import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.provider.MediaStore
-import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.fz.common.activity.asyncWhenStart
-import com.fz.common.coroutine.asyncApi
 import com.fz.common.encrypt.md5
 import com.fz.common.model.ViewModelState
 import com.fz.common.permissions.PermissionRequestDsl
@@ -25,6 +15,7 @@ import com.fz.common.permissions.requestPermissionsDsl
 import com.fz.common.text.isNonEmpty
 import com.fz.common.utils.*
 import com.fz.commutils.demo.model.*
+import com.fz.commutils.demo.model.AppUtils.startCameraActivity
 import com.fz.toast.showToast
 import com.socks.library.KLog
 import kotlinx.android.synthetic.main.activity_main.*
@@ -38,6 +29,7 @@ import java.io.File
  */
 class MainActivity : AppCompatActivity() {
     private val viewModel = MainViewModel()
+    private val RESULT_CODE_OPEN_CAMERA = 0x0104
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -62,9 +54,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        requestPermissionsDsl(""){
+        baseContext.copyToClipBoard{
+            ""
+        }
+        copyToClipBoard("")
+        requestPermissionsDsl( Manifest.permission.WRITE_EXTERNAL_STORAGE){
             onGranted {
-                startCameraActivity(this@MainActivity,11)
+                startCameraActivity(this@MainActivity,RESULT_CODE_OPEN_CAMERA)
             }
         }
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)

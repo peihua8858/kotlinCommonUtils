@@ -92,6 +92,10 @@ fun Any?.findActivity(): Activity? {
     return findActivity(checkContextOrNull(this))
 }
 
+fun Context?.findActivity(): Activity? {
+    return findActivity(checkContextOrNull(this))
+}
+
 fun Context?.getActivity(): Activity? {
     return getActivity(this)
 }
@@ -129,6 +133,10 @@ fun Any?.findActivity(context: Context?): Activity? {
  */
 fun Context?.isDestroy(): Boolean {
     return isDestroy(findActivity(this))
+}
+
+fun Context?.isFinish(): Boolean {
+    return isFinish(this.findActivity())
 }
 
 /**
@@ -198,10 +206,10 @@ fun ComponentActivity.createHandler(onError: (CoroutineContext, Throwable) -> Un
  * @version 1.0
  */
 fun <T> ComponentActivity.launchWithStart(
-        block: suspend CoroutineScope.() -> T,
-        callback: (T) -> Unit = {},
-        onError: (Throwable) -> Unit = {},
-        onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> T,
+    callback: (T) -> Unit = {},
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
 ): Job {
     return lifecycleScope.launch {
         whenStarted { runCatching(block, callback, onError, complete = onComplete) }
@@ -232,7 +240,11 @@ fun <T> ComponentActivity.apiWithLaunchStarted(api: ApiModel<T>.() -> Unit): Job
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> ComponentActivity.apiWithLaunchStarted(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+fun <T> ComponentActivity.apiWithLaunchStarted(
+    manager: FragmentManager? = null,
+    isShowDialog: Boolean = true,
+    api: ApiModel<T>.() -> Unit
+): Job {
     return lifecycleScope.launch {
         whenStarted { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
@@ -247,10 +259,10 @@ fun <T> ComponentActivity.apiWithLaunchStarted(manager: FragmentManager? = null,
  * @version 1.0
  */
 fun <T> ComponentActivity.launchWhenCreated(
-        block: suspend CoroutineScope.() -> T,
-        callback: (T) -> Unit = {},
-        onError: (Throwable) -> Unit = {},
-        onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> T,
+    callback: (T) -> Unit = {},
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
 ): Job {
     return lifecycleScope.launch {
         whenCreated { runCatching(block, callback, onError, complete = onComplete) }
@@ -281,7 +293,11 @@ fun <T> ComponentActivity.apiWithLaunchCreated(api: ApiModel<T>.() -> Unit): Job
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> ComponentActivity.apiWithLaunchCreated(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+fun <T> ComponentActivity.apiWithLaunchCreated(
+    manager: FragmentManager? = null,
+    isShowDialog: Boolean = true,
+    api: ApiModel<T>.() -> Unit
+): Job {
     return lifecycleScope.launch {
         whenCreated { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
@@ -296,10 +312,10 @@ fun <T> ComponentActivity.apiWithLaunchCreated(manager: FragmentManager? = null,
  * @version 1.0
  */
 fun <T> ComponentActivity.launchWhenResumed(
-        block: suspend CoroutineScope.() -> T,
-        callback: (T) -> Unit = {},
-        onError: (Throwable) -> Unit = {},
-        onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> T,
+    callback: (T) -> Unit = {},
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
 ): Job {
     return lifecycleScope.launch {
         whenResumed { runCatching(block, callback, onError, complete = onComplete) }
@@ -330,7 +346,11 @@ fun <T> ComponentActivity.apiWithLaunchResumed(api: ApiModel<T>.() -> Unit): Job
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> ComponentActivity.apiWithLaunchResumed(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+fun <T> ComponentActivity.apiWithLaunchResumed(
+    manager: FragmentManager? = null,
+    isShowDialog: Boolean = true,
+    api: ApiModel<T>.() -> Unit
+): Job {
     return lifecycleScope.launch {
         whenResumed { ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch() }
     }
@@ -345,10 +365,10 @@ fun <T> ComponentActivity.apiWithLaunchResumed(manager: FragmentManager? = null,
  * @version 1.0
  */
 fun <T> ComponentActivity.launch(
-        block: suspend CoroutineScope.() -> T,
-        callback: (T) -> Unit = {},
-        onError: (Throwable) -> Unit = {},
-        onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> T,
+    callback: (T) -> Unit = {},
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
 ): Job {
     return lifecycleScope.launch {
         runCatching(block, callback, onError, complete = onComplete)
@@ -376,7 +396,11 @@ fun <T> ComponentActivity.apiWithLaunch(api: ApiModel<T>.() -> Unit): Job {
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> ComponentActivity.apiWithLaunch(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+fun <T> ComponentActivity.apiWithLaunch(
+    manager: FragmentManager? = null,
+    isShowDialog: Boolean = true,
+    api: ApiModel<T>.() -> Unit
+): Job {
     return lifecycleScope.launch {
         ApiModel<T>(manager, isShowDialog).apply(api).syncLaunch()
     }
@@ -392,10 +416,10 @@ fun <T> ComponentActivity.apiWithLaunch(manager: FragmentManager? = null, isShow
  * @version 1.0
  */
 fun <T> ComponentActivity.asyncWhenCreated(
-        block: suspend CoroutineScope.() -> T,
-        callback: (T) -> Unit = {},
-        onError: (Throwable) -> Unit = {},
-        onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> T,
+    callback: (T) -> Unit = {},
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
 ): Job {
     return lifecycleScope.launch {
         whenCreated { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
@@ -426,7 +450,11 @@ fun <T> ComponentActivity.apiWithAsyncCreated(api: ApiModel<T>.() -> Unit): Job 
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> ComponentActivity.apiWithAsyncCreated(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+fun <T> ComponentActivity.apiWithAsyncCreated(
+    manager: FragmentManager? = null,
+    isShowDialog: Boolean = true,
+    api: ApiModel<T>.() -> Unit
+): Job {
     return lifecycleScope.launch {
         whenCreated {
             ApiModel<T>(manager, isShowDialog).apply(api).launch()
@@ -444,10 +472,10 @@ fun <T> ComponentActivity.apiWithAsyncCreated(manager: FragmentManager? = null, 
  * @version 1.0
  */
 fun <T> ComponentActivity.asyncWhenStart(
-        block: suspend CoroutineScope.() -> T,
-        callback: (T) -> Unit = {},
-        onError: (Throwable) -> Unit = {},
-        onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> T,
+    callback: (T) -> Unit = {},
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
 ): Job {
     return lifecycleScope.launch {
         whenStarted { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
@@ -478,7 +506,11 @@ fun <T> ComponentActivity.apiWithAsyncStarted(api: ApiModel<T>.() -> Unit): Job 
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> ComponentActivity.apiWithAsyncStarted(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+fun <T> ComponentActivity.apiWithAsyncStarted(
+    manager: FragmentManager? = null,
+    isShowDialog: Boolean = true,
+    api: ApiModel<T>.() -> Unit
+): Job {
     return lifecycleScope.launch {
         whenStarted {
             ApiModel<T>(manager, isShowDialog).apply(api).launch()
@@ -496,10 +528,10 @@ fun <T> ComponentActivity.apiWithAsyncStarted(manager: FragmentManager? = null, 
  * @version 1.0
  */
 fun <T> ComponentActivity.asyncWhenResumed(
-        block: suspend CoroutineScope.() -> T,
-        callback: (T) -> Unit = {},
-        onError: (Throwable) -> Unit = {},
-        onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> T,
+    callback: (T) -> Unit = {},
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
 ): Job {
     return lifecycleScope.launch {
         whenResumed { runCatching(block, callback, onError, Dispatchers.IO, onComplete) }
@@ -530,7 +562,11 @@ fun <T> ComponentActivity.apiWithAsyncResumed(api: ApiModel<T>.() -> Unit): Job 
  * @date 2021/2/17 10:58
  * @version 1.0
  */
-fun <T> ComponentActivity.apiWithAsyncResumed(manager: FragmentManager? = null, isShowDialog: Boolean = true, api: ApiModel<T>.() -> Unit): Job {
+fun <T> ComponentActivity.apiWithAsyncResumed(
+    manager: FragmentManager? = null,
+    isShowDialog: Boolean = true,
+    api: ApiModel<T>.() -> Unit
+): Job {
     return lifecycleScope.launch {
         whenResumed {
             ApiModel<T>(manager, isShowDialog).apply(api).launch()
@@ -547,7 +583,8 @@ fun <T> ComponentActivity.apiWithAsyncResumed(manager: FragmentManager? = null, 
 fun Context?.startActivityByShareElement(intent: Intent, shareView: View? = null) {
     if (this != null) {
         if (shareView != null) {
-            val compat = ActivityOptionsCompat.makeScaleUpAnimation(shareView, shareView.width / 2, shareView.height / 2, 0, 0)
+            val compat =
+                ActivityOptionsCompat.makeScaleUpAnimation(shareView, shareView.width / 2, shareView.height / 2, 0, 0)
             ActivityCompat.startActivity(this, intent, compat.toBundle())
         } else {
             this.startActivity(intent)

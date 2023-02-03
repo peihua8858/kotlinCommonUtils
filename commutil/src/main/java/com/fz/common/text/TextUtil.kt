@@ -103,12 +103,12 @@ fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
  * @date 2019/10/16 18:22
  * @version 1.0
  */
-fun Any?.pasteText(context: Context): CharSequence? {
+fun Context.pasteText(): CharSequence? {
     // 得到剪贴板管理器
-    val cmb = context.clipboardManager
+    val cmb = clipboardManager
     val clip = cmb?.primaryClip
     return if (clip != null && clip.itemCount > 0) {
-        clip.getItemAt(0).coerceToText(context)
+        clip.getItemAt(0).coerceToText(this)
     } else null
 }
 
