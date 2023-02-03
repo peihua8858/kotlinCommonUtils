@@ -322,7 +322,6 @@ fun Context?.copyToClipBoard(lazyContent: () -> CharSequence) {
 /**
  * 粘贴到系统剪贴板
  */
-@JvmOverloads
 fun Context?.copyToClipBoard(lazyContent: () -> CharSequence, callback: ((Boolean) -> Unit)? = null) {
     val content = lazyContent()
     val context = checkContext(this)
