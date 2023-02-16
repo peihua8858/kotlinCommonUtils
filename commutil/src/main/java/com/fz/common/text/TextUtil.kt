@@ -113,7 +113,12 @@ fun Context.pasteText(): CharSequence? {
     val cmb = clipboardManager
     val clip = cmb?.primaryClip
     return if (clip != null && clip.itemCount > 0) {
-        clip.getItemAt(0).coerceToText(this)
+        try {
+            clip.getItemAt(0).coerceToText(this)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            return null
+        }
     } else null
 }
 
