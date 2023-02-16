@@ -293,20 +293,18 @@ fun Any?.startNotificationSettings(context: Context) {
 private fun buildIntent(context: Context): Intent {
     val packageName = context.packageName
     val intent = Intent()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        val uid = context.applicationInfo.uid
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
-            intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-            intent.putExtra(Settings.EXTRA_CHANNEL_ID, uid)
-        } else {
-            intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
-            intent.putExtra("app_package", packageName)
-            intent.putExtra("app_uid", uid)
-        }
-    } else
+    val uid = context.applicationInfo.uid
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        intent.putExtra(Settings.EXTRA_CHANNEL_ID, uid)
+    } else {
+        intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
+        intent.putExtra("app_package", packageName)
+        intent.putExtra("app_uid", uid)
+    }
     // < 4.4以下没有从app跳转到应用通知设置页面的Action，可考虑跳转到应用详情页面,
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     intent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
     intent.data = Uri.fromParts("package", context.packageName, null)
     return intent
@@ -316,7 +314,7 @@ private fun buildIntent(context: Context): Intent {
  * 粘贴到系统剪贴板
  */
 fun Context?.copyToClipBoard(lazyContent: () -> CharSequence) {
-    copyToClipBoard(lazyContent){}
+    copyToClipBoard(lazyContent) {}
 }
 
 /**
@@ -339,7 +337,11 @@ fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)
     val cm = clipboardManager
     val clipData = ClipData.newPlainText("text", content)
     cm?.let {
-        cm.setPrimaryClip(clipData)
+        try {
+            cm.setPrimaryClip(clipData)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
                 ClipboardManager.OnPrimaryClipChangedListener {
@@ -357,7 +359,11 @@ fun Context.copyToClipBoard(intent: Intent, callback: ((Boolean) -> Unit)? = nul
     val cm = clipboardManager
     val clipData = ClipData.newIntent("Intent", intent)
     cm?.let {
-        cm.setPrimaryClip(clipData)
+        try {
+            cm.setPrimaryClip(clipData)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
                 ClipboardManager.OnPrimaryClipChangedListener {
@@ -369,12 +375,17 @@ fun Context.copyToClipBoard(intent: Intent, callback: ((Boolean) -> Unit)? = nul
         }
     }
 }
+
 @JvmOverloads
 fun Context.copyToClipBoard(uri: Uri, callback: ((Boolean) -> Unit)? = null) {
     val cm = clipboardManager
     val clipData = ClipData.newUri(contentResolver, "URI", uri)
     cm?.let {
-        cm.setPrimaryClip(clipData)
+        try {
+            cm.setPrimaryClip(clipData)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
                 ClipboardManager.OnPrimaryClipChangedListener {
@@ -393,12 +404,17 @@ fun Context.pasteText(): CharSequence {
 
 fun Context.pasteText(index: Int): CharSequence {
     val cm = clipboardManager
-    if (cm != null && cm.hasPrimaryClip()) {
-        val primaryClip = cm.primaryClip
-        val result = primaryClip?.getItemAt(index)?.text
-        if (result.isNonEmpty()) {
-            return result
+    try {
+        if (cm != null && cm.hasPrimaryClip()) {
+            val primaryClip = cm.primaryClip
+            val result = primaryClip?.getItemAt(index)?.text
+            if (result.isNonEmpty()) {
+                return result
+            }
+
         }
+    } catch (e: Throwable) {
+        e.printStackTrace()
     }
     return ""
 }
@@ -409,9 +425,13 @@ fun Context.pasteIntent(): Intent? {
 
 fun Context.pasteIntent(index: Int): Intent? {
     val cm = clipboardManager
-    if (cm != null && cm.hasPrimaryClip()) {
-        val primaryClip = cm.primaryClip
-        return primaryClip?.getItemAt(index)?.intent
+    try {
+        if (cm != null && cm.hasPrimaryClip()) {
+            val primaryClip = cm.primaryClip
+            return primaryClip?.getItemAt(index)?.intent
+        }
+    } catch (e: Throwable) {
+        e.printStackTrace()
     }
     return null
 }
@@ -422,9 +442,13 @@ fun Context.pasteUri(): Uri? {
 
 fun Context.pasteUri(index: Int): Uri? {
     val cm = clipboardManager
-    if (cm != null && cm.hasPrimaryClip()) {
-        val primaryClip = cm.primaryClip
-        return primaryClip?.getItemAt(index)?.uri
+    try {
+        if (cm != null && cm.hasPrimaryClip()) {
+            val primaryClip = cm.primaryClip
+            return primaryClip?.getItemAt(index)?.uri
+        }
+    } catch (e: Throwable) {
+        e.printStackTrace()
     }
     return null
 }
