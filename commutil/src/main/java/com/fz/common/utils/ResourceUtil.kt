@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import com.fz.common.view.utils.dip2px
 import java.io.IOException
 import java.io.InputStream
+import kotlin.math.roundToInt
 
 internal fun Any?.getResource(): Resources? {
     val context: Context = checkContext(this) ?: return null.eLog { "Context  is null." }
@@ -131,7 +132,7 @@ fun Context.getDimens(@DimenRes resId: Int): Int {
     try {
         resource.getValue(resId, value, true)
         if (value.type == TypedValue.TYPE_DIMENSION) {
-            return dip2px(resource, TypedValue.complexToFloat(value.data))
+            return resource.dip2px(TypedValue.complexToFloat(value.data)).roundToInt()
         }
     } catch (e: Exception) {
         e.printStackTrace()
@@ -151,7 +152,7 @@ fun Any?.getDimens(@DimenRes resId: Int): Int {
     try {
         resource.getValue(resId, value, true)
         if (value.type == TypedValue.TYPE_DIMENSION) {
-            return dip2px(resource, TypedValue.complexToFloat(value.data))
+            return resource.dip2px(TypedValue.complexToFloat(value.data)).roundToInt()
         }
     } catch (e: Exception) {
         e.printStackTrace()
