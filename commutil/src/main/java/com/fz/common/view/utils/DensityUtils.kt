@@ -1,5 +1,6 @@
 @file:JvmName("DensityUtils")
 @file:JvmMultifileClass
+
 package com.fz.common.view.utils
 
 import android.app.Activity
@@ -9,9 +10,9 @@ import android.content.res.Resources
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.fz.common.utils.checkContext
-import com.fz.common.utils.checkNotNull
 import com.fz.common.utils.eLog
 import com.fz.common.utils.mContext
+import kotlin.math.roundToInt
 
 /**
  *  在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法将dp值转px
@@ -22,20 +23,21 @@ import com.fz.common.utils.mContext
  * @version 1.0
  */
 fun Any?.dip2px(dpValue: Int): Int {
-    return dip2px(dpValue.toFloat())
+    val context = checkContext(this) ?: return 0.eLog { "Context not found." }
+    return dip2px(context, dpValue)
 }
 
 /**
  * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法将dp值转px
+ * @param context 当前上下文
  * @param dpValue dp 值
  * @return 返回转换后的像素值
  * @author dingpeihua
  * @date 2020/7/7 17:50
  * @version 1.0
  */
-fun Any?.dip2px(dpValue: Float): Int {
-    val context = checkContext(this) ?: return 0.eLog { "Context not found." }
-    return dip2px(context, dpValue)
+fun Any?.dip2px(context: Context, dpValue: Int): Int {
+    return dip2px(context.resources, dpValue)
 }
 
 /**
@@ -47,7 +49,7 @@ fun Any?.dip2px(dpValue: Float): Int {
  * @date 2020/7/7 17:50
  * @version 1.0
  */
-fun Any?.dip2px(resources: Resources, dpValue: Float): Int {
+fun Any?.dip2px(resources: Resources, dpValue: Int): Int {
     return resources.dip2px(dpValue)
 }
 
@@ -60,8 +62,9 @@ fun Any?.dip2px(resources: Resources, dpValue: Float): Int {
  * @version 1.0
  */
 fun Resources?.dip2px(dpValue: Int): Int {
-    return dip2px(dpValue.toFloat())
+    return dip2px(dpValue.toFloat()).roundToInt()
 }
+
 
 /**
  * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法将dp值转px
@@ -71,9 +74,9 @@ fun Resources?.dip2px(dpValue: Int): Int {
  * @date 2020/7/7 17:50
  * @version 1.0
  */
-fun Resources?.dip2px(dpValue: Float): Int {
-    val scale: Float = this?.displayMetrics?.density ?: 0f
-    return (dpValue * scale + 0.5f).toInt()
+fun Any?.dip2px(dpValue: Float): Float {
+    val context = checkContext(this) ?: return 0f.eLog { "Context not found." }
+    return dip2px(context, dpValue)
 }
 
 /**
@@ -85,8 +88,34 @@ fun Resources?.dip2px(dpValue: Float): Int {
  * @date 2020/7/7 17:50
  * @version 1.0
  */
-fun Any?.dip2px(context: Context, dpValue: Float): Int {
+fun Any?.dip2px(context: Context, dpValue: Float): Float {
     return dip2px(context.resources, dpValue)
+}
+
+/**
+ * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法
+ * @param resources [Resources]
+ * @param dpValue dp 值
+ * @return 返回转换后的像素值
+ * @author dingpeihua
+ * @date 2020/7/7 17:50
+ * @version 1.0
+ */
+fun Any?.dip2px(resources: Resources, dpValue: Float): Float {
+    return resources.dip2px(dpValue)
+}
+
+/**
+ * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法将dp值转px
+ * @param dpValue dp 值
+ * @return 返回转换后的像素值
+ * @author dingpeihua
+ * @date 2020/7/7 17:50
+ * @version 1.0
+ */
+fun Resources?.dip2px(dpValue: Float): Float {
+    val scale: Float = this?.displayMetrics?.density ?: 0f
+    return (dpValue * scale + 0.5f)
 }
 
 /**
@@ -98,32 +127,7 @@ fun Any?.dip2px(context: Context, dpValue: Float): Int {
  * @version 1.0
  */
 fun Any?.px2dip(pxValue: Int): Int {
-    return px2dip(pxValue.toFloat())
-}
-
-/**
- * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法
- * @param dpValue dp 值
- * @return 返回转换后的像素值
- * @author dingpeihua
- * @date 2020/7/7 17:50
- * @version 1.0
- */
-fun Any?.px2dip(pxValue: Float): Int {
     val context = checkContext(this) ?: return 0.eLog { "Context not found." }
-    return px2dip(context.resources, pxValue)
-}
-
-/**
- * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法将px值转dp
- * @param context 当前上下文
- * @param pxValue px 值
- * @return 返回转换后的像素值
- * @author dingpeihua
- * @date 2020/7/7 17:50
- * @version 1.0
- */
-fun Any?.px2dip(context: Context, pxValue: Float): Int {
     return px2dip(context.resources, pxValue)
 }
 
@@ -136,7 +140,7 @@ fun Any?.px2dip(context: Context, pxValue: Float): Int {
  * @date 2020/7/7 17:50
  * @version 1.0
  */
-fun Any?.px2dip(resources: Resources, pxValue: Float): Int {
+fun Any?.px2dip(resources: Resources, pxValue: Int): Int {
     return resources.px2dip(pxValue)
 }
 
@@ -149,7 +153,46 @@ fun Any?.px2dip(resources: Resources, pxValue: Float): Int {
  * @version 1.0
  */
 fun Resources?.px2dip(pxValue: Int): Int {
-    return px2dip(pxValue.toFloat())
+    return px2dip(pxValue.toFloat()).roundToInt()
+}
+
+/**
+ * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法
+ * @param dpValue dp 值
+ * @return 返回转换后的像素值
+ * @author dingpeihua
+ * @date 2020/7/7 17:50
+ * @version 1.0
+ */
+fun Any?.px2dip(pxValue: Float): Float {
+    val context = checkContext(this) ?: return 0f.eLog { "Context not found." }
+    return px2dip(context.resources, pxValue)
+}
+
+/**
+ * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法将px值转dp
+ * @param context 当前上下文
+ * @param pxValue px 值
+ * @return 返回转换后的像素值
+ * @author dingpeihua
+ * @date 2020/7/7 17:50
+ * @version 1.0
+ */
+fun Any?.px2dip(context: Context, pxValue: Float): Float {
+    return px2dip(context.resources, pxValue)
+}
+
+/**
+ * 在[View]、 [Context]、[Activity]、[Fragment]、[Dialog]中可直接使用该方法将px值转dp
+ * @param resources [Resources]
+ * @param pxValue px 值
+ * @return 返回转换后的像素值
+ * @author dingpeihua
+ * @date 2020/7/7 17:50
+ * @version 1.0
+ */
+fun Any?.px2dip(resources: Resources, pxValue: Float): Float {
+    return resources.px2dip(pxValue)
 }
 
 /**
@@ -160,16 +203,16 @@ fun Resources?.px2dip(pxValue: Int): Int {
  * @date 2020/7/7 17:50
  * @version 1.0
  */
-fun Resources?.px2dip(pxValue: Float): Int {
+fun Resources?.px2dip(pxValue: Float): Float {
     if (pxValue == 0f) {
-        return 0
+        return 0f
     }
     var resource = this
     if (resource == null) {
         resource = mContext?.resources
     }
     val scale: Float = resource?.displayMetrics?.density ?: 0f
-    return (pxValue / scale + 0.5f).toInt()
+    return (pxValue / scale + 0.5f)
 }
 
 /**
@@ -179,17 +222,6 @@ fun Resources?.px2dip(pxValue: Float): Int {
  * @return sp对应的像素
  */
 fun Any?.sp2px(sp: Int): Int {
-    val context = checkContext(this) ?: return 0.eLog { "Context not found." }
-    return sp2px(context, sp)
-}
-
-/**
- * sp值转换为px值，保证文字大小不变
- *
- * @param sp 字体大小单位
- * @return sp对应的像素
- */
-fun Any?.sp2px(sp: Float): Int {
     val context = checkContext(this) ?: return 0.eLog { "Context not found." }
     return sp2px(context, sp)
 }
@@ -210,17 +242,7 @@ fun Any?.sp2px(context: Context, sp: Int): Int {
  * @param sp 字体大小单位
  * @return sp对应的像素
  */
-fun Any?.sp2px(context: Context, sp: Float): Int {
-    return sp2px(context.resources, sp)
-}
-
-/**
- * sp值转换为px值，保证文字大小不变
- *
- * @param sp 字体大小单位
- * @return sp对应的像素
- */
-fun Any?.sp2px(resources: Resources, sp: Float): Int {
+fun Any?.sp2px(resources: Resources, sp: Int): Int {
     return resources.sp2px(sp)
 }
 
@@ -230,18 +252,8 @@ fun Any?.sp2px(resources: Resources, sp: Float): Int {
  * @param sp 字体大小单位
  * @return sp对应的像素
  */
-fun Any?.sp2px(resources: Resources, sp: Int): Int {
-    return resources.sp2px(sp.toFloat())
-}
-
-/**
- * sp值转换为px值，保证文字大小不变
- *
- * @param sp 字体大小单位
- * @return sp对应的像素
- */
 fun Resources?.sp2px(sp: Int): Int {
-    return sp2px(sp.toFloat())
+    return sp2px(sp.toFloat()).roundToInt()
 }
 
 /**
@@ -250,15 +262,46 @@ fun Resources?.sp2px(sp: Int): Int {
  * @param sp 字体大小单位
  * @return sp对应的像素
  */
-fun Resources?.sp2px(sp: Float): Int {
+fun Any?.sp2px(sp: Float): Float {
+    val context = checkContext(this) ?: return 0f.eLog { "Context not found." }
+    return sp2px(context, sp)
+}
+
+/**
+ * sp值转换为px值，保证文字大小不变
+ *
+ * @param sp 字体大小单位
+ * @return sp对应的像素
+ */
+fun Any?.sp2px(context: Context, sp: Float): Float {
+    return sp2px(context.resources, sp)
+}
+
+/**
+ * sp值转换为px值，保证文字大小不变
+ *
+ * @param sp 字体大小单位
+ * @return sp对应的像素
+ */
+fun Any?.sp2px(resources: Resources, sp: Float): Float {
+    return resources.sp2px(sp)
+}
+
+/**
+ * sp值转换为px值，保证文字大小不变
+ *
+ * @param sp 字体大小单位
+ * @return sp对应的像素
+ */
+fun Resources?.sp2px(sp: Float): Float {
     if (sp == 0f) {
-        return 0
+        return 0f
     }
     var resource = this
     if (resource == null) {
         resource = mContext?.resources
     }
-    val res = resource ?: return 0.eLog { "Resources not found." }
+    val res = resource ?: return 0f.eLog { "Resources not found." }
     val scaledDensity = res.displayMetrics.scaledDensity
-    return (sp * scaledDensity + 0.5f).toInt()
+    return (sp * scaledDensity + 0.5f)
 }

@@ -176,9 +176,6 @@ fun checkContext(any: Any?): Context? {
         is Context -> {
             any
         }
-        is Activity -> {
-            any
-        }
         is View -> {
             any.context
         }
@@ -208,9 +205,6 @@ fun checkContext(any: Any?): Context? {
 fun checkContextOrNull(any: Any?): Context? {
     return when (any) {
         is Context -> {
-            any
-        }
-        is Activity -> {
             any
         }
         is View -> {
