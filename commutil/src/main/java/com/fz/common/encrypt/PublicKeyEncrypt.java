@@ -23,8 +23,7 @@ public class PublicKeyEncrypt extends RSAEncrypt {
      * @return
      */
     private static PublicKey getPublicKeyFromX509(String bysKey) throws Exception {
-        byte[] decodedKey = Base64.decode(bysKey, Base64.NO_WRAP);
-        return getPublicKeyFromX509(decodedKey);
+        return getPublicKeyFromX509(bysKey.getBytes(UTF_8));
     }
 
     /**
@@ -34,7 +33,8 @@ public class PublicKeyEncrypt extends RSAEncrypt {
      * @return
      */
     private static PublicKey getPublicKeyFromX509(byte[] bysKey) throws Exception {
-        X509EncodedKeySpec x509 = new X509EncodedKeySpec(bysKey);
+        byte[] decodedKey = Base64.decode(bysKey, Base64.NO_WRAP);
+        X509EncodedKeySpec x509 = new X509EncodedKeySpec(decodedKey);
         KeyFactory keyFactory = KeyFactory.getInstance(RSA);
         return keyFactory.generatePublic(x509);
     }

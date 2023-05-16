@@ -177,26 +177,65 @@ fun View?.resolveAttribute(resId: Int, @StyleRes defaultRes: Int): Int {
     return context.resolveAttribute(resId, defaultRes)
 }
 
-fun View?.setMarginBottom(bottom: Int) {
+fun View?.setMarginBottom(@Px bottom: Int) {
     if (this == null) return
     (layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin = bottom
 }
 
-fun View?.setMarginTop(top: Int) {
+fun View?.setMarginBottomByDp(bottom: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin = dip2px(bottom)
+}
+
+fun View?.setMarginTop(@Px top: Int) {
     if (this == null) return
     (layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin = top
 }
 
-fun View?.setMarginEnd(end: Int) {
+fun View?.setMarginTopByDp(top: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin = dip2px(top)
+}
+
+fun View?.setMarginEnd(@Px end: Int) {
     if (this == null) return
     (layoutParams as? ViewGroup.MarginLayoutParams)?.marginEnd = end
 }
 
-fun View?.setMarginStart(start: Int) {
+fun View?.setMarginEndByDp(end: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.marginEnd = dip2px(end)
+}
+
+fun View?.setMarginStart(@Px start: Int) {
     if (this == null) return
     (layoutParams as? ViewGroup.MarginLayoutParams)?.marginStart = start
 }
 
+fun View?.setMarginStartByDp(start: Int) {
+    if (this == null) return
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.marginStart = dip2px(start)
+}
+
+fun View?.setMargin(@Px start: Int, @Px top: Int, @Px end: Int, @Px bottom: Int) {
+    if (this == null) return
+    val layoutParams = layoutParams as ViewGroup.MarginLayoutParams
+    layoutParams.marginStart = start
+    layoutParams.topMargin = top
+    layoutParams.marginEnd = end
+    layoutParams.bottomMargin = bottom
+    this.layoutParams = layoutParams
+}
+
+fun View?.setMarginByDp(start: Int, top: Int, end: Int, bottom: Int) {
+    if (this == null) return
+    val layoutParams = layoutParams as ViewGroup.MarginLayoutParams
+    layoutParams.marginStart = dip2px(start)
+    layoutParams.topMargin = dip2px(top)
+    layoutParams.marginEnd = dip2px(end)
+    layoutParams.bottomMargin = dip2px(bottom)
+    this.layoutParams = layoutParams
+}
 
 /**
  * 设置控件内边距
@@ -213,6 +252,65 @@ fun View?.setMarginStart(start: Int) {
 fun View?.setViewPaddingPx(@Px paddingStart: Int, @Px paddingTop: Int, @Px paddingEnd: Int, @Px paddingBottom: Int) {
     if (this == null) return
     setPaddingRelative(max(paddingStart, 0), max(paddingTop, 0), max(paddingEnd, 0), max(paddingBottom, 0))
+}
+
+/**
+ * 设置控件内边距
+ *
+ * @param view          目标视视图
+ * @param paddingStart  左边距
+ * @param paddingTop    上边距
+ * @param paddingEnd    右边距
+ * @param paddingBottom 下边距
+ * @author dingpeihua
+ * @date 2018/12/7 18:09
+ * @version 1.0
+ */
+fun View?.setViewPaddingDp(paddingStart: Int, paddingTop: Int, paddingEnd: Int, paddingBottom: Int) {
+    if (this == null) return
+    setViewPaddingPx(dip2px(paddingStart), dip2px(paddingTop), dip2px(paddingEnd), dip2px(paddingBottom))
+}
+
+
+fun View?.setPaddingBottom(@Px bottom: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, paddingTop, paddingEnd, bottom)
+}
+
+fun View?.setPaddingTop(@Px top: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, top, paddingEnd, paddingBottom)
+}
+
+fun View?.setPaddingEnd(@Px end: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, paddingTop, end, paddingBottom)
+}
+
+fun View?.setPaddingStart(@Px start: Int) {
+    if (this == null) return
+    setViewPaddingPx(start, paddingTop, paddingEnd, paddingBottom)
+}
+
+
+fun View?.setPaddingBottomByDp(bottom: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, paddingTop, paddingEnd, dip2px(bottom))
+}
+
+fun View?.setPaddingTopByDp(top: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, dip2px(top), paddingEnd, paddingBottom)
+}
+
+fun View?.setPaddingEndByDp(end: Int) {
+    if (this == null) return
+    setViewPaddingPx(paddingStart, paddingTop, dip2px(end), paddingBottom)
+}
+
+fun View?.setPaddingStartByDp(start: Int) {
+    if (this == null) return
+    setViewPaddingPx(dip2px(start), paddingTop, paddingEnd, paddingBottom)
 }
 
 /**
@@ -257,44 +355,6 @@ private class ViewWrapper(val view: View) {
     fun getWidth(): Int {
         return view.layoutParams.width
     }
-}
-
-/**
- * 设置控件内边距
- *
- * @param view          目标视视图
- * @param paddingStart  左边距
- * @param paddingTop    上边距
- * @param paddingEnd    右边距
- * @param paddingBottom 下边距
- * @author dingpeihua
- * @date 2018/12/7 18:09
- * @version 1.0
- */
-fun View?.setViewPaddingDp(paddingStart: Int, paddingTop: Int, paddingEnd: Int, paddingBottom: Int) {
-    if (this == null) return
-    setViewPaddingPx(dip2px(paddingStart), dip2px(paddingTop), dip2px(paddingEnd), dip2px(paddingBottom))
-}
-
-
-fun View?.setPaddingBottom(@Px bottom: Int) {
-    if (this == null) return
-    setViewPaddingPx(paddingStart, paddingTop, paddingEnd, bottom)
-}
-
-fun View?.setPaddingTop(@Px top: Int) {
-    if (this == null) return
-    setViewPaddingPx(paddingStart, top, paddingEnd, paddingBottom)
-}
-
-fun View?.setPaddingEnd(@Px end: Int) {
-    if (this == null) return
-    setViewPaddingPx(paddingStart, paddingTop, end, paddingBottom)
-}
-
-fun View?.setPaddingStart(@Px start: Int) {
-    if (this == null) return
-    setViewPaddingPx(start, paddingTop, paddingEnd, paddingBottom)
 }
 
 fun View.measureSize(): Size {

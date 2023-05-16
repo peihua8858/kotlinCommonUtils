@@ -114,6 +114,9 @@ fun Any?.dip2px(resources: Resources, dpValue: Float): Float {
  * @version 1.0
  */
 fun Resources?.dip2px(dpValue: Float): Float {
+    if (dpValue == 0f) {
+        return 0f
+    }
     val scale: Float = this?.displayMetrics?.density ?: 0f
     return (dpValue * scale + 0.5f)
 }
