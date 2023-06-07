@@ -338,11 +338,37 @@ fun String?.createFile(): Boolean {
  * @version 1.0
  */
 fun File?.copyToFile(dest: File?): Boolean {
+    return copyToFile(FileOutputStream(dest))
+}
+
+fun File?.copyToFile(dest: OutputStream?): Boolean {
     try {
         this?.let { input ->
             FileInputStream(input).use { fis ->
                 dest?.let { out ->
-                    FileOutputStream(out).use { fos ->
+                    out.use { fos ->
+                        val buffer = ByteArray(1024)
+                        var length: Int
+                        while (fis.read(buffer).also { length = it } > 0) {
+                            fos.write(buffer, 0, length)
+                        }
+                        return true
+                    }
+                }
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return false
+}
+
+fun File?.copyToFile(dest: InputStream?): Boolean {
+    try {
+        this?.let { input ->
+            FileOutputStream(input).use { fos ->
+                dest?.let { input ->
+                    input.use { fis ->
                         val buffer = ByteArray(1024)
                         var length: Int
                         while (fis.read(buffer).also { length = it } > 0) {
@@ -558,12 +584,15 @@ fun calculate(length: Long): String {
         length >= UNIT_GB -> {
             String.format(Locale.US, "%.2f GB", length / 1024f / 1024f / 1024f)
         }
+
         length >= UNIT_MB -> {
             String.format(Locale.US, "%.2f MB", length / 1024f / 1024f)
         }
+
         length > UNIT_KB -> {
             String.format(Locale.US, "%.2f KB", length / 1024f)
         }
+
         else -> {
             String.format(Locale.US, "%.2f B", length.toFloat())
         }
@@ -926,6 +955,21 @@ fun File?.formatSize(): String {
     return getFileSize().formatFileSize()
 }
 
+private val separator = File.separator
+private fun Context.cachePath(cacheName: String): String {
+    val cachePath = getDiskCacheDir()
+    return "${if (cachePath != null) cachePath.absolutePath else cacheDir.absolutePath}${separator}$cacheName$separator"
+}
+
+fun Context.cacheFile(cacheName: String): File {
+    val cachePath = cachePath(cacheName)
+    val file = File(cachePath)
+    if (!file.exists()) {
+        file.mkdirs()
+    }
+    return file
+}
+
 /**
  * 转换文件大小
  *
@@ -939,12 +983,15 @@ fun Long.formatFileSize(): String {
         this < 1024 -> {
             String.format(Locale.US, "%.2fB", this.toFloat())
         }
+
         this < 1048576 -> {
             String.format(Locale.US, "%.2fKB", this / 1024f)
         }
+
         this < 1073741824 -> {
             String.format(Locale.US, "%.2fMB", this / 1048576f)
         }
+
         else -> {
             String.format(Locale.US, "%.2fGB", this / 1073741824f)
         }

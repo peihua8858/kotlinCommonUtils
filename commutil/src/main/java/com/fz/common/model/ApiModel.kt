@@ -16,7 +16,7 @@ class ApiModel<Response>(
     private val fragmentManager: FragmentManager? = null,
     private val isShowDialog: Boolean = false
 ) {
-
+    private var isManualClose = false
     private var processDialog: LoadingDialogFragment? = null
     internal lateinit var request: suspend CoroutineScope.() -> Response
 
@@ -77,7 +77,8 @@ class ApiModel<Response>(
         }
     }
 
-    fun showLoadingDialog(fragmentManager: FragmentManager, isCancelable: Boolean = false) {
+    fun showLoadingDialog(fragmentManager: FragmentManager, isManualClose: Boolean, isCancelable: Boolean = false) {
+        this.isManualClose = isManualClose
         if (processDialog == null) {
             processDialog = LoadingDialogFragment()
             processDialog!!.isCancelable = isCancelable
@@ -90,6 +91,10 @@ class ApiModel<Response>(
 
     fun showLoadingDialog(fragmentManager: FragmentManager) {
         showLoadingDialog(fragmentManager, false)
+    }
+
+    fun showLoadingDialog(fragmentManager: FragmentManager, isManualClose: Boolean = false) {
+        showLoadingDialog(fragmentManager, isManualClose, false)
     }
 
     fun dismissLoadingDialog() {
@@ -111,7 +116,8 @@ class ApiModel<Response>(
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
-                dismissLoadingDialog()
+                if (!isManualClose)
+                    dismissLoadingDialog()
             }
         }
     }
@@ -129,7 +135,8 @@ class ApiModel<Response>(
             onError?.invoke(e)
         } finally {
             onComplete?.invoke()
-            dismissLoadingDialog()
+            if (!isManualClose)
+                dismissLoadingDialog()
         }
     }
 
@@ -145,7 +152,8 @@ class ApiModel<Response>(
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
-                dismissLoadingDialog()
+                if (!isManualClose)
+                    dismissLoadingDialog()
             }
         }
     }
@@ -164,7 +172,8 @@ class ApiModel<Response>(
                 onError?.invoke(e)
             } finally {
                 onComplete?.invoke()
-                dismissLoadingDialog()
+                if (!isManualClose)
+                    dismissLoadingDialog()
             }
         }
     }

@@ -17,8 +17,13 @@ import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorListener
+import androidx.core.view.marginBottom
+import androidx.core.view.marginEnd
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.fz.common.listener.OnNoDoubleClickListener
 import com.fz.common.utils.checkContext
+import com.fz.common.utils.dLog
 import com.fz.common.utils.getDimens
 import com.fz.common.utils.getResourceId
 import com.fz.common.utils.resolveAttribute
@@ -370,4 +375,51 @@ fun View.measureHeight(maxWidth: Int): Int {
     layoutParams.width = maxWidth
     measure(widthSpec, heightSpec)
     return measuredHeight
+}
+
+/**
+ * 动画隐藏浮窗
+ *
+ */
+fun View.animateOut(
+    isRtl: Boolean = false,
+    isVertical: Boolean = false,
+    offset: Int = if (isVertical) this.height else this.width,
+    listener: ViewPropertyAnimatorListener? = null
+) {
+    try {
+        val animate = ViewCompat.animate(this)
+        if (isVertical) {
+            animate.translationY((offset + marginBottom).toFloat())
+        } else {
+            val offsetO = (offset + marginEnd).toFloat()
+            animate.translationX((if (isRtl) -offsetO else +offsetO))
+        }
+        animate.setListener(listener)
+        animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
+            .start()
+    } catch (e: java.lang.Exception) {
+        e.printStackTrace()
+    }
+}
+
+/**
+ * 动画显示浮窗
+ *
+ */
+fun View.animateIn(
+    isVertical: Boolean = false,
+    listener: ViewPropertyAnimatorListener? = null
+) {
+    dLog { "newState>>>>animateIn" }
+    visibility = View.VISIBLE
+    val animate = ViewCompat.animate(this)
+    if (isVertical) {
+        animate.translationY(0f)
+    } else {
+        animate.translationX(0f)
+    }
+    animate.setListener(listener)
+    animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
+        .start()
 }

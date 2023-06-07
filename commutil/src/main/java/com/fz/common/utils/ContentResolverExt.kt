@@ -17,6 +17,7 @@ import android.provider.MediaStore
 import android.util.Size
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.fz.common.file.copyToFile
 import com.fz.common.text.isNonEmpty
 import java.io.File
 import java.io.FileNotFoundException
@@ -71,12 +72,14 @@ fun Context.getFileFromUri(uri: Uri?): File? {
         "file" -> uri.path?.let {
             File(it)
         }
+
         null -> {
             val file = File(uri.toString())
             if (file.exists()) {
                 file
             } else null
         }
+
         else -> null
     }
 }
@@ -190,4 +193,37 @@ private fun ContentResolver.storeThumbnail(
     } catch (ex: IOException) {
         null
     }
+}
+
+fun ContentResolver.saveFileToExternal(source: File, title: String,mimeType: String): Uri? {
+    val values = ContentValues()
+    values.put(MediaStore.Images.Media.TITLE, title)
+    values.put(MediaStore.Images.Media.DISPLAY_NAME, title)
+    values.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+    // Add the date meta data to ensure the image is added at the front of the gallery
+    values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
+    values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+    try {
+        val uri = insert(MediaStore.Files.getContentUri("external"), values)
+        if (uri != null) {
+            val imageOut = openOutputStream(uri)
+            try {
+                source.copyToFile(imageOut)
+            } finally {
+                imageOut?.flush()
+                imageOut?.close()
+            }
+            // Wait until MINI_KIND thumbnail is generated.
+            // Everything went well above, publish it!
+            values.clear()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                values.put(MediaStore.MediaColumns.IS_PENDING, 0)
+            }
+            update(uri, values, null, null);
+            return uri
+        }
+    } catch (e: java.lang.Exception) {
+        e.printStackTrace()
+    }
+    return null
 }
