@@ -195,10 +195,10 @@ private fun ContentResolver.storeThumbnail(
     }
 }
 
-fun ContentResolver.saveFileToExternal(source: File, title: String,mimeType: String): Uri? {
+fun ContentResolver.saveFileToExternal(source: File, mimeType: String): Uri? {
     val values = ContentValues()
-    values.put(MediaStore.Images.Media.TITLE, title)
-    values.put(MediaStore.Images.Media.DISPLAY_NAME, title)
+    values.put(MediaStore.Images.Media.TITLE, source.nameWithoutExtension)
+    values.put(MediaStore.Images.Media.DISPLAY_NAME, source.name)
     values.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
     // Add the date meta data to ensure the image is added at the front of the gallery
     values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
@@ -219,9 +219,10 @@ fun ContentResolver.saveFileToExternal(source: File, title: String,mimeType: Str
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 values.put(MediaStore.MediaColumns.IS_PENDING, 0)
             }
-            update(uri, values, null, null);
+            update(uri, values, null, null)
             return uri
         }
+
     } catch (e: java.lang.Exception) {
         e.printStackTrace()
     }
