@@ -2,8 +2,10 @@ package com.fz.common.view.utils
 
 import android.graphics.Rect
 import android.view.View
+import androidx.annotation.Px
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 
@@ -19,10 +21,12 @@ fun RecyclerView?.getEndPosition(): Int {
             is LinearLayoutManager -> {
                 findLastVisibleItemPosition()
             }
+
             is StaggeredGridLayoutManager -> {
                 val lastPositions = findLastVisibleItemPositions(IntArray(spanCount))
                 lastPositions.maxOrNull() ?: -1
             }
+
             else -> {
                 itemCount - 1
             }
@@ -43,10 +47,12 @@ fun RecyclerView?.getStartPosition(): Int {
             is LinearLayoutManager -> {
                 findFirstVisibleItemPosition()
             }
+
             is StaggeredGridLayoutManager -> {
                 val firstPositions = findFirstVisibleItemPositions(IntArray(spanCount))
                 firstPositions.minOrNull() ?: -1
             }
+
             else -> {
                 itemCount - 1
             }
@@ -80,7 +86,12 @@ fun ViewPager2?.changeOverScrollMode(mode: Int) {
     }
 }
 
-fun RecyclerView.measureTwoHalf(limitLines: Float, itemHeight: Int, callback: (Int) -> Unit) {
+fun RecyclerView.measureTwoHalf(
+    limitLines: Float,
+    itemHeight: Int,
+    @Px offset: Int = 0,
+    callback: (Int) -> Unit
+) {
     post {
         val orientation = when (val layoutManager = layoutManager) {
             is StaggeredGridLayoutManager -> layoutManager.orientation
@@ -92,10 +103,9 @@ fun RecyclerView.measureTwoHalf(limitLines: Float, itemHeight: Int, callback: (I
         if (orientation == RecyclerView.HORIZONTAL) {
             var realWidth = 0
             val size = limitLines.toInt()
-            val margin = dip2px(16)
             for (i in 0 until size) {
                 realWidth += itemHeight
-                realWidth += margin
+                realWidth += offset
             }
             realWidth += (itemHeight / 2)
             val params = layoutParams
@@ -105,10 +115,9 @@ fun RecyclerView.measureTwoHalf(limitLines: Float, itemHeight: Int, callback: (I
         } else {
             var realHeight = 0
             val size = limitLines.toInt()
-            val margin = dip2px(16)
             for (i in 0 until size) {
                 realHeight += itemHeight
-                realHeight += margin
+                realHeight += offset
             }
             realHeight += (itemHeight / 2)
             val params = layoutParams
@@ -119,7 +128,7 @@ fun RecyclerView.measureTwoHalf(limitLines: Float, itemHeight: Int, callback: (I
     }
 }
 
-fun RecyclerView.measureTwoHalf(limitLines: Float, callback: (Int) -> Unit) {
+fun RecyclerView.measureTwoHalf(limitLines: Float, @Px offset: Int = 0, callback: (Int) -> Unit) {
     post {
         val adapter = adapter
         val orientation = when (val layoutManager = layoutManager) {
@@ -134,11 +143,10 @@ fun RecyclerView.measureTwoHalf(limitLines: Float, callback: (Int) -> Unit) {
             if (orientation == RecyclerView.HORIZONTAL) {
                 var realWidth = 0
                 val size = if (count > limitLines) limitLines.toInt() else count
-                val margin = dip2px(16)
                 for (i in 0 until size) {
                     val view: View? = getChildAt(i)
                     realWidth += view?.measuredWidth ?: 0
-                    realWidth += margin
+                    realWidth += offset
                 }
                 if (count > limitLines) {
                     val view: View? = getChildAt(limitLines.toInt() - 1)
@@ -152,11 +160,10 @@ fun RecyclerView.measureTwoHalf(limitLines: Float, callback: (Int) -> Unit) {
             } else {
                 var realHeight = 0
                 val size = if (count > limitLines) limitLines.toInt() else count
-                val margin = dip2px(16)
                 for (i in 0 until size) {
                     val view: View? = getChildAt(i)
                     realHeight += view?.measuredHeight ?: 0
-                    realHeight += margin
+                    realHeight += offset
                 }
                 if (count > limitLines) {
                     val view: View? = getChildAt(limitLines.toInt() - 1)
@@ -232,9 +239,11 @@ fun RecyclerView?.smoothScrollToCenter(view: View, position: Int) {
             is LinearLayoutManager -> {
                 layoutManager.orientation
             }
+
             is StaggeredGridLayoutManager -> {
                 layoutManager.orientation
             }
+
             else -> RecyclerView.VERTICAL
         }
         if (orientation == RecyclerView.VERTICAL) {
@@ -309,9 +318,11 @@ fun RecyclerView?.scrollToCenter(view: View, position: Int) {
             is LinearLayoutManager -> {
                 layoutManager.orientation
             }
+
             is StaggeredGridLayoutManager -> {
                 layoutManager.orientation
             }
+
             else -> RecyclerView.VERTICAL
         }
         if (orientation == RecyclerView.VERTICAL) {
