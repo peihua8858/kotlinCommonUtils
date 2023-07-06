@@ -4,7 +4,13 @@ import androidx.fragment.app.FragmentManager
 import com.fz.common.utils.eLog
 import com.fz.common.utils.getStackTraceMessage
 import com.fz.dialog.LoadingDialogFragment
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.CancellationException
 
 /**
  * api 方法封装
@@ -16,6 +22,7 @@ class ApiModel<Response>(
     private val fragmentManager: FragmentManager? = null,
     private val isShowDialog: Boolean = false
 ) {
+    private var coroutineScope: CoroutineScope? = null
     private var isManualClose = false
     private var processDialog: LoadingDialogFragment? = null
     internal lateinit var request: suspend CoroutineScope.() -> Response
@@ -27,6 +34,8 @@ class ApiModel<Response>(
     private var onError: ((Throwable) -> Unit?)? = null
 
     private var onComplete: (() -> Unit?)? = null
+    private var onCancel: (() -> Unit?)? = null
+    private var isCanceledJob = false
 
     constructor() : this(null, false)
 
@@ -36,6 +45,10 @@ class ApiModel<Response>(
 
     internal fun isOnResponse(): Boolean {
         return onResponse != null
+    }
+
+    internal fun isOnCancel(): Boolean {
+        return onCancel != null
     }
 
     internal fun isOnError(): Boolean {
@@ -71,18 +84,31 @@ class ApiModel<Response>(
         return this
     }
 
+    infix fun onCancel(onCancel: (() -> Unit)?): ApiModel<Response> {
+        this.onCancel = onCancel
+        return this
+    }
+
     private fun showLoadingDialog() {
         if (fragmentManager != null && isShowDialog) {
             showLoadingDialog(fragmentManager)
         }
     }
 
-    fun showLoadingDialog(fragmentManager: FragmentManager, isManualClose: Boolean, isCancelable: Boolean = false) {
+    fun showLoadingDialog(
+        fragmentManager: FragmentManager,
+        isManualClose: Boolean = false,
+        isCancelable: Boolean = true
+    ) {
         this.isManualClose = isManualClose
         if (processDialog == null) {
             processDialog = LoadingDialogFragment()
             processDialog!!.isCancelable = isCancelable
             processDialog!!.setCanceledOnTouchOutside(isCancelable)
+            processDialog!!.setCanceledOnBackPressed(isCancelable)
+            processDialog!!.setOnDismissListener {
+                cancelJob()
+            }
         }
         if (processDialog != null && !processDialog!!.isShowing) {
             processDialog!!.show(fragmentManager, "ApiLoadingDialog")
@@ -97,6 +123,15 @@ class ApiModel<Response>(
         showLoadingDialog(fragmentManager, isManualClose, false)
     }
 
+    val isCanceled: Boolean
+        get() = isCanceledJob
+
+    fun cancelJob() {
+        isCanceledJob = true
+        coroutineScope?.cancel(CancellationException("Close dialog"))
+        invokeOnCancel()
+    }
+
     fun dismissLoadingDialog() {
         if (processDialog != null) {
             processDialog!!.dismissAllowingStateLoss()
@@ -107,15 +142,15 @@ class ApiModel<Response>(
     internal suspend fun syncLaunch() {
         coroutineScope {
             showLoadingDialog()
-            onStart?.invoke()
+            invokeOnStart()
             try {
                 val response = request()
-                onResponse?.invoke(response)
+                invokeOnResponse(response)
             } catch (e: Throwable) {
                 eLog { e.getStackTraceMessage() }
-                onError?.invoke(e)
+                invokeOnError(e)
             } finally {
-                onComplete?.invoke()
+                invokeOnComplete()
                 if (!isManualClose)
                     dismissLoadingDialog()
             }
@@ -124,17 +159,18 @@ class ApiModel<Response>(
 
     internal suspend fun launch() {
         showLoadingDialog()
-        onStart?.invoke()
+        invokeOnStart()
         try {
             val response = withContext(Dispatchers.IO) {
+                coroutineScope = this
                 request()
             }
-            onResponse?.invoke(response)
+            invokeOnResponse(response)
         } catch (e: Throwable) {
             eLog { e.getStackTraceMessage() }
-            onError?.invoke(e)
+            invokeOnError(e)
         } finally {
-            onComplete?.invoke()
+            invokeOnComplete()
             if (!isManualClose)
                 dismissLoadingDialog()
         }
@@ -142,16 +178,17 @@ class ApiModel<Response>(
 
     internal fun syncLaunch(viewModelScope: CoroutineScope) {
         viewModelScope.launch(Dispatchers.Main) {
+            coroutineScope = this
             showLoadingDialog()
-            onStart?.invoke()
+            invokeOnStart()
             try {
                 val response = request()
-                onResponse?.invoke(response)
+                invokeOnResponse(response)
             } catch (e: Throwable) {
                 eLog { e.getStackTraceMessage() }
-                onError?.invoke(e)
+                invokeOnError(e)
             } finally {
-                onComplete?.invoke()
+                invokeOnComplete()
                 if (!isManualClose)
                     dismissLoadingDialog()
             }
@@ -160,18 +197,19 @@ class ApiModel<Response>(
 
     internal fun launch(viewModelScope: CoroutineScope) {
         viewModelScope.launch(Dispatchers.Main) {
+            coroutineScope = this
             showLoadingDialog()
-            onStart?.invoke()
+            invokeOnStart()
             try {
                 val response = withContext(Dispatchers.IO) {
                     request()
                 }
-                onResponse?.invoke(response)
+                invokeOnResponse(response)
             } catch (e: Throwable) {
                 eLog { e.getStackTraceMessage() }
-                onError?.invoke(e)
+                invokeOnError(e)
             } finally {
-                onComplete?.invoke()
+                invokeOnComplete()
                 if (!isManualClose)
                     dismissLoadingDialog()
             }
@@ -179,18 +217,26 @@ class ApiModel<Response>(
     }
 
     fun invokeOnError(e: Throwable) {
+        if (isCanceled) return
         this.onError?.invoke(e)
     }
 
     fun invokeOnResponse(response: Response) {
+        if (isCanceled) return
         this.onResponse?.invoke(response)
     }
 
     fun invokeOnStart() {
+        if (isCanceled) return
         this.onStart?.invoke()
     }
 
     fun invokeOnComplete() {
+        if (isCanceled) return
         this.onComplete?.invoke()
+    }
+
+    fun invokeOnCancel() {
+        this.onCancel?.invoke()
     }
 }

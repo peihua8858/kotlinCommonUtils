@@ -183,7 +183,10 @@ fun CharSequence?.isNonEmpty(): Boolean {
  * @date 2021/1/11 11:02
  * @version 1.0
  */
-fun Any?.isNonEmpty(vararg text: CharSequence?): Boolean {
+fun isNonEmpty(vararg text: CharSequence?): Boolean {
+    if (text.isEmpty()) {
+        return false
+    }
     for (c in text) {
         if (c.isNullOrEmpty()) {
             return false

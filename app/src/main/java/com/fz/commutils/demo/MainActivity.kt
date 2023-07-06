@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.internal.wait
 import java.io.File
 
 /**
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
                     dLog { "Error:" + if (isMainThread()) "在主线程" else "在子线程" }
                     eLog { "请求失败" }
                 }
+
                 ViewModelState.SUCCESS -> {
                     dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "请求成功" }
@@ -54,13 +56,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        baseContext.copyToClipBoard{
+        baseContext.copyToClipBoard {
             ""
         }
         copyToClipBoard("")
-        requestPermissionsDsl( Manifest.permission.WRITE_EXTERNAL_STORAGE){
+        requestPermissionsDsl(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
             onGranted {
-                startCameraActivity(this@MainActivity,RESULT_CODE_OPEN_CAMERA)
+                startCameraActivity(this@MainActivity, RESULT_CODE_OPEN_CAMERA)
             }
         }
         tv_content.setDrawableStart(R.mipmap.ic_shipping_info)
@@ -147,23 +149,41 @@ class MainActivity : AppCompatActivity() {
 //            KLog.d(">>>>>>map2:$map2")
 //            KLog.d(">>>>>>p:$p2")
             apiWithAsyncCreated<String> {
-                val dialog = processDialog
+//                val dialog = processDialog
                 onStart {
-                   showProcessDialog()
+                    eLog { "MainActivity>>>>>开始" }
+                    showLoadingDialog(supportFragmentManager, true, true)
+//                   showProcessDialog()
                 }
                 onRequest {
-                    try {
-                        Thread.sleep(5000)
-                    } catch (e: Exception) {
-                        eLog { ">>>>>" + e.message }
-                    }
+//                    try {
+                        eLog { "MainActivity>>>>>onRequest》开始" }
+//                        sleep(10000)
+                        var index = 0
+                        while (index < 10) {
+//                            if (isCanceled) {
+//                                return@onRequest "取消执行"
+//                            }
+                            eLog { "MainActivity>>>>>onRequest》正在执行...$index" }
+                            ++index
+                            delay(1000)
+                        }
+
+//                    } catch (e: Exception) {
+//                        eLog { "MainActivity>>>>>onRequest" + e.message }
+//                    }
+                    eLog { "MainActivity>>>>>onRequest》结束" }
                     "响应数据"
                 }
                 onResponse {
-                    dLog { ">>>$it" }
+                    dLog { "MainActivity>>>onResponse$it" }
                 }
                 onComplete {
-                    dismissProgressDialog()
+                    dLog { "MainActivity>>>onComplete" }
+//                    dismissLoadingDialog()
+                }
+                onCancel {
+                    dLog { "MainActivity>>>Cancel" }
                 }
             }
         }
@@ -176,7 +196,7 @@ class MainActivity : AppCompatActivity() {
                     f.get()
                 }
                 onResponse {
-                    val result = saveImageToGallery(it,  "测试保存文件")
+                    val result = saveImageToGallery(it, "测试保存文件")
                     dLog { ">>>>>>>result:$result" }
                 }
                 onComplete { dismissLoadingDialog() }
@@ -247,15 +267,18 @@ class MainActivity : AppCompatActivity() {
                         is PermissionResult.PermissionGranted -> {
                             showToast("Granted!")
                         }
+
                         is PermissionResult.PermissionDenied -> {
                             val data =
                                 deniedPermissions.toString().replace("android.permission.", "")
                             showToast("Denied:$data")
                         }
+
                         is PermissionResult.ShowRational -> {
                             showToast("ShowRational")
                             showRational(this)
                         }
+
                         is PermissionResult.PermissionDeniedPermanently -> {
                             val data = permanentlyDeniedPermissions.toString()
                                 .replace("android.permission.", "")
@@ -321,14 +344,17 @@ class MainActivity : AppCompatActivity() {
             is PermissionResult.PermissionGranted -> {
                 showToast("Granted!")
             }
+
             is PermissionResult.PermissionDenied -> {
                 val data = result.deniedPermissions.toString().replace("android.permission.", "")
                 showToast("Denied:$data")
             }
+
             is PermissionResult.ShowRational -> {
                 showToast("ShowRational")
                 showRational(result)
             }
+
             is PermissionResult.PermissionDeniedPermanently -> {
                 val data = result.permanentlyDeniedPermissions.toString()
                     .replace("android.permission.", "")
@@ -363,12 +389,15 @@ class MainActivity : AppCompatActivity() {
                     1 -> {
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
+
                     2 -> {
                         arrayOf(Manifest.permission.READ_CONTACTS)
                     }
+
                     3 -> {
                         arrayOf(Manifest.permission.CAMERA)
                     }
+
                     22 -> arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     4 -> {
                         arrayOf(
@@ -377,6 +406,7 @@ class MainActivity : AppCompatActivity() {
                             Manifest.permission.CAMERA
                         )
                     }
+
                     else -> {
                         arrayOf()
                     }
@@ -439,9 +469,11 @@ class MainActivity : AppCompatActivity() {
                 index > 5 -> {
                     stringBuilder.replace(5, length, "****").toString()
                 }
+
                 index != -1 -> {
                     stringBuilder.replace(index, length, "****").toString()
                 }
+
                 else -> {
                     this.toString()
                 }
