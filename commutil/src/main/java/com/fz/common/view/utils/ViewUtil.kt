@@ -20,6 +20,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorListener
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.fz.common.listener.OnNoDoubleClickListener
 import com.fz.common.utils.checkContext
@@ -348,6 +350,82 @@ fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
     }
     animation.start()
 }
+fun View?.setPadding(view: View) {
+    this?.setPadding(view.paddingStart, view.paddingTop, view.paddingEnd, view.paddingBottom)
+}
+fun View?.setMargin(view: View) {
+    setMargin(view.marginStart, view.marginTop, view.marginEnd, view.marginBottom)
+}
+/**
+ * [View]宽度展开折叠动画
+ * @param   isExpend  true:展开  false:收起
+ * @param   width     展开时的宽度
+ * @param duration 动画时长
+ * @author dingpeihua
+ * @date 2022/5/14 19:12
+ * @version 1.0
+ */
+fun View.animationWidth(
+    isExpend: Boolean, width: Int, duration: Long = 300,
+    model: (AnimatorListenerModel<Animator>.() -> Unit)? = null
+) {
+    val viewWrapper = ViewWrapper(this)
+    val animation = if (isExpend) ObjectAnimator.ofInt(
+        viewWrapper, "width", 0, width
+    )
+    else ObjectAnimator.ofInt(viewWrapper, "width", width, 0)
+    animation.duration = duration
+    val listener = if (model != null) AnimatorListenerModel<Animator>().apply(model) else null
+    animation.addListener(object : InternalAnimatorListenerAdapter(listener) {
+        override fun onAnimationStart(animation: Animator) {
+            super.onAnimationStart(animation)
+            if (isExpend) this@animationWidth.visibility = View.VISIBLE
+        }
+
+        override fun onAnimationEnd(animation: Animator) {
+            super.onAnimationEnd(animation)
+            if (!isExpend) this@animationWidth.visibility = View.GONE
+        }
+    })
+    animation.addUpdateListener {
+        viewWrapper.setWidth(it.animatedValue as Int)
+    }
+    animation.start()
+}
+
+internal open class InternalAnimatorListenerAdapter(private val model: AnimatorListenerModel<Animator>?) :
+    AnimatorListenerAdapter() {
+
+    @CallSuper
+    override fun onAnimationStart(animation: Animator) {
+        model?.invokeAnimationStart(animation)
+    }
+
+    @CallSuper
+    override fun onAnimationEnd(animation: Animator) {
+        model?.invokeAnimationEnd(animation)
+    }
+
+    @CallSuper
+    override fun onAnimationCancel(animation: Animator) {
+        model?.invokeAnimationCancel(animation)
+    }
+
+    @CallSuper
+    override fun onAnimationRepeat(animation: Animator) {
+        model?.invokeAnimationRepeat(animation)
+    }
+
+    @CallSuper
+    override fun onAnimationPause(animation: Animator) {
+        model?.invokeAnimationPause(animation)
+    }
+
+    @CallSuper
+    override fun onAnimationResume(animation: Animator) {
+        model?.invokeAnimationResume(animation)
+    }
+}
 
 private class ViewWrapper(val view: View) {
 
@@ -377,15 +455,16 @@ fun View.measureHeight(maxWidth: Int): Int {
     return measuredHeight
 }
 
+
 /**
- * 动画隐藏浮窗
+ * 弹出动画
  *
  */
 fun View.animateOut(
-    isRtl: Boolean = false,
     isVertical: Boolean = false,
+    isRtl: Boolean = false,
     offset: Int = if (isVertical) this.height else this.width,
-    listener: ViewPropertyAnimatorListener? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     try {
         val animate = ViewCompat.animate(this)
@@ -395,7 +474,10 @@ fun View.animateOut(
             val offsetO = (offset + marginEnd).toFloat()
             animate.translationX((if (isRtl) -offsetO else +offsetO))
         }
-        animate.setListener(listener)
+        if (model != null) {
+            val listener = AnimatorListenerModel<View>().apply(model)
+            animate.setListener(InternalViewPropertyAnimatorListener(listener))
+        }
         animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
             .start()
     } catch (e: java.lang.Exception) {
@@ -404,12 +486,12 @@ fun View.animateOut(
 }
 
 /**
- * 动画显示浮窗
+ * 弹入动画
  *
  */
 fun View.animateIn(
     isVertical: Boolean = false,
-    listener: ViewPropertyAnimatorListener? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     dLog { "newState>>>>animateIn" }
     visibility = View.VISIBLE
@@ -419,7 +501,111 @@ fun View.animateIn(
     } else {
         animate.translationX(0f)
     }
-    animate.setListener(listener)
+    if (model != null) {
+        val listener = AnimatorListenerModel<View>().apply(model)
+        animate.setListener(InternalViewPropertyAnimatorListener(listener))
+    }
     animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
         .start()
+}
+
+/**
+ * 透明度动画
+ *
+ */
+fun View.animateAlpha(
+    isVisible: Boolean = true,
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null
+) {
+    dLog { "newState>>>>animateAlpha" }
+    visibility = View.VISIBLE
+    val animate = ViewCompat.animate(this)
+    animate.alpha(if (isVisible) 1f else 0f)
+    if (model != null) {
+        val listener = AnimatorListenerModel<View>().apply(model)
+        animate.setListener(InternalViewPropertyAnimatorListener(listener))
+    }
+    animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
+        .start()
+}
+
+internal class InternalViewPropertyAnimatorListener(private val model: AnimatorListenerModel<View>) :
+    ViewPropertyAnimatorListener {
+    @CallSuper
+    override fun onAnimationStart(view: View) {
+        model.invokeAnimationStart(view)
+    }
+
+    @CallSuper
+    override fun onAnimationEnd(view: View) {
+        model.invokeAnimationEnd(view)
+    }
+
+    @CallSuper
+    override fun onAnimationCancel(view: View) {
+        model.invokeAnimationCancel(view)
+    }
+
+}
+
+class AnimatorListenerModel<T> {
+    private var onAnimationStart: ((T) -> Unit?)? = null
+    private var onAnimationEnd: ((T) -> Unit?)? = null
+    private var onAnimationCancel: ((T) -> Unit?)? = null
+    private var onAnimationRepeat: ((T) -> Unit?)? = null
+    private var onAnimationPause: ((T) -> Unit?)? = null
+    private var onAnimationResume: ((T) -> Unit?)? = null
+    infix fun onAnimationStart(onStart: ((T) -> Unit?)?): AnimatorListenerModel<T> {
+        this.onAnimationStart = onStart
+        return this
+    }
+
+    infix fun onAnimationEnd(onEnd: ((T) -> Unit?)?): AnimatorListenerModel<T> {
+        this.onAnimationEnd = onEnd
+        return this
+    }
+
+    infix fun onAnimationCancel(onCancel: ((T) -> Unit)?): AnimatorListenerModel<T> {
+        this.onAnimationCancel = onCancel
+        return this
+    }
+
+    infix fun onAnimationRepeat(onRepeat: ((T) -> Unit?)?): AnimatorListenerModel<T> {
+        this.onAnimationRepeat = onRepeat
+        return this
+    }
+
+    infix fun onAnimationPause(onPause: ((T) -> Unit)?): AnimatorListenerModel<T> {
+        this.onAnimationPause = onPause
+        return this
+    }
+
+    infix fun onAnimationResume(onResume: ((T) -> Unit)?): AnimatorListenerModel<T> {
+        this.onAnimationResume = onResume
+        return this
+    }
+
+    fun invokeAnimationStart(view: T) {
+        this.onAnimationStart?.invoke(view)
+    }
+
+    fun invokeAnimationEnd(view: T) {
+        this.onAnimationEnd?.invoke(view)
+    }
+
+    fun invokeAnimationCancel(view: T) {
+        this.onAnimationCancel?.invoke(view)
+    }
+
+    fun invokeAnimationRepeat(view: T) {
+        this.onAnimationRepeat?.invoke(view)
+    }
+
+    fun invokeAnimationPause(view: T) {
+        this.onAnimationPause?.invoke(view)
+    }
+
+    fun invokeAnimationResume(view: T) {
+        this.onAnimationResume?.invoke(view)
+    }
 }
