@@ -350,12 +350,15 @@ fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
     }
     animation.start()
 }
+
 fun View?.setPadding(view: View) {
     this?.setPadding(view.paddingStart, view.paddingTop, view.paddingEnd, view.paddingBottom)
 }
+
 fun View?.setMargin(view: View) {
     setMargin(view.marginStart, view.marginTop, view.marginEnd, view.marginBottom)
 }
+
 /**
  * [View]宽度展开折叠动画
  * @param   isExpend  true:展开  false:收起
@@ -464,6 +467,7 @@ fun View.animateOut(
     isVertical: Boolean = false,
     isRtl: Boolean = false,
     offset: Int = if (isVertical) this.height else this.width,
+    duration: Long = 300,
     model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     try {
@@ -478,6 +482,7 @@ fun View.animateOut(
             val listener = AnimatorListenerModel<View>().apply(model)
             animate.setListener(InternalViewPropertyAnimatorListener(listener))
         }
+        animate.duration = duration
         animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
             .start()
     } catch (e: java.lang.Exception) {
@@ -491,6 +496,7 @@ fun View.animateOut(
  */
 fun View.animateIn(
     isVertical: Boolean = false,
+    duration: Long = 300,
     model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     dLog { "newState>>>>animateIn" }
@@ -505,6 +511,7 @@ fun View.animateIn(
         val listener = AnimatorListenerModel<View>().apply(model)
         animate.setListener(InternalViewPropertyAnimatorListener(listener))
     }
+    animate.duration = duration
     animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
         .start()
 }
@@ -515,6 +522,7 @@ fun View.animateIn(
  */
 fun View.animateAlpha(
     isVisible: Boolean = true,
+    duration: Long = 300,
     model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     dLog { "newState>>>>animateAlpha" }
@@ -525,6 +533,7 @@ fun View.animateAlpha(
         val listener = AnimatorListenerModel<View>().apply(model)
         animate.setListener(InternalViewPropertyAnimatorListener(listener))
     }
+    animate.duration = duration
     animate.setInterpolator(FastOutSlowInInterpolator()).withLayer()
         .start()
 }
