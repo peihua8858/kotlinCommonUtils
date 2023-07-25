@@ -28,6 +28,8 @@ import com.fz.common.utils.checkContext
 import com.fz.common.utils.dLog
 import com.fz.common.utils.getDimens
 import com.fz.common.utils.getResourceId
+import com.fz.common.utils.isAppRtl
+import com.fz.common.utils.isN
 import com.fz.common.utils.resolveAttribute
 import java.util.*
 import kotlin.math.max
@@ -458,6 +460,12 @@ fun View.measureHeight(maxWidth: Int): Int {
     return measuredHeight
 }
 
+fun View.isRtl(): Boolean {
+    if (isN) {
+        return resources.configuration.locales.get(0).isAppRtl()
+    }
+    return resources.configuration.locale.isAppRtl()
+}
 
 /**
  * 弹出动画
@@ -465,17 +473,22 @@ fun View.measureHeight(maxWidth: Int): Int {
  */
 fun View.animateOut(
     isVertical: Boolean = false,
-    isRtl: Boolean = false,
     offset: Int = if (isVertical) this.height else this.width,
     duration: Long = 300,
     model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     try {
+        var tempOffset = offset
+        if (tempOffset == 0) {
+            measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            tempOffset = if (isVertical) measuredHeight else measuredWidth
+        }
+        val isRtl: Boolean = isRtl()
         val animate = ViewCompat.animate(this)
         if (isVertical) {
-            animate.translationY((offset + marginBottom).toFloat())
+            animate.translationY((tempOffset + marginBottom).toFloat())
         } else {
-            val offsetO = (offset + marginEnd).toFloat()
+            val offsetO = (tempOffset + marginEnd).toFloat()
             animate.translationX((if (isRtl) -offsetO else +offsetO))
         }
         if (model != null) {
@@ -496,11 +509,18 @@ fun View.animateOut(
  */
 fun View.animateIn(
     isVertical: Boolean = false,
+    offset: Int = if (isVertical) height else width,
     duration: Long = 300,
     model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     dLog { "newState>>>>animateIn" }
     visibility = View.VISIBLE
+    var tempOffset = offset
+    if (tempOffset == 0) {
+        measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        tempOffset = if (isVertical) measuredHeight else measuredWidth
+    }
+    if (isVertical) y += tempOffset else x += tempOffset
     val animate = ViewCompat.animate(this)
     if (isVertical) {
         animate.translationY(0f)

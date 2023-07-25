@@ -3,6 +3,8 @@
 
 package com.fz.common.utils
 
+import android.content.Context
+import android.os.Build
 import android.os.Looper
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
@@ -27,6 +29,37 @@ fun Any?.checkMainThread(msg: String?): Boolean {
     throw IllegalStateException(msg)
 }
 
+/**
+ * [Build.VERSION.SDK_INT]>= Android 13
+ */
+inline val isTiramisu: Boolean
+    get() = Build.VERSION.SDK_INT >= 33
+
+/**
+ * [Build.VERSION.SDK_INT]>= Android 9
+ */
+inline val isOreo: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+
+/**
+ * [Build.VERSION.SDK_INT]>= Android 9
+ */
+inline val isPie: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+inline val isUpsideDownCake: Boolean
+    get() = Build.VERSION.SDK_INT >= 34
+inline val isQ: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+/**
+ * [Build.VERSION.SDK_INT]>= Android 11
+ */
+inline val isR: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+inline val isM: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+inline val isN: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 /**
  * 布局方向是从右到左
  *
@@ -69,6 +102,12 @@ fun Locale?.isAppLtr(): Boolean {
  */
 fun Any?.isAppLtr(local: Locale?): Boolean {
     return TextUtilsCompat.getLayoutDirectionFromLocale(local) == ViewCompat.LAYOUT_DIRECTION_LTR
+}
+fun Context.isRtl():Boolean{
+    if (isN) {
+        return resources.configuration.locales.get(0).isAppRtl()
+    }
+    return resources.configuration.locale.isAppRtl()
 }
 
 @OptIn(ExperimentalContracts::class)
