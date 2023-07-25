@@ -558,18 +558,18 @@ internal class InternalViewPropertyAnimatorListener(private val model: AnimatorL
 }
 
 class AnimatorListenerModel<T> {
-    private var onAnimationStart: ((T) -> Unit?)? = null
-    private var onAnimationEnd: ((T) -> Unit?)? = null
-    private var onAnimationCancel: ((T) -> Unit?)? = null
-    private var onAnimationRepeat: ((T) -> Unit?)? = null
-    private var onAnimationPause: ((T) -> Unit?)? = null
-    private var onAnimationResume: ((T) -> Unit?)? = null
-    infix fun onAnimationStart(onStart: ((T) -> Unit?)?): AnimatorListenerModel<T> {
+    private var onAnimationStart: ((T) -> Unit)? = null
+    private var onAnimationEnd: ((T) -> Unit)? = null
+    private var onAnimationCancel: ((T) -> Unit)? = null
+    private var onAnimationRepeat: ((T) -> Unit)? = null
+    private var onAnimationPause: ((T) -> Unit)? = null
+    private var onAnimationResume: ((T) -> Unit)? = null
+    infix fun onAnimationStart(onStart: ((T) -> Unit)?): AnimatorListenerModel<T> {
         this.onAnimationStart = onStart
         return this
     }
 
-    infix fun onAnimationEnd(onEnd: ((T) -> Unit?)?): AnimatorListenerModel<T> {
+    infix fun onAnimationEnd(onEnd: ((T) -> Unit)?): AnimatorListenerModel<T> {
         this.onAnimationEnd = onEnd
         return this
     }
@@ -579,7 +579,7 @@ class AnimatorListenerModel<T> {
         return this
     }
 
-    infix fun onAnimationRepeat(onRepeat: ((T) -> Unit?)?): AnimatorListenerModel<T> {
+    infix fun onAnimationRepeat(onRepeat: ((T) -> Unit)?): AnimatorListenerModel<T> {
         this.onAnimationRepeat = onRepeat
         return this
     }
