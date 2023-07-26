@@ -509,18 +509,11 @@ fun View.animateOut(
  */
 fun View.animateIn(
     isVertical: Boolean = false,
-    offset: Int = if (isVertical) height else width,
     duration: Long = 300,
     model: (AnimatorListenerModel<View>.() -> Unit)? = null
 ) {
     dLog { "newState>>>>animateIn" }
     visibility = View.VISIBLE
-    var tempOffset = offset
-    if (tempOffset == 0) {
-        measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-        tempOffset = if (isVertical) measuredHeight else measuredWidth
-    }
-    if (isVertical) y += tempOffset else x += tempOffset
     val animate = ViewCompat.animate(this)
     if (isVertical) {
         animate.translationY(0f)
