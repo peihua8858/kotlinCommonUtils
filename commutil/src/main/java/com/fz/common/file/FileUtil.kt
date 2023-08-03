@@ -366,6 +366,9 @@ fun File?.copyToFile(dest: OutputStream?): Boolean {
 fun File?.copyToFile(dest: InputStream?): Boolean {
     try {
         this?.let { input ->
+            if (!input.exists()) {
+                input.parentFile?.mkdirs()
+            }
             FileOutputStream(input).use { fos ->
                 dest?.let { input ->
                     input.use { fis ->
