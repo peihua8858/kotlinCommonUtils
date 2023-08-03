@@ -339,7 +339,7 @@ fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
     else ObjectAnimator.ofInt(viewWrapper, "width", width, 0)
     animation.duration = duration
     animation.addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationStart(animation: Animator?) {
+        override fun onAnimationStart(animation: Animator) {
             if (isExpend) this@animationWidth.visibility = View.VISIBLE
         }
 
