@@ -7,12 +7,12 @@ import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.CancellationSignal
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Size
 import androidx.core.net.toUri
@@ -96,15 +96,28 @@ fun Context.getFileFromContentUri(contentUri: Uri?): File? {
  * 通过内容解析中查询uri中的文件路径
  */
 fun ContentResolver.getFileFromContentUri(contentUri: Uri?): File? {
-    return contentUri?.let {
-        val filePathColumn = arrayOf(MediaStore.MediaColumns.DATA)
-        val cursor: Cursor? = query(
-            it, filePathColumn, null,
-            null, null
-        )
+    return contentUri?.let {uri->
+        val column = arrayOf(MediaStore.Images.Media.DATA)
+        val sel: String
+        val cursor = try {
+            val wholeID = DocumentsContract.getDocumentId(uri)
+            val id = wholeID.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+            // where id is equal to
+            sel = MediaStore.Images.Media._ID + "=?"
+            query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                column, sel, arrayOf(id), null
+            )
+        } catch (e: Throwable) {
+            query(
+                uri, column, null,
+                null, null
+            )
+        }
         return cursor?.use {
+            val columnIndex = cursor.getColumnIndex(column[0])
             cursor.moveToFirst()
-            val filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]))
+            val filePath = cursor.getString(columnIndex)
             if (filePath.isNonEmpty()) {
                 return File(filePath)
             }
