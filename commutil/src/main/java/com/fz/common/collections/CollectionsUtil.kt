@@ -223,10 +223,34 @@ fun <T> MutableList<T>.findOrFirst(predicate: (T) -> Boolean): T {
     return this[0]
 }
 
-fun <I, T> List<I>.convert(p: (I) -> T): MutableList<T> {
-    val result = mutableListOf<T>()
+fun <T, R> List<T>.convert(predicate: (T) -> R): List<R> {
+    val result = mutableListOf<R>()
     for (item in this) {
-        result.add(p(item))
+        result.add(predicate(item))
     }
     return result
+}
+
+fun <T> MutableList<T>.removeBy(predicate: (T) -> Boolean): List<T> {
+    var i = 0
+    while (i < this.size) {
+        if (predicate(this[i])) {
+            removeAt(i)
+            continue
+        }
+        i++
+    }
+    return this
+}
+
+fun <T> MutableList<T>.filterData(predicate: (T) -> Boolean): MutableList<T> {
+    var i = 0
+    while (i < this.size) {
+        if (predicate(this[i])) {
+            removeAt(i)
+            continue
+        }
+        i++
+    }
+    return this
 }

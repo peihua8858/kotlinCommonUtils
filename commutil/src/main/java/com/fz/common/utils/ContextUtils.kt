@@ -176,9 +176,11 @@ fun checkContext(any: Any?): Context? {
         is Context -> {
             any
         }
+
         is View -> {
             any.context
         }
+
         is Fragment -> {
             try {
                 any.context
@@ -186,9 +188,11 @@ fun checkContext(any: Any?): Context? {
                 mContext
             }
         }
+
         is Dialog -> {
             any.context
         }
+
         else -> {
             mContext
         }
@@ -207,15 +211,19 @@ fun checkContextOrNull(any: Any?): Context? {
         is Context -> {
             any
         }
+
         is View -> {
             any.context
         }
+
         is Fragment -> {
             any.context
         }
+
         is Dialog -> {
             any.context
         }
+
         else -> {
             null
         }
@@ -571,7 +579,16 @@ fun Context?.getMetaData(key: String, default: String): String {
  * @param description 文件描述
  */
 fun Context.saveImageToGallery(source: File, description: String): String? {
-    return saveBitmapToGallery(BitmapFactory.decodeFile(source.absolutePath), source.name, description)
+    return saveImageToGallery(source, source.name, description)
+}
+
+/**
+ * 保存一个图片文件[source]到相册
+ * @param source 图片文件
+ * @param description 文件描述
+ */
+fun Context.saveImageToGallery(source: File, fileName: String, description: String): String? {
+    return saveImageToGallery(source.absolutePath, fileName, description)
 }
 
 /**
@@ -580,7 +597,11 @@ fun Context.saveImageToGallery(source: File, description: String): String? {
  * @param description 文件描述
  */
 fun Context.saveImageToGallery(path: String, description: String): String? {
-    return saveBitmapToGallery(BitmapFactory.decodeFile(path), path.createFileName("jpg"), description)
+    return saveImageToGallery(path, path.createFileName("jpg"), description)
+}
+
+fun Context.saveImageToGallery(path: String, fileName: String, description: String): String? {
+    return saveBitmapToGallery(BitmapFactory.decodeFile(path), fileName, description)
 }
 
 /**
@@ -591,4 +612,32 @@ fun Context.saveImageToGallery(path: String, description: String): String? {
  */
 fun Context.saveBitmapToGallery(source: Bitmap, title: String, description: String): String? {
     return contentResolver.saveBitmapToGallery(source, title, description)
+}
+
+/**
+ * 保存一个文件到外部存储器
+ * @author dingpeihua
+ * @date 2023/8/15 11:02
+ * @version 1.0
+ */
+fun Context.saveFileToExternal(source: File, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source, mimeType)
+}
+/**
+ * 保存一个文件到外部存储器
+ * @author dingpeihua
+ * @date 2023/8/15 11:02
+ * @version 1.0
+ */
+fun Context.saveFileToExternal(source: File,  displayName: String, title: String, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source,displayName, title, mimeType)
+}
+/**
+ * 保存一个文件到外部存储器
+ * @author dingpeihua
+ * @date 2023/8/15 11:02
+ * @version 1.0
+ */
+fun Context.saveFileToExternal(source: File,  displayName: String, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source,displayName, source.nameWithoutExtension, mimeType)
 }

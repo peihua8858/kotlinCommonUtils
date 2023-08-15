@@ -52,11 +52,3 @@ fun <K, V> JSONObject.toList(): List<Pair<K, V>> {
     }
     return result
 }
-
-fun <I, T> List<I>.convert(p: (I) -> T): List<T> {
-    val result = mutableListOf<T>()
-    for (item in this) {
-        result.add(p(item))
-    }
-    return result
-}

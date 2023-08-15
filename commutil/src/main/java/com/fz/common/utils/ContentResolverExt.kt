@@ -96,7 +96,7 @@ fun Context.getFileFromContentUri(contentUri: Uri?): File? {
  * 通过内容解析中查询uri中的文件路径
  */
 fun ContentResolver.getFileFromContentUri(contentUri: Uri?): File? {
-    return contentUri?.let {uri->
+    return contentUri?.let { uri ->
         val column = arrayOf(MediaStore.Images.Media.DATA)
         val sel: String
         val cursor = try {
@@ -209,9 +209,17 @@ private fun ContentResolver.storeThumbnail(
 }
 
 fun ContentResolver.saveFileToExternal(source: File, mimeType: String): Uri? {
+    return saveFileToExternal(source, source.name, source.nameWithoutExtension, mimeType)
+}
+
+fun ContentResolver.saveFileToExternal(source: File, displayName: String, mimeType: String): Uri? {
+    return saveFileToExternal(source, displayName, source.nameWithoutExtension, mimeType)
+}
+
+fun ContentResolver.saveFileToExternal(source: File, displayName: String, title: String, mimeType: String): Uri? {
     val values = ContentValues()
-    values.put(MediaStore.Images.Media.TITLE, source.nameWithoutExtension)
-    values.put(MediaStore.Images.Media.DISPLAY_NAME, source.name)
+    values.put(MediaStore.Images.Media.TITLE, title)
+    values.put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
     values.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
     // Add the date meta data to ensure the image is added at the front of the gallery
     values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
@@ -240,4 +248,11 @@ fun ContentResolver.saveFileToExternal(source: File, mimeType: String): Uri? {
         e.printStackTrace()
     }
     return null
+}
+
+fun ContentResolver.deleteFile(uri: Uri?): Boolean {
+    if (uri == null) return false
+    // 删除文件
+    val rowsDeleted = delete(uri, null, null)
+    return rowsDeleted > 0
 }
