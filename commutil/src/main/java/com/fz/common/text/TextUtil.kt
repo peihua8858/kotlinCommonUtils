@@ -159,7 +159,7 @@ fun CharSequence?.isEmptyOrBlank(): Boolean {
     contract {
         returns(false) implies (this@isEmptyOrBlank != null)
     }
-    return this == null || isEmpty() || isNullOrBlank()
+    return isNullOrEmpty() || isNullOrBlank()
 }
 
 /**
@@ -173,7 +173,7 @@ fun CharSequence?.isNonEmpty(): Boolean {
     contract {
         returns(true) implies (this@isNonEmpty != null)
     }
-    return this != null && length > 0 && isNotBlank()
+    return !isNullOrEmpty() && isNotBlank()
 }
 
 /**
@@ -193,21 +193,6 @@ fun isNonEmpty(vararg text: CharSequence?): Boolean {
         }
     }
     return true
-}
-
-/**
- * 判断字符串是否为空
- * @param text
- * @author dingpeihua
- * @date 2020/8/7 8:58
- * @version 1.0
- */
-@OptIn(ExperimentalContracts::class)
-fun Any?.isNonEmpty(text: CharSequence?): Boolean {
-    contract {
-        returns(true) implies (this@isNonEmpty != null)
-    }
-    return text != null && text.isNotEmpty() && text.isNotBlank()
 }
 
 fun conValidate(con: CharSequence?): Boolean {
