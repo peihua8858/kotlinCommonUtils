@@ -12,7 +12,7 @@ import kotlinx.coroutines.async
 import java.lang.NullPointerException
 
 class MainViewModel : ViewModel() {
-    val viewState: MutableLiveData<ViewModelState<PointResponse?>> = MutableLiveData()
+    val viewState: MutableLiveData<Result<PointResponse?>> = MutableLiveData()
     fun onRequest(currentPage: Int, pageSize: Int) {
         apiRequestLimit(viewState) {
             onRequest {

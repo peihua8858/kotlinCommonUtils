@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.encrypt.md5
+import com.fz.common.model.Result
 import com.fz.common.model.ViewModelState
 import com.fz.common.permissions.PermissionRequestDsl
 import com.fz.common.permissions.PermissionResult
@@ -35,24 +36,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewModel.viewState.observe(this) {
-            when (it.state) {
-                ViewModelState.STARTING -> {
+            when (it) {
+                is Result.Stating -> {
                     dLog { "Starting:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "开始请求..." }
                 }
-//                ViewModelState.Complete -> {
-//                    dLog { "Complete:" + if (isMainThread()) "在主线程" else "在子线程" }
-//                    dLog { "请求完成" }
-//                }
-                ViewModelState.ERROR -> {
-                    dLog { "Error:" + if (isMainThread()) "在主线程" else "在子线程" }
-                    eLog { "请求失败" }
-                }
 
-                ViewModelState.SUCCESS -> {
+                is Result.Success -> {
+                    val response = it.data
                     dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "请求成功" }
-                    val response = it.data
+                }
+
+                is Result.Failure -> {
+                    dLog { "Error:" + if (isMainThread()) "在主线程" else "在子线程" }
+                    eLog { "请求失败" }
                 }
             }
         }
@@ -157,17 +155,17 @@ class MainActivity : AppCompatActivity() {
                 }
                 onRequest {
 //                    try {
-                        eLog { "MainActivity>>>>>onRequest》开始" }
+                    eLog { "MainActivity>>>>>onRequest》开始" }
 //                        sleep(10000)
-                        var index = 0
-                        while (index < 10) {
+                    var index = 0
+                    while (index < 10) {
 //                            if (isCanceled) {
 //                                return@onRequest "取消执行"
 //                            }
-                            eLog { "MainActivity>>>>>onRequest》正在执行...$index" }
-                            ++index
-                            delay(1000)
-                        }
+                        eLog { "MainActivity>>>>>onRequest》正在执行...$index" }
+                        ++index
+                        delay(1000)
+                    }
 
 //                    } catch (e: Exception) {
 //                        eLog { "MainActivity>>>>>onRequest" + e.message }
