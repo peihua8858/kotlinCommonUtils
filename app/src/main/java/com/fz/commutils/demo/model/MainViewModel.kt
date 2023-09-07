@@ -8,11 +8,10 @@ import com.fz.common.utils.eLog
 import com.fz.common.utils.isMainThread
 import com.fz.common.utils.isSuccessFull
 import com.fz.commutils.demo.api.ApiManager
-import kotlinx.coroutines.async
 import java.lang.NullPointerException
 
 class MainViewModel : ViewModel() {
-    val viewState: MutableLiveData<Result<PointResponse?>> = MutableLiveData()
+    val viewState: MutableLiveData<ResultData<PointResponse?>> = MutableLiveData()
     fun onRequest(currentPage: Int, pageSize: Int) {
         apiRequestLimit(viewState) {
             onRequest {

@@ -7,8 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.encrypt.md5
-import com.fz.common.model.Result
-import com.fz.common.model.ViewModelState
+import com.fz.common.model.ResultData
 import com.fz.common.permissions.PermissionRequestDsl
 import com.fz.common.permissions.PermissionResult
 import com.fz.common.permissions.requestPermissions
@@ -23,7 +22,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.internal.wait
 import java.io.File
 
 /**
@@ -37,18 +35,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         viewModel.viewState.observe(this) {
             when (it) {
-                is Result.Stating -> {
+                is ResultData.Stating -> {
                     dLog { "Starting:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "开始请求..." }
                 }
 
-                is Result.Success -> {
+                is ResultData.Success -> {
                     val response = it.data
                     dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "请求成功" }
                 }
 
-                is Result.Failure -> {
+                is ResultData.Failure -> {
                     dLog { "Error:" + if (isMainThread()) "在主线程" else "在子线程" }
                     eLog { "请求失败" }
                 }
