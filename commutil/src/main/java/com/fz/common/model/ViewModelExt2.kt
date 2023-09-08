@@ -29,7 +29,7 @@ sealed class ResultData<T> {
  *
  * @param result 请求结果
  */
-fun <T> MutableLiveData<ResultData<T?>>.parseResult(result: IHttpResponse<T?>?) {
+fun <T> MutableLiveData<ResultData<T>>.parseResult(result: IHttpResponse<T>?) {
     postValue(
         if (result.isSuccessFull()) {
             ResultData.Success(result.getData())
@@ -78,7 +78,7 @@ internal fun <T> ApiModel<T>.parseMethod(viewState: MutableLiveData<ResultData<T
     return this
 }
 
-internal fun <T> ApiModel<IHttpResponse<T?>>.parseMethodLimit(viewState: MutableLiveData<ResultData<T?>>): ApiModel<IHttpResponse<T?>> {
+internal fun <T> ApiModel<IHttpResponse<T>>.parseMethodLimit(viewState: MutableLiveData<ResultData<T>>): ApiModel<IHttpResponse<T>> {
     if (!isOnStart()) {
         onStart { viewState.postValue(ResultData.Stating()) }
     }
@@ -95,10 +95,10 @@ internal fun <T> ApiModel<IHttpResponse<T?>>.parseMethodLimit(viewState: Mutable
  * [ViewModel]在主线程中开启协程扩展
  */
 fun <T> ViewModel.apiSyncRequestLimit(
-    viewState: MutableLiveData<ResultData<T?>>,
-    apiDSL: ApiModel<IHttpResponse<T?>>.() -> Unit,
+    viewState: MutableLiveData<ResultData<T>>,
+    apiDSL: ApiModel<IHttpResponse<T>>.() -> Unit,
 ) {
-    ApiModel<IHttpResponse<T?>>()
+    ApiModel<IHttpResponse<T>>()
         .apply(apiDSL)
         .parseMethodLimit(viewState)
         .syncLaunch(viewModelScope)
@@ -108,10 +108,10 @@ fun <T> ViewModel.apiSyncRequestLimit(
  * [ViewModel]在IO线程中开启协程扩展
  */
 fun <T> ViewModel.apiRequestLimit(
-    viewState: MutableLiveData<ResultData<T?>>,
-    apiDSL: ApiModel<IHttpResponse<T?>>.() -> Unit,
+    viewState: MutableLiveData<ResultData<T>>,
+    apiDSL: ApiModel<IHttpResponse<T>>.() -> Unit,
 ) {
-    ApiModel<IHttpResponse<T?>>()
+    ApiModel<IHttpResponse<T>>()
         .apply(apiDSL)
         .parseMethodLimit(viewState)
         .launch(viewModelScope)
@@ -121,8 +121,8 @@ fun <T> ViewModel.apiRequestLimit(
  * [ViewModel]在IO线程中开启协程扩展
  */
 fun <T> ViewModel.request(
-    viewState: MutableLiveData<ResultData<T?>>,
-    request: suspend CoroutineScope.() -> T?,
+    viewState: MutableLiveData<ResultData<T>>,
+    request: suspend CoroutineScope.() -> T,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
         viewState.postValue(ResultData.Stating())
@@ -142,8 +142,8 @@ fun <T> ViewModel.request(
  * [ViewModel]在IO线程中开启协程扩展
  */
 fun <T> ViewModel.requestLimit(
-    viewState: MutableLiveData<ResultData<T?>>,
-    request: suspend CoroutineScope.() -> IHttpResponse<T?>?,
+    viewState: MutableLiveData<ResultData<T>>,
+    request: suspend CoroutineScope.() -> IHttpResponse<T>?,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
         viewState.postValue(ResultData.Stating())

@@ -10,5 +10,5 @@ interface IHttpResponse<RESULT> {
     val isSuccess: Boolean
     fun isSuccess(isShowToast: Boolean): Boolean
     val msg: String?
-    fun getData(): RESULT?
+    fun getData(): RESULT
 }

@@ -33,6 +33,17 @@ class MainViewModel : ViewModel() {
 //                viewState.parseResult(it)
             }
         }
+        request(viewState){
+            dLog { "request:" + if (isMainThread()) "在主线程" else "在子线程" }
+            val param = RequestParam()
+            param.put("page", currentPage)
+            param.put("page_size", pageSize)
+            val response = ApiManager.userApi().requestPoints(param.createRequestBody())
+            if (response.isSuccessFull()) {
+                return@request response.result
+            }
+            throw NullPointerException("error")
+        }
     }
 
     fun onRequest2(currentPage: Int, pageSize: Int) {
