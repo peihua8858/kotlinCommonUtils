@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 is ResultData.Success -> {
-                    val response = it.data
+                    val response = it.result
                     dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
                     dLog { "请求成功" }
                 }

@@ -41,8 +41,8 @@ sealed class ResultData<T> {
         }
 
     class Stating<T> : ResultData<T>()
-    data class Success<T>(val data: T) : ResultData<T>()
-    data class Failure<T>(val e: Throwable) : ResultData<T>()
+    data class Success<T>(internal val data: T) : ResultData<T>()
+    data class Failure<T>(internal val e: Throwable) : ResultData<T>()
 }
 
 /**
