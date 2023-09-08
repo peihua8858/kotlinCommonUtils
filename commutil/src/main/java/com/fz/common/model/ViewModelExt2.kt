@@ -19,7 +19,28 @@ import kotlinx.coroutines.withContext
  * @version 1.0
  */
 sealed class ResultData<T> {
-    data class Stating<T>(val message: String = "") : ResultData<T>()
+    val isSuccess: Boolean
+        get() = this is Success
+    val isError: Boolean
+        get() = this is Failure
+    val isString: Boolean
+        get() = this is Stating
+    val result: T
+        get() {
+            if (this is Success) {
+                return this.data
+            }
+            throw NullPointerException("this must be Success")
+        }
+    val error: Throwable
+        get() {
+            if (this is Failure) {
+                return this.e
+            }
+            return Exception()
+        }
+
+    class Stating<T> : ResultData<T>()
     data class Success<T>(val data: T) : ResultData<T>()
     data class Failure<T>(val e: Throwable) : ResultData<T>()
 }

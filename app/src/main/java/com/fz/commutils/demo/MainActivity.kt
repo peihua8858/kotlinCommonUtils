@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.encrypt.md5
 import com.fz.common.model.ResultData
+import com.fz.common.model.isSuccess
 import com.fz.common.permissions.PermissionRequestDsl
 import com.fz.common.permissions.PermissionResult
 import com.fz.common.permissions.requestPermissions
@@ -34,6 +35,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewModel.viewState.observe(this) {
+            if (it.isSuccess) {
+               val data= it.result
+            }
             when (it) {
                 is ResultData.Stating -> {
                     dLog { "Starting:" + if (isMainThread()) "在主线程" else "在子线程" }
