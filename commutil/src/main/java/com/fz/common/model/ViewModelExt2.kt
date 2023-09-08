@@ -27,17 +27,11 @@ sealed class ResultData<T> {
         get() = this is Stating
     val result: T
         get() {
-            if (this is Success) {
-                return this.data
-            }
-            throw NullPointerException("this must be Success")
+            return (this as Success).data
         }
     val error: Throwable
         get() {
-            if (this is Failure) {
-                return this.e
-            }
-            return Exception()
+            return (this as Failure).e
         }
 
     class Stating<T> : ResultData<T>()
