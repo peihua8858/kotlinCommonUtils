@@ -19,11 +19,11 @@ import kotlinx.coroutines.withContext
  * @version 1.0
  */
 sealed class ResultData<T> {
-    val isSuccess: Boolean
+    inline val isSuccess: Boolean
         get() = this is Success
-    val isError: Boolean
+    inline val isError: Boolean
         get() = this is Failure
-    val isString: Boolean
+    inline val isString: Boolean
         get() = this is Stating
     val result: T
         get() {
