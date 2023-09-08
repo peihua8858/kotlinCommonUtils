@@ -78,7 +78,7 @@ internal fun <T> ApiModel<T>.parseMethod(viewState: MutableLiveData<ResultData<T
     return this
 }
 
-internal fun <T> ApiModel<IHttpResponse<T>>.parseMethodLimit(viewState: MutableLiveData<ResultData<T>>): ApiModel<IHttpResponse<T>> {
+internal fun <T> ApiModel<IHttpResponse<T>?>.parseMethodLimit(viewState: MutableLiveData<ResultData<T>>): ApiModel<IHttpResponse<T>?> {
     if (!isOnStart()) {
         onStart { viewState.postValue(ResultData.Stating()) }
     }
@@ -86,7 +86,13 @@ internal fun <T> ApiModel<IHttpResponse<T>>.parseMethodLimit(viewState: MutableL
         onError { viewState.postValue(ResultData.Failure(it)) }
     }
     if (!isOnResponse()) {
-        onResponse { viewState.postValue(ResultData.Success(it.getData())) }
+        onResponse {
+            if (it.isSuccessFull()) {
+                ResultData.Success(it.getData())
+            } else {
+                ResultData.Failure(Throwable(it?.msg ?: "Unknown"))
+            }
+        }
     }
     return this
 }
@@ -96,9 +102,9 @@ internal fun <T> ApiModel<IHttpResponse<T>>.parseMethodLimit(viewState: MutableL
  */
 fun <T> ViewModel.apiSyncRequestLimit(
     viewState: MutableLiveData<ResultData<T>>,
-    apiDSL: ApiModel<IHttpResponse<T>>.() -> Unit,
+    apiDSL: ApiModel<IHttpResponse<T>?>.() -> Unit,
 ) {
-    ApiModel<IHttpResponse<T>>()
+    ApiModel<IHttpResponse<T>?>()
         .apply(apiDSL)
         .parseMethodLimit(viewState)
         .syncLaunch(viewModelScope)
@@ -109,9 +115,9 @@ fun <T> ViewModel.apiSyncRequestLimit(
  */
 fun <T> ViewModel.apiRequestLimit(
     viewState: MutableLiveData<ResultData<T>>,
-    apiDSL: ApiModel<IHttpResponse<T>>.() -> Unit,
+    apiDSL: ApiModel<IHttpResponse<T>?>.() -> Unit,
 ) {
-    ApiModel<IHttpResponse<T>>()
+    ApiModel<IHttpResponse<T>?>()
         .apply(apiDSL)
         .parseMethodLimit(viewState)
         .launch(viewModelScope)
