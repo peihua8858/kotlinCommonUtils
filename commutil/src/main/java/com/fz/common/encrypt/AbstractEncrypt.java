@@ -1,6 +1,7 @@
 package com.fz.common.encrypt;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 加解密
@@ -10,7 +11,7 @@ import java.nio.charset.Charset;
  * @date 2019/10/15 16:29
  */
 public interface AbstractEncrypt {
-    Charset UTF_8 = Charset.forName("UTF-8");
+    Charset UTF_8 = StandardCharsets.UTF_8;
 
     /**
      * 加密字符串
