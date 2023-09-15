@@ -1,16 +1,20 @@
 package com.fz.common.permissions
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 /**
  * @param permissions vararg of all the permissions for request.
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
 inline fun FragmentActivity.requestPermissions(
-        vararg permissions: String,
-        requestBlock: PermissionRequest.() -> Unit,
+    vararg permissions: String,
+    requestBlock: PermissionRequest.() -> Unit,
 ) {
     PermissionManager.requestPermissions(this, *permissions) { this.requestBlock() }
 }
@@ -20,8 +24,8 @@ inline fun FragmentActivity.requestPermissions(
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
 inline fun FragmentActivity.requestPermissionsDsl(
-        vararg permissions: String,
-        requestBlock: PermissionCallbacksDSL.() -> Unit,
+    vararg permissions: String,
+    requestBlock: PermissionCallbacksDSL.() -> Unit,
 ) {
     DslPermissionManager.requestPermissions(this, *permissions) { requestBlock() }
 }
@@ -32,8 +36,8 @@ inline fun FragmentActivity.requestPermissionsDsl(
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
 inline fun Fragment.requestPermissions(
-        vararg permissions: String,
-        requestBlock: PermissionRequest.() -> Unit,
+    vararg permissions: String,
+    requestBlock: PermissionRequest.() -> Unit,
 ) {
     PermissionManager.requestPermissions(this, *permissions) { this.requestBlock() }
 }
@@ -43,8 +47,27 @@ inline fun Fragment.requestPermissions(
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
 inline fun Fragment.requestPermissionsDsl(
-        vararg permissions: String,
-        requestBlock: PermissionCallbacksDSL.() -> Unit,
+    vararg permissions: String,
+    requestBlock: PermissionCallbacksDSL.() -> Unit,
 ) {
     DslPermissionManager.requestPermissions(this, *permissions) { requestBlock() }
+}
+
+@OptIn(ExperimentalContracts::class)
+fun Context.checkSelfPermissions(vararg permissions: String): Boolean {
+    contract {
+        returns()
+    }
+    val result = permissions.filter { !this.checkPermission(it) }
+    return result.isEmpty()
+}
+
+@OptIn(ExperimentalContracts::class)
+fun Context.checkPermission(permission: String): Boolean {
+    contract {
+        returns()
+    }
+    return ActivityCompat.checkSelfPermission(
+        this, permission
+    ) == PackageManager.PERMISSION_GRANTED
 }

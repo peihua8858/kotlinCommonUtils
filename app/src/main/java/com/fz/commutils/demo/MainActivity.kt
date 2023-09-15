@@ -2,12 +2,15 @@ package com.fz.commutils.demo
 
 import android.Manifest
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.fz.common.activity.asyncWhenStart
 import com.fz.common.encrypt.md5
 import com.fz.common.model.ResultData
+import com.fz.common.model.isError
+import com.fz.common.model.isStarting
 import com.fz.common.model.isSuccess
 import com.fz.common.permissions.PermissionRequestDsl
 import com.fz.common.permissions.PermissionResult
@@ -19,7 +22,6 @@ import com.fz.commutils.demo.model.*
 import com.fz.commutils.demo.model.AppUtils.startCameraActivity
 import com.fz.toast.showToast
 import com.socks.library.KLog
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -34,26 +36,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val tv_content = findViewById<View>(R.id.tv_content)
+        val btnExecute = findViewById<View>(R.id.btnExecute)
+        val btnSaveImage = findViewById<View>(R.id.btnSaveImage)
+        val btnExecute1 = findViewById<View>(R.id.btnExecute1)
+        val textView = findViewById<View>(R.id.textView)
+        val textView1 = findViewById<View>(R.id.textView1)
         viewModel.viewState.observe(this) {
-            if (it.isSuccess) {
-               val data= it.result
-            }
-            when (it) {
-                is ResultData.Stating -> {
-                    dLog { "Starting:" + if (isMainThread()) "在主线程" else "在子线程" }
-                    dLog { "开始请求..." }
-                }
-
-                is ResultData.Success -> {
-                    val response = it.result
-                    dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
-                    dLog { "请求成功" }
-                }
-
-                is ResultData.Failure -> {
-                    dLog { "Error:" + if (isMainThread()) "在主线程" else "在子线程" }
-                    eLog { "请求失败" }
-                }
+            if (it.isStarting()) {
+                dLog { "Starting:" + if (isMainThread()) "在主线程" else "在子线程" }
+                dLog { "开始请求..." }
+            } else if (it.isSuccess()) {
+                val sus = it.data
+//                val data= it.data
+                dLog { "Success:" + if (isMainThread()) "在主线程" else "在子线程" }
+                dLog { "请求成功" }
+            } else if (it.isError()) {
+                it.error.printStackTrace()
+                dLog { "Error:" + if (isMainThread()) "在主线程" else "在子线程" }
+                eLog { "请求失败" }
             }
         }
         baseContext.copyToClipBoard {

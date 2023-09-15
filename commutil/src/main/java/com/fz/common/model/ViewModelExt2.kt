@@ -11,6 +11,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 /**
  * ViewModel 状态记录
@@ -19,26 +21,32 @@ import kotlinx.coroutines.withContext
  * @version 1.0
  */
 sealed class ResultData<T> {
-    inline val isSuccess: Boolean
-        get() = this is Success
-    inline val isError: Boolean
-        get() = this is Failure
-    inline val isString: Boolean
-        get() = this is Stating
-    val result: T
-        get() {
-            return (this as Success).data
-        }
-    val error: Throwable
-        get() {
-            return (this as Failure).e
-        }
-
-    class Stating<T> : ResultData<T>()
-    data class Success<T>(internal val data: T) : ResultData<T>()
-    data class Failure<T>(internal val e: Throwable) : ResultData<T>()
+    class Starting<T> : ResultData<T>()
+    data class Success<T>(val data: T) : ResultData<T>()
+    data class Failure<T>(val error: Throwable) : ResultData<T>()
 }
 
+@OptIn(ExperimentalContracts::class)
+fun <T> ResultData<T>.isSuccess(): Boolean {
+    contract {
+        returns(true) implies (this@isSuccess is ResultData.Success)
+    }
+    return this is ResultData.Success
+}
+@OptIn(ExperimentalContracts::class)
+fun <T> ResultData<T>.isError(): Boolean {
+    contract {
+        returns(true) implies (this@isError is ResultData.Failure)
+    }
+    return this is ResultData.Failure
+}
+@OptIn(ExperimentalContracts::class)
+fun <T> ResultData<T>.isStarting(): Boolean {
+    contract {
+        returns(true) implies (this@isStarting is ResultData.Starting)
+    }
+    return this is ResultData.Starting
+}
 /**
  * 处理返回值
  *
@@ -82,7 +90,7 @@ fun <T> ViewModel.apiRequest(
 
 internal fun <T> ApiModel<T>.parseMethod(viewState: MutableLiveData<ResultData<T>>): ApiModel<T> {
     if (!isOnStart()) {
-        onStart { viewState.postValue(ResultData.Stating()) }
+        onStart { viewState.postValue(ResultData.Starting()) }
     }
     if (!isOnError()) {
         onError { viewState.postValue(ResultData.Failure(it)) }
@@ -95,7 +103,7 @@ internal fun <T> ApiModel<T>.parseMethod(viewState: MutableLiveData<ResultData<T
 
 internal fun <T> ApiModel<IHttpResponse<T>?>.parseMethodLimit(viewState: MutableLiveData<ResultData<T>>): ApiModel<IHttpResponse<T>?> {
     if (!isOnStart()) {
-        onStart { viewState.postValue(ResultData.Stating()) }
+        onStart { viewState.postValue(ResultData.Starting()) }
     }
     if (!isOnError()) {
         onError { viewState.postValue(ResultData.Failure(it)) }
@@ -146,7 +154,7 @@ fun <T> ViewModel.request(
     request: suspend CoroutineScope.() -> T,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
-        viewState.postValue(ResultData.Stating())
+        viewState.postValue(ResultData.Starting())
         try {
             val response = withContext(Dispatchers.IO) {
                 request()
@@ -167,7 +175,7 @@ fun <T> ViewModel.requestLimit(
     request: suspend CoroutineScope.() -> IHttpResponse<T>?,
 ) {
     viewModelScope.launch(Dispatchers.Main) {
-        viewState.postValue(ResultData.Stating())
+        viewState.postValue(ResultData.Starting())
         try {
             val response = withContext(Dispatchers.IO) {
                 request()
