@@ -9,9 +9,9 @@ import android.content.Context
 import android.content.res.Resources
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.fz.common.ContextInitializer
 import com.fz.common.utils.checkContext
 import com.fz.common.utils.eLog
-import com.fz.common.utils.mContext
 import kotlin.math.roundToInt
 
 /**
@@ -212,7 +212,7 @@ fun Resources?.px2dip(pxValue: Float): Float {
     }
     var resource = this
     if (resource == null) {
-        resource = mContext?.resources
+        resource = ContextInitializer.mContext.resources
     }
     val scale: Float = resource?.displayMetrics?.density ?: 0f
     return (pxValue / scale + 0.5f)
@@ -302,7 +302,7 @@ fun Resources?.sp2px(sp: Float): Float {
     }
     var resource = this
     if (resource == null) {
-        resource = mContext?.resources
+        resource = ContextInitializer.mContext.resources
     }
     val res = resource ?: return 0f.eLog { "Resources not found." }
     val scaledDensity = res.displayMetrics.scaledDensity

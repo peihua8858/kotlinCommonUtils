@@ -1,6 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.fz.common" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.fz.common">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <application>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="com.fz.common.KotlinUtilInitializer"
+                android:value="androidx.startup" />
+        </provider>
+    </application>
 </manifest>

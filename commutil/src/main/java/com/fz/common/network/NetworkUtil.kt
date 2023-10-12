@@ -2,9 +2,42 @@ package com.fz.common.network
 
 import android.content.Context
 import androidx.fragment.app.Fragment
+import com.fz.common.ContextInitializer
 import com.fz.common.R
 import com.fz.common.text.isNonEmpty
 import com.fz.toast.ToastCompat
+
+fun Context.isConnected(): Boolean {
+    return Connectivity.isConnected(this)
+}
+
+fun Context.isConnected(showNetworkErrorTips: Boolean): Boolean {
+    return NetworkUtil.isConnected(this, showNetworkErrorTips)
+}
+
+fun Fragment?.isConnected(showNetworkErrorTips: Boolean): Boolean {
+    return NetworkUtil.isConnected(this, showNetworkErrorTips)
+}
+
+fun Fragment?.isConnected(): Boolean {
+    return NetworkUtil.isConnected(this)
+}
+
+fun Context.getNetworkType(): NetworkType {
+    return NetworkUtil.getNetworkType(this)
+}
+
+fun Context.isConnectedWifi(context: Context): Boolean {
+    return NetworkUtil.isConnectedWifi(context)
+}
+
+fun Context.isConnectedMobile(context: Context): Boolean {
+    return NetworkUtil.isConnectedMobile(context)
+}
+
+fun Context.isConnectionFast(context: Context): Boolean {
+    return NetworkUtil.isConnectionFast(context)
+}
 
 /**
  * 网络工具类
@@ -14,12 +47,6 @@ import com.fz.toast.ToastCompat
  * @date 2017/11/8 10:18
  */
 object NetworkUtil {
-    private var mContext: Context? = null
-
-    @JvmStatic
-    fun init(context: Context) {
-        mContext = context
-    }
 
     /**
      * 检测网络是否连接
@@ -30,7 +57,7 @@ object NetworkUtil {
      */
     @JvmStatic
     fun isConnected(): Boolean {
-        return mContext?.let { Connectivity.isConnected(it) } ?: false
+        return ContextInitializer.mContext.let { Connectivity.isConnected(it) }
     }
 
     /**

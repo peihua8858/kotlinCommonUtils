@@ -34,6 +34,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation "androidx.startup:startup-runtime:1.1.1"
     implementation 'androidx.core:core-ktx:1.10.1'
 //    compileOnly "com.fz.klog:Klog:1.0.3"
 //    implementation 'com.fz.toast:ToastCompat:1.0.13'

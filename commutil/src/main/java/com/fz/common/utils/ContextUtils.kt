@@ -3,7 +3,6 @@
 
 package com.fz.common.utils
 
-import android.annotation.SuppressLint
 import android.app.*
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -21,6 +20,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -30,6 +30,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.fz.common.ContextInitializer
 import com.fz.common.file.createFileName
 import com.fz.common.file.deleteFileOrDir
 import com.fz.common.file.formatSize
@@ -38,12 +39,6 @@ import com.fz.common.text.isNonEmpty
 import java.io.File
 import java.util.*
 
-
-@SuppressLint("StaticFieldLeak")
-internal var mContext: Context? = null
-fun initContext(context: Context) {
-    mContext = context
-}
 
 /**
  * 网络链接管理器
@@ -185,7 +180,7 @@ fun checkContext(any: Any?): Context? {
             try {
                 any.context
             } catch (e: Exception) {
-                mContext
+                ContextInitializer.mContext
             }
         }
 
@@ -194,7 +189,7 @@ fun checkContext(any: Any?): Context? {
         }
 
         else -> {
-            mContext
+            ContextInitializer.mContext
         }
     }
 }
@@ -228,6 +223,13 @@ fun checkContextOrNull(any: Any?): Context? {
             null
         }
     }
+}
+
+fun Context.getDisplayMetrics(): DisplayMetrics {
+    val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val outMetrics = DisplayMetrics()
+    wm.defaultDisplay.getRealMetrics(outMetrics)
+    return outMetrics
 }
 
 /**
@@ -505,22 +507,22 @@ fun Context.isUsingArLanguage(): Boolean {
 }
 
 fun Context?.getColorCompat(@ColorRes resId: Int): Int {
-    val ctx = this ?: mContext
-    return ctx?.let {
+    val ctx = this ?: ContextInitializer.mContext
+    return ctx.let {
         ContextCompat.getColor(it, resId)
     } ?: -1
 }
 
 fun Context?.getDrawableCompat(@DrawableRes resId: Int): Drawable? {
-    val ctx = this ?: mContext
-    return ctx?.let {
+    val ctx = this ?: ContextInitializer.mContext
+    return ctx.let {
         ContextCompat.getDrawable(it, resId)
     }
 }
 
 fun Context?.getDimensionPixelOffset(@DimenRes resId: Int): Int {
-    val ctx = this ?: mContext
-    return ctx?.resources?.getDimensionPixelOffset(resId) ?: 0
+    val ctx = this ?: ContextInitializer.mContext
+    return ctx.resources?.getDimensionPixelOffset(resId) ?: 0
 }
 
 fun Context.clearCacheFile() {
@@ -623,21 +625,23 @@ fun Context.saveBitmapToGallery(source: Bitmap, title: String, description: Stri
 fun Context.saveFileToExternal(source: File, mimeType: String): Uri? {
     return contentResolver.saveFileToExternal(source, mimeType)
 }
+
 /**
  * 保存一个文件到外部存储器
  * @author dingpeihua
  * @date 2023/8/15 11:02
  * @version 1.0
  */
-fun Context.saveFileToExternal(source: File,  displayName: String, title: String, mimeType: String): Uri? {
-    return contentResolver.saveFileToExternal(source,displayName, title, mimeType)
+fun Context.saveFileToExternal(source: File, displayName: String, title: String, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source, displayName, title, mimeType)
 }
+
 /**
  * 保存一个文件到外部存储器
  * @author dingpeihua
  * @date 2023/8/15 11:02
  * @version 1.0
  */
-fun Context.saveFileToExternal(source: File,  displayName: String, mimeType: String): Uri? {
-    return contentResolver.saveFileToExternal(source,displayName, source.nameWithoutExtension, mimeType)
+fun Context.saveFileToExternal(source: File, displayName: String, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source, displayName, source.nameWithoutExtension, mimeType)
 }
