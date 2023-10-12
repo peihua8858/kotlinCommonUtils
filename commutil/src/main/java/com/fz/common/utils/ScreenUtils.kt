@@ -5,7 +5,6 @@ import android.content.res.Resources
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
-import com.fz.common.ContextInitializer
 import com.fz.common.view.utils.dip2px
 
 
@@ -70,52 +69,31 @@ fun Fragment?.getScreenHeight(): Int {
 /**
  * 获取系统状态栏高度
  *
- * @author dingpeihua
- * @date 2019/9/2 19:06
- * @version 1.0
- */
-fun getStatusHeight(): Int {
-    return getStatusHeight(ContextInitializer.mContext)
-}
-
-/**
- * 获取系统状态栏高度
- *
  * @param context 当前上下文
  * @author dingpeihua
  * @date 2019/9/2 19:06
  * @version 1.0
  */
-fun getStatusHeight(context: Context): Int {
-    val statusHeight = getSysResourceDimensionPixelSize(context, "status_bar_height")
+fun Context.getStatusHeight(): Int {
+    val statusHeight = getSysResourceDimensionPixelSize("status_bar_height")
     Log.i("ScreenMatchUtil", "statusBarHeight:$statusHeight")
-    return if (statusHeight <= 0) context.dip2px(24) else statusHeight
+    return if (statusHeight <= 0) dip2px(24) else statusHeight
 }
 
 /**
  * 获取底部导航栏高度
  *
  * @param context 当前上下文
- * @author dingpeihua
- * @date 2019/9/2 18:59
- * @version 1.0
- */
-fun getNavigationBarHeight(context: Context): Int {
-    val navigationBarHeight = getSysResourceDimensionPixelSize(context, "navigation_bar_height")
-    Log.i("TAG", "navigationBarHeight:$navigationBarHeight")
-    return if (navigationBarHeight <= 0) context.dip2px(48) else navigationBarHeight
-}
-
-/**
- * 获取底部导航栏高度
- *
  * @author dingpeihua
  * @date 2019/9/2 18:59
  * @version 1.0
  */
 fun Context.getNavigationBarHeight(): Int {
-    return getNavigationBarHeight(this)
+    val navigationBarHeight = getSysResourceDimensionPixelSize("navigation_bar_height")
+    Log.i("TAG", "navigationBarHeight:$navigationBarHeight")
+    return if (navigationBarHeight <= 0) dip2px(48) else navigationBarHeight
 }
+
 
 /**
  * 获取系统资源id
@@ -124,25 +102,8 @@ fun Context.getNavigationBarHeight(): Int {
  * @date 2019/9/2 19:04
  * @version 1.0
  */
-fun getSystemIdentifier(resources: Resources, name: String?): Int {
-    return resources.getIdentifier(name, "dimen", "android")
-}
-
-/**
- * 获取系统资源
- *
- * @author dingpeihua
- * @date 2019/9/2 19:02
- * @version 1.0
- */
-fun getSysResourceDimensionPixelSize(context: Context, name: String?): Int {
-    try {
-        val resources = context.resources
-        return resources.getDimensionPixelSize(getSystemIdentifier(resources, name))
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return -1
+fun Resources.getSystemIdentifier(name: String?): Int {
+    return getIdentifier(name, "dimen", "android")
 }
 
 /**
@@ -153,5 +114,11 @@ fun getSysResourceDimensionPixelSize(context: Context, name: String?): Int {
  * @version 1.0
  */
 fun Context.getSysResourceDimensionPixelSize(name: String?): Int {
-    return getSysResourceDimensionPixelSize(this, name)
+    try {
+        val resources = resources
+        return resources.getDimensionPixelSize(resources.getSystemIdentifier(name))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return -1
 }
