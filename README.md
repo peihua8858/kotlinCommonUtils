@@ -42,7 +42,7 @@ Or Maven:
   <version>1.1.1-beta32</version>
 </dependency>
 ```
-
+## Permission
 ```xml
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
