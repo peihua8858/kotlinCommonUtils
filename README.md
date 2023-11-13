@@ -239,8 +239,8 @@ Activity/Fragment.apiWithAsyncCreated<T>{
     }
 }
 ```
-```
 ## License
+
 ```sh
 Copyright 2023 peihua
 
