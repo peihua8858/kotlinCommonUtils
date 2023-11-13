@@ -85,43 +85,6 @@ fun TextView?.textViewToString(): String {
     return this?.text?.toString()?.trim { it <= ' ' } ?: ""
 }
 
-fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
-    if (this == null) {
-        return false
-    }
-    val c = context.clipboardManager
-    val clipData = ClipData.newPlainText("text label", this)
-    try {
-        c?.setPrimaryClip(clipData)
-        return true
-    } catch (e: Throwable) {
-        e.printStackTrace()
-    }
-    return false
-}
-
-/**
- * 实现粘贴功能
- *
- * @param context
- * @author dingpeihua
- * @date 2019/10/16 18:22
- * @version 1.0
- */
-fun Context.pasteText(): CharSequence? {
-    // 得到剪贴板管理器
-    val cmb = clipboardManager
-    val clip = cmb?.primaryClip
-    return if (clip != null && clip.itemCount > 0) {
-        try {
-            clip.getItemAt(0).coerceToText(this)
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            return null
-        }
-    } else null
-}
-
 fun String?.toBase64(): ByteArray? {
     return if (null == this) {
         null

@@ -21,7 +21,10 @@ class KotlinUtilInitializer : Initializer<Unit> {
 
 @SuppressLint("StaticFieldLeak")
 object ContextInitializer {
-    internal lateinit var mContext: Context
+    lateinit var mContext: Context
+        internal set
+
+    @JvmStatic
     fun setContext(context: Context) {
         mContext = context
     }

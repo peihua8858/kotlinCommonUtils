@@ -8,6 +8,7 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
@@ -18,6 +19,7 @@ import android.util.Size
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.fz.common.file.copyToFile
+import com.fz.common.file.createFileName
 import com.fz.common.text.isNonEmpty
 import java.io.File
 import java.io.FileNotFoundException
@@ -255,4 +257,77 @@ fun ContentResolver.deleteFile(uri: Uri?): Boolean {
     // 删除文件
     val rowsDeleted = delete(uri, null, null)
     return rowsDeleted > 0
+}
+
+
+
+/**
+ * 保存一个图片文件[source]到相册
+ * @param source 图片文件
+ * @param description 文件描述
+ */
+fun Context.saveImageToGallery(source: File, description: String): String? {
+    return saveImageToGallery(source, source.name, description)
+}
+
+/**
+ * 保存一个图片文件[source]到相册
+ * @param source 图片文件
+ * @param description 文件描述
+ */
+fun Context.saveImageToGallery(source: File, fileName: String, description: String): String? {
+    return saveImageToGallery(source.absolutePath, fileName, description)
+}
+
+/**
+ * 根据路径[path]保存图片到相册
+ * @param path 图片路径
+ * @param description 文件描述
+ */
+fun Context.saveImageToGallery(path: String, description: String): String? {
+    return saveImageToGallery(path, path.createFileName("jpg"), description)
+}
+
+fun Context.saveImageToGallery(path: String, fileName: String, description: String): String? {
+    return saveBitmapToGallery(BitmapFactory.decodeFile(path), fileName, description)
+}
+
+/**
+ * 保存一个图片[source]到相册
+ * @param source 图片对象
+ * @param title 文件显示名称
+ * @param description 文件描述
+ */
+fun Context.saveBitmapToGallery(source: Bitmap, title: String, description: String): String? {
+    return contentResolver.saveBitmapToGallery(source, title, description)
+}
+
+/**
+ * 保存一个文件到外部存储器
+ * @author dingpeihua
+ * @date 2023/8/15 11:02
+ * @version 1.0
+ */
+fun Context.saveFileToExternal(source: File, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source, mimeType)
+}
+
+/**
+ * 保存一个文件到外部存储器
+ * @author dingpeihua
+ * @date 2023/8/15 11:02
+ * @version 1.0
+ */
+fun Context.saveFileToExternal(source: File, displayName: String, title: String, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source, displayName, title, mimeType)
+}
+
+/**
+ * 保存一个文件到外部存储器
+ * @author dingpeihua
+ * @date 2023/8/15 11:02
+ * @version 1.0
+ */
+fun Context.saveFileToExternal(source: File, displayName: String, mimeType: String): Uri? {
+    return contentResolver.saveFileToExternal(source, displayName, source.nameWithoutExtension, mimeType)
 }
