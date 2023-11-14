@@ -1,7 +1,7 @@
 # Kotlin Android Util
 kotlinCommonUtils is a Kotlin tool library that simplifies Android development, making the code more concise and readable.
 
-[简体中文🇨🇳](README_CN.md)
+[简体中文🇨🇳](README.md)
 
 [![Jitpack](https://jitpack.io/v/peihua8858/kotlinCommonUtils.svg)](https://github.com/peihua8858)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](https://github.com/peihua8858)
