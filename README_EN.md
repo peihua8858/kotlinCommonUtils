@@ -1,25 +1,25 @@
 # Kotlin Android Util
-kotlinCommonUtils是一个Kotlin工具库，可以简化Android开发，使代码更加简洁和可读。
+kotlinCommonUtils is a Kotlin tool library that simplifies Android development, making the code more concise and readable.
 
-[English](README.md)
+[简体中文🇨🇳](README_CN.md)
 
 [![Jitpack](https://jitpack.io/v/peihua8858/kotlinCommonUtils.svg)](https://github.com/peihua8858)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](https://github.com/peihua8858)
 [![Star](https://img.shields.io/github/stars/peihua8858/kotlinCommonUtils.svg)](https://github.com/peihua8858/kotlinCommonUtils)
 
 
-## 目录
--[最新版本](https://github.com/peihua8858/kotlinCommonUtils/releases/tag/1.1.1-beta32)<br>
--[如何引用](#如何引用)<br>
--[进阶使用](#进阶使用)<br>
--[权限](#权限)<br>
--[如何提Issues](https://github.com/peihua8858/PictureSelector/wiki/%E5%A6%82%E4%BD%95%E6%8F%90Issues%3F)<br>
+## Contents
+-[Latest version](https://github.com/peihua8858/kotlinCommonUtils/releases/tag/1.1.1-beta32)<br>
+-[Download](#Download)<br>
+-[Usage](#Usage)<br>
+-[Permission](#Permission)<br>
+-[Issues](https://github.com/peihua8858/PictureSelector/wiki/%E5%A6%82%E4%BD%95%E6%8F%90Issues%3F)<br>
 -[License](#License)<br>
 
 
-## 如何引用
+## Download
 
-使用 Gradle
+Use Gradle
 
 ```sh
 repositories {
@@ -33,7 +33,7 @@ dependencies {
 }
 ```
 
-或者 Maven:
+Or Maven:
 
 ```xml
 <dependency>
@@ -42,17 +42,17 @@ dependencies {
   <version>1.1.1-beta32</version>
 </dependency>
 ```
-## 权限
+## Permission
 ```xml
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 ```
 
-## 进阶使用
+## Usage
 
-一个简单的用例如下所示：
+A simple use case is shown below:
 
-1、判断字符串是否为空
+1、Check String is null
 
 ```kotlin
 import com.fz.common.text.isNonEmpty
@@ -63,7 +63,7 @@ if (spu.isNonEmpty()) {
 }
 ```
 
-2、判断List、Map或者Array 是否为空
+2、Check List or Map is nonNull
 ```kotlin
 //List
 import com.fz.common.collections.isNonEmpty
@@ -84,7 +84,7 @@ if (map.isNonEmpty()) {
     result = map
 }
 ```
-3、权限 DSL用法
+3、Permission DSL
 ```kotlin
 import com.fz.common.permissions.requestPermissionsDsl
 requestPermissionsDsl(Manifest.permission.POST_NOTIFICATIONS) {
@@ -99,13 +99,13 @@ requestPermissionsDsl(Manifest.permission.POST_NOTIFICATIONS) {
     }
 }
 ```
-4、使用ContentProvider保存图片文件到sd卡
+4、use ContentProvider save image to sdcard
 ```kotlin
 import com.fz.common.utils.saveImageToGallery
 val imageFile = File("D://images/5.jpg")
 context.saveImageToGallery(imageFile, imageFile.name)
 ```
-5、ViewModel协程用法
+5、ViewModel use coroutine
 ```kotlin
 import com.fz.common.model.ViewModelState
 class BottomTopMatchViewModel : ViewModel() {
@@ -143,7 +143,7 @@ class BottomTopMatchViewModel : ViewModel() {
        }
     }
 }
-//Activity 监听
+//Activity observe
 viewModel.matchTypeState.observe(this) {
     if (it.isStarting()) {
         showLoadingView()
@@ -155,7 +155,7 @@ viewModel.matchTypeState.observe(this) {
     }
 }
 
-//Activity 监听
+//Activity observe
 viewModel.matchTypeState2.observe(this) {
     if (it.isStarting()) {
         showLoadingView()
@@ -167,7 +167,7 @@ viewModel.matchTypeState2.observe(this) {
     }
 }
 ```
-6、网络状态
+6、Network status
 ```kotlin
 //kotlin  or java
 import com.fz.common.network.NetworkUtil
@@ -177,11 +177,11 @@ if (NetworkUtil.isConnected(context, true)) {
     showToast("Disconnected from the network. ")
 }
 ```
-7、视图动画
+7、View animation
 ```kotlin
 import com.fz.common.view.utils.animateIn
 import com.fz.common.view.utils.animateOut
-//进入动画
+//Enter animation
 View.animateIn(true){
     onAnimationStart{
             //todo
@@ -196,7 +196,7 @@ View.animateIn(true){
            //todo
     }
 }
-//退出动画
+//Exit animation
 View.animateOut(true){
     onAnimationStart{
            //todo
@@ -211,30 +211,30 @@ View.animateOut(true){
            //todo
     }
 }
-//其他动画如：透明度动画（View.animateAlpha()）、宽度展开折叠(View.animationWidth)等
+//Other animations such as: transparency animation (View.animateAlpha()), width expansion and folding (View.animationWidth), etc.
 ```
-8、Activity or Fragment 协程用法
+8、Activity or Fragment calls kotlin coroutine
 ```kotlin
 import com.fz.common.utils.apiWithAsyncCreated
 Activity/Fragment.apiWithAsyncCreated<T>{
     onStart{
-       //网络请求前
+       //Before network request
        //todo
     }
     onRequest{
-        //发起网络请求
+        //Make a network request
         //todo  
     }
     onResponse{
-        // 网络请求成功
+        // Network request successful
         //todo   
     }
     onError{
-        //网络请求失败
+        //Network request failed
        //todo    
     }
     onComplete{
-        //网络请求完成
+        //Network request completed
         //todo    
     }
 }
