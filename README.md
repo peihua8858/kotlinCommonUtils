@@ -9,7 +9,7 @@ kotlinCommonUtils是一个Kotlin工具库，可以简化Android开发，使代�
 
 
 ## 目录
--[最新版本](https://github.com/peihua8858/kotlinCommonUtils/releases/tag/1.1.1-beta32)<br>
+-[最新版本](https://github.com/peihua8858/kotlinCommonUtils/releases/tag/1.1.1)<br>
 -[如何引用](#如何引用)<br>
 -[进阶使用](#进阶使用)<br>
 -[权限](#权限)<br>
@@ -18,7 +18,8 @@ kotlinCommonUtils是一个Kotlin工具库，可以简化Android开发，使代�
 
 
 ## 如何引用
-
+* 把 `maven { url 'https://jitpack.io' }` 加入到 repositories 中
+* 添加如下依赖，末尾的「latestVersion」指的是kotlinCommonUtils [![Download](https://jitpack.io/v/peihua8858/kotlinCommonUtils.svg)](https://jitpack.io/#peihua8858/kotlinCommonUtils) 里的版本名称，请自行替换。
 使用 Gradle
 
 ```sh
@@ -29,7 +30,7 @@ repositories {
 
 dependencies {
   // KotlinCommonUtils
-  implementation 'com.github.peihua8858:kotlinCommonUtils:1.1.1-beta32'
+  implementation 'com.github.peihua8858:kotlinCommonUtils:latestVersion'
 }
 ```
 
@@ -39,7 +40,7 @@ dependencies {
 <dependency>
   <groupId>com.github.peihua8858</groupId>
   <artifactId>kotlinCommonUtils</artifactId>
-  <version>1.1.1-beta32</version>
+  <version>latestVersion</version>
 </dependency>
 ```
 ## 权限
