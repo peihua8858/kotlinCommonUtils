@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
   // KotlinCommonUtils
-  implementation 'com.github.peihua8858:kotlinCommonUtils:latestVersion'
+  implementation 'com.github.peihua8858:kotlinCommonUtils:${latestVersion}'
 }
 ```
 
@@ -40,7 +40,7 @@ dependencies {
 <dependency>
   <groupId>com.github.peihua8858</groupId>
   <artifactId>kotlinCommonUtils</artifactId>
-  <version>latestVersion</version>
+  <version>${latestVersion}</version>
 </dependency>
 ```
 ## 权限
