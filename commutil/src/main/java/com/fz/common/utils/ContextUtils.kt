@@ -9,6 +9,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
@@ -21,6 +22,7 @@ import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -405,3 +407,10 @@ fun Context.getDiskCacheDir(): File? {
     }
     return cacheDir
 }
+val Context.isLandScape: Boolean
+    get() {
+        val isLandScape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        Log.d("isLandScape", isLandScape.toString())
+        Log.d("isLandScape", resources.configuration.orientation.toString())
+        return isLandScape
+    }

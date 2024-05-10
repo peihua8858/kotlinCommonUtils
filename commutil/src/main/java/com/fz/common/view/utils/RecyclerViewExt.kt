@@ -3,6 +3,7 @@ package com.fz.common.view.utils
 import android.graphics.Rect
 import android.view.View
 import androidx.annotation.Px
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -336,5 +337,167 @@ fun RecyclerView?.scrollToCenter(view: View, position: Int) {
             val half = reWidth / 2
             scrollBy(left - half, 0)
         }
+    }
+}
+
+/**
+ * 获取列表列数
+ */
+val RecyclerView.spanCount: Int
+    get() {
+        val manager = layoutManager
+        if (manager is GridLayoutManager) {
+            return manager.spanCount
+        } else if (manager is StaggeredGridLayoutManager) {
+            return manager.spanCount
+        }
+        return 1
+    }
+
+/**
+ * 获取最后一条完全展示的位置
+ *
+ * @return
+ */
+val RecyclerView?.lastCompletelyPosition: Int
+    get() {
+        if (this == null) return -1
+        layoutManager?.apply {
+            return when (this) {
+                is LinearLayoutManager -> {
+                    findLastCompletelyVisibleItemPosition()
+                }
+
+                is StaggeredGridLayoutManager -> {
+                    val lastPositions = findLastCompletelyVisibleItemPositions(IntArray(spanCount))
+                    lastPositions.maxOrNull() ?: -1
+                }
+
+                else -> {
+                    itemCount - 1
+                }
+            }
+        }
+        return -1
+    }
+
+/**
+ * 获取第一条完全展示的位置
+ *
+ * @return
+ */
+val RecyclerView?.firstCompletelyPosition: Int
+    get() {
+        if (this == null) return -1
+        layoutManager?.apply {
+            return when (this) {
+                is LinearLayoutManager -> {
+                    findFirstCompletelyVisibleItemPosition()
+                }
+
+                is StaggeredGridLayoutManager -> {
+                    val firstPositions =
+                        findFirstCompletelyVisibleItemPositions(IntArray(spanCount))
+                    firstPositions.minOrNull() ?: -1
+                }
+
+                else -> {
+                    itemCount - 1
+                }
+            }
+        }
+        return -1
+    }
+
+/**
+ * 获取列表行数
+ */
+val RecyclerView.lines: Int
+    get() {
+        val itemCount = adapter?.itemCount ?: 0
+        if (itemCount == 0) {
+            return 0
+        }
+        val spanCount = spanCount
+        var lines = itemCount / spanCount
+        if (itemCount % spanCount != 0) {
+            lines++
+        }
+        return lines
+    }
+
+/**
+ * recyclerView 实现上一页或下一页操作
+ * @param slideCount 上一页缓存滚动的具体位置
+ * @param isNextPage 是否下一页
+ * @param isSmoothScroll 是否平滑滚动
+ * @param callback 回调
+ * @return 返回当前页滚动的具体位置
+ */
+fun RecyclerView.pageScroll(
+    slideCount: Int,
+    isNextPage: Boolean = true,
+    isSmoothScroll: Boolean = true,
+    callback: (Int, Int) -> Unit
+) {
+    var tempSlideCount = slideCount
+    if (isSmoothScroll) {
+        addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    removeOnScrollListener(this)
+                    post {
+                        callback(tempSlideCount, firstCompletelyPosition)
+                    }
+                }
+            }
+        })
+    }
+    val firstChild = getChildAt(0)
+    val manager = layoutManager
+    val orientation =
+        if (manager is LinearLayoutManager) manager.orientation
+        else if (manager is StaggeredGridLayoutManager) manager.orientation
+        else RecyclerView.VERTICAL
+    val params = firstChild.layoutParams as RecyclerView.LayoutParams
+    val firstPosition = firstCompletelyPosition
+    val lastPosition = lastCompletelyPosition
+    val itemSize = lastPosition - firstPosition
+    val spanCount = spanCount
+    var lines = itemSize / spanCount
+    if (itemSize % spanCount != 0) {
+        lines++
+    }
+    if (orientation == RecyclerView.VERTICAL) {
+        val height = firstChild.height + params.topMargin + params.bottomMargin
+        var slideHeight = if (isNextPage) lines * height else -(lines * height)
+        tempSlideCount += slideHeight
+        val countHeight = height * this.lines
+        if (countHeight - tempSlideCount <= 0) {
+            slideHeight = 0 - countHeight
+            tempSlideCount = 0
+        }
+        if (isSmoothScroll) {
+            smoothScrollBy(0, slideHeight)
+        } else {
+            scrollBy(0, slideHeight)
+        }
+    } else if (orientation == RecyclerView.HORIZONTAL) {
+        val width = firstChild.width + params.marginStart + params.marginEnd
+        var slideWidth = if (isNextPage) lines * width else -(lines * width)
+        tempSlideCount += slideWidth
+        val countHeight = width * this.lines
+        if (countHeight - tempSlideCount <= 0) {
+            slideWidth = 0 - countHeight
+            tempSlideCount = 0
+        }
+        if (isSmoothScroll) {
+            smoothScrollBy(slideWidth, 0)
+        } else {
+            scrollBy(slideWidth, 0)
+        }
+    }
+    if (!isSmoothScroll) {
+        post { callback(tempSlideCount, firstCompletelyPosition) }
     }
 }

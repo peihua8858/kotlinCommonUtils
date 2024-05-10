@@ -29,6 +29,7 @@ import com.fz.common.utils.dLog
 import com.fz.common.utils.getDimens
 import com.fz.common.utils.getResourceId
 import com.fz.common.utils.isAppRtl
+import com.fz.common.utils.isLandScape
 import com.fz.common.utils.isN
 import com.fz.common.utils.resolveAttribute
 import java.util.*
@@ -631,3 +632,5 @@ class AnimatorListenerModel<T> {
         this.onAnimationResume?.invoke(view)
     }
 }
+val View.isLandScape: Boolean
+    get() = context.isLandScape
