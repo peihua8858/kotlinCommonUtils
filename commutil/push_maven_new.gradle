@@ -1,0 +1,297 @@
+apply plugin: "maven-publish"
+repositories {
+    google()
+    mavenCentral()
+}
+def serverName = "service"
+def apiVersion = "1.0.0.21"
+apiVersion = getVersion(apiVersion)
+def apiPkgName = "com.peihua8858.service.api"
+task deleteBuild(type: Delete) {
+    println "deleteBuild()"
+    def buildDir = project.buildDir.absolutePath
+    delete buildDir
+}
+def archiveName
+def srcClassDir
+task makeJar(type: Jar) {
+    println "makeJar()"
+    appendix = serverName
+    baseName = "gcs"
+    version = apiVersion
+    classifier = "release"
+    archiveName = "${baseName}-${appendix}-${version}-${classifier}"
+    //需打包的资源所在的路径集
+    srcClassDir = project.buildDir.absolutePath + "/intermediates/javac/release/classes"
+    //初始化资源路径集
+    from srcClassDir
+    String apiPath = apiPkgName.replaceAll('\\.', '\\/')
+    //    include apiSrcDir + "/**/*.class"
+    include "${apiPath}/**/*.class"
+    println "apiPkgName = ${apiPkgName} , apiPath = ${apiPath}"
+}
+publishing {
+    publications {
+        api(MavenPublication) {
+            groupId 'com.peihua8858.service'
+            artifactId serverName + "-api"
+            version "${apiVersion}"
+            def targetJarPath = project.buildDir.absolutePath + "/libs/" + archiveName + ".jar"
+            artifact(targetJarPath)
+            println "targetJarName = " + targetJarPath
+            println "发布成功：maven url = " + getGroupId() + ":" + getArtifactId() + ":" + getVersion()
+        }
+        service(MavenPublication) {
+            groupId 'com.peihua8858.service'
+            artifactId serverName + "-service"
+            version "${apiVersion}"
+            def targetAARPath = project.buildDir.absolutePath + "/outputs/aar/${archives BaseName}-release.aar"
+            artifact(targetAARPath)
+            println "发布成功：maven url = " + getGroupId() + ":" + getArtifactId() + ":" + getVersion()
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+                ext.addDependency = { dep, scope, type ->
+                    // ignore invalid dependencies
+                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified") {
+                        return
+                    }
+                    final dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dep.group)
+                    dependencyNode.appendNode('artifactId', dep.name)
+                    //购物hesheng接口 版本后面有online
+                    if (dep.name == 'safepaybase') {
+                        dependencyNode.appendNode('classifier', "online")
+                    }
+                    dependencyNode.appendNode('version', dep.version)
+                    dependencyNode.appendNode('scope', scope)
+                    if (type != null && !type.isEmpty()) {
+                        dependencyNode.appendNode('type', type)
+                    }
+                    if (!dep.transitive) {
+                        // If this dependency is not transitive, we should force exclude all its dependencies them from the POM
+                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        exclusionNode.appendNode('groupId', '*')
+                        exclusionNode.appendNode('artifactId', '*')
+                    } else if (!dep.properties.excludeRules.empty) {
+                        // Otherwise add specified exclude rules
+                        final exclusionsNode = dependencyNode.appendNode('exclusions')
+                        dep.properties.excludeRules.each { rule ->
+                            final exclusionNode = exclusionsNode.appendNode('exclusion')
+                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                        }
+                    }
+                }
+                // Construct module -> type map.
+                def moduleTypeMap = new HashMap<>()
+                if (project.hasProperty('moduleTypeMap') && (project.getProperty('moduleTypeMap') instanceof HashMap)) {
+                    moduleTypeMap.putAll(project.getProperty('moduleTypeMap'))
+                }
+                /*def oldConfigurations = ['providedCompile', 'compile']
+                    oldConfigurations.each { configName ->
+                        configurations.findByName(configName).getIncoming().getArtifacts().each { artifact ->
+                        if (!artifact.getId().class.getName().endsWith('DefaultModuleComponentArtifactIdentifier')) {
+                            return
+                        }
+                        def artifactName = artifact.getId().getName()
+                        moduleTypeMap.put(artifactName.getName(), artifactName.getExtension())
+                        println artifactName.getName()
+                        println artifactName.getExtension()
+                        println '------'
+                    }
+                }*/
+                //Set support configurations.
+                def configurationScopeMap = new HashMap<>()
+                configurationScopeMap.put('providedCompile', 'provided')
+                configurationScopeMap.put('compile', 'compile')
+                configurationScopeMap.put('api', 'compile')
+                configurationScopeMap.put('implementation', 'compile')
+                // Append dependency node for all configurations.
+                configurationScopeMap.keySet().each { key ->
+                    if (!configurations.hasWithName(key)) {
+                        return
+                    }
+                    def scope = configurationScopeMap.get(key)
+                    def currentConfiguration = configurations.findByName(key)
+                    currentConfiguration.getDependencies().each { dep ->
+                        // Make aar as default module type.
+                        if (dep.name == 'safepaybase') {
+                            println dep.group
+                            println dep.name
+                            println moduleTypeMap.get(dep.name)
+                            println dep.version
+                        }
+                        def mytype = moduleTypeMap.get(dep.name)
+                        if (dep.group == 'com.google.zxing') {
+                            println dep.group
+                            println dep.name
+                            println moduleTypeMap.get(dep.name)
+                            println dep.version
+                            mytype = 'jar'
+                        }
+                        if (moduleTypeMap.get(dep.name) == null) {
+                            println 'type is null'
+                            if (dep.group == 'com.android.databinding') {
+                                println 'group is databinding11'
+                                //moduleTypeMap.put(dep.name, 'jar')
+                                mytype = 'jar'
+                            } else if (dep.group == 'com.google.zxing') {
+                                println 'group is databinding14'
+                                //moduleTypeMap.put(dep.name, 'jar')
+                                mytype = 'jar'
+                            } else {
+                                println 'group is databinding22'
+                                //moduleTypeMap.put(dep.name, 'aar')
+                                mytype = 'aar'
+                            }
+                        }
+                        //addDependency(dep, scope, moduleTypeMap.get(dep.name))
+                        addDependency(dep, scope, mytype)
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        def repositoryInfo = getRepositoryInfo(apiVersion)
+        maven {
+            name = "Snapshot"
+            url = repositoryInfo.get("repository")
+            credentials {
+                username = repositoryInfo.get("username")
+                password = repositoryInfo.get("password")
+            }
+        }
+        maven {
+            name = "mavenLocalFile"
+            url = uri("${rootDir}/plugin_libs")
+        }
+    }
+}
+task publishApi(dependsOn: [
+        'deleteBuild',// 0
+        'assemble',// 1
+        'makeJar', // 2
+        'publishApiPublicationToSnapshotRepository' // 3
+], group: 'waft-gcs') {
+    println "publishApi()"
+}
+assemble.mustRunAfter 'deleteBuild'
+makeJar.mustRunAfter 'assemble'
+publishApiPublicationToSnapshotRepository.mustRunAfter 'makeJar'
+publishServicePublicationToSnapshotRepository.mustRunAfter 'assemble'
+task publishService(dependsOn: [
+        'deleteBuild', // 0
+        'assemble',// 1
+        'publishServicePublicationToSnapshotRepository' // 2
+], group: 'waft-gcs') {
+    println "publishService()"
+}
+assemble.mustRunAfter 'deleteBuild'
+publishServicePublicationToSnapshotRepository.mustRunAfter
+'assemble' task publishAll(dependsOn: [
+        'deleteBuild',// 0
+        'assemble',// 1
+        'makeJar', // 2
+        'publishApiPublicationToSnapshotRepository', // 3
+        'publishServicePublicationToSnapshotRepository' //4
+], group: 'waft-gcs') {
+    println "publishAll()"
+}
+publishServicePublicationToSnapshotRepository.mustRunAfter 'publishApiPublicationToSnapshotRepository'
+
+def getRepositoryInfo(String version) {
+    HashMap info = new HashMap()
+    if (version.endsWith("-SNAPSHOT")) {
+        info.put("repository", "http://mvnrepo.mvn.com/nexus/content/repositories/snapshots")
+        info.put("username", "snapshotsAdmin")
+        info.put("password", "123456")
+    } else {
+        info.put("repository", "http://mvnrepo.mvn-inc.com/nexus/content/repositories/releases")
+        def accountMap = getAccount()
+        info.put("username", accountMap.get("username"))
+        info.put("password", accountMap.get("password"))
+    }
+    return info
+}
+
+HashMap getAccount() {
+    HashMap accountMap = new HashMap()
+    def parsedSettingsXml
+    def settingsFile = '/home/admin/software/apache-maven-3.2.1/conf/settings.xml'
+    def defaultSettingsFile = System.getProperty("user.home") + "/.m2/settings.xml"
+    println("defaultSettingsFile: " + defaultSettingsFile)
+    if (new File(settingsFile).exists() || new File(defaultSettingsFile).exists()) {
+        if (new File(settingsFile).exists()) {
+            parsedSettingsXml = (new XmlParser()).parse(settingsFile);
+        } else if (new File(defaultSettingsFile).exists()) {
+            parsedSettingsXml = (new XmlParser()).parse(defaultSettingsFile);
+        }
+        parsedSettingsXml.servers[0].server.each { server ->
+            if ("releases" == server.id.text()) {
+                accountMap.put("id", server.id.text())
+                accountMap.put("username", server.username.text())
+                accountMap.put("password", server.password.text())
+            }
+        }
+    } else {
+        accountMap.put("id", "releases")
+        accountMap.put("username", "admin")
+        accountMap.put("password", "screct")
+    }
+    return accountMap
+}
+// 获取发布版本
+String getVersion(String localVersion) {
+    // 获取发布版本
+    def deployVersion = localVersion
+    // 获取平台或者是打包脚本中的版本参数对应的要打包的版本信息
+    if (System.getenv("deployVersion") != null) {
+        deployVersion = System.getenv("deployVersion")
+    }
+    if (System.hasProperty('deployVersion')) {
+        deployVersion = System.getProperty('deployVersion')
+    }
+    if (System.getenv('P_VERSION_NAME') != null) {
+        deployVersion = System.getenv('PP_VERSION_NAME')
+    }
+    if (System.hasProperty('PP_VERSION_NAME')) {
+        deployVersion = System.getProperty('PP_VERSION_NAME')
+    }
+    return deployVersion
+}
+//    //// 发布到本地
+// tasks.register('publishApiPublicationToMavenLocalFile', PublishToMavenRepository) {
+//         publication = publishing.publications['api']
+//         repository = repositories.mavenLocalFile//
+//     // 可以在这里添加额外的配置，比如 onlyIf { ... } 来控制任务执行条件
+// }
+//tasks.register('publishServicePublicationToMavenLocalFile', PublishToMavenRepository) {
+//        publication = publishing.publications['service']
+//        repository = repositories.mavenLocalFile//
+//    // 可以在这里添加额外的配置，比如 onlyIf { ... } 来控制任务执行条件//
+//}
+//// 发布到本地指定目录
+// publishApiPublicationToMavenLocalFile.mustRunAfter 'makeJar'
+// publishServicePublicationToMavenLocalFile.mustRunAfter 'publishApiPublicationToMavenLocalFile'
+// task publishAllToMavenLocal(dependsOn: [
+//        'deleteBuild',// 0
+//        'assemble',// 1
+//        'makeJar', // 2
+//        'publishApiPublicationToMavenLocalFile', // 3
+//        'publishServicePublicationToMavenLocalFile' //4
+// ],
+//        group: 'waft-gcs') {
+//    println "publishAllToMavenLocalFile()"
+// }
+publishApiPublicationToMavenLocalFileRepository.mustRunAfter 'makeJar'
+publishServicePublicationToMavenLocalFileRepository.mustRunAfter 'publishApiPublicationToMavenLocalFileRepository'
+task publishAllToMavenLocalFile(dependsOn: [
+        'deleteBuild',// 0
+        'assemble',// 1
+        'makeJar', // 2
+        'publishApiPublicationToMavenLocalFileRepository', //3
+        'publishServicePublicationToMavenLocalFileRepository' //4
+], group: 'waft-gcs') {
+    println "publishAllToMavenLocalFile()"
+}
