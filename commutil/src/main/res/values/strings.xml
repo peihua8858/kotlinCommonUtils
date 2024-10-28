@@ -17,4 +17,6 @@
     <string name="tips_check_network">Network connection failure,please check your network settings.</string>
     <string name="text_choose_application">Open with</string>
     <string name="precessing">Processing</string>
+    <string name="text_last_page">Already last page!</string>
+    <string name="text_first_page">Already first page!</string>
 </resources>

@@ -34,6 +34,13 @@ import com.fz.common.utils.isN
 import com.fz.common.utils.resolveAttribute
 import java.util.*
 import kotlin.math.max
+fun View.getDimensionPixelSize(id: Int): Int {
+    return resources.getDimensionPixelSize(id)
+}
+
+fun View.getDimension(id: Int): Float {
+    return resources.getDimension(id)
+}
 
 /**
  * 扩展方法，用于获取View

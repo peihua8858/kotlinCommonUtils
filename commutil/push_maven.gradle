@@ -1,78 +1,84 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply plugin: 'maven'
-def buildType = /*"SNAPSHOT" */"release"
+apply plugin: 'maven-publish'
+def isRelease = true
 def mavenUrl = "http://" + String.valueOf(maven_ip) + ":8989/repository/globalegrow/"
 def mavenUrlSnapshot = "http://" + String.valueOf(maven_ip) + ":8989/repository/globalegrow-snapshot/"
 def mavenUserName = "longxl"
 def mavenPwd = "longxl123"
-def sdkVersionName = "1.0.1"
-def sdkVersionNameSnapshot = "1.0.58-SNAPSHOT"
-def pomName = "commutil"
-def pomGroupId = "com.fz.commutil"
-def pomArtifactId = "commutil"
-def pomPackaging = "aar"
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-task androidJavadocs(type: Javadoc) {
-    options.encoding = "UTF-8"
-    source = android.sourceSets.main.java.srcDirs
-    //添加classpath，解析类型
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-//打包doc
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    archiveClassifier = 'javadoc' //分类器，区分jar
-    from androidJavadocs.destinationDir
-}
-
-//打包源码
-task androidSourcesJar(type: Jar) {
-    archiveClassifier = 'sources'//分类器，区分jar
-    from android.sourceSets.main.java.srcDirs
-}
-//解决 JavaDoc 中文注释生成失败的问题
-tasks.withType(Javadoc) {
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addStringOption('encoding', 'UTF-8')
-    options.addStringOption('charSet', 'UTF-8')
-}
-
-artifacts {
-    archives androidSourcesJar
-//    archives androidJavadocsJar
-}
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            println "start upload aar build type:" + buildType
-            def ver = sdkVersionName
-            if (buildType == "release") {
-                println "uploadArchives build release"
-                repository(url: mavenUrl) {
-                    authentication(userName: mavenUserName, password: mavenPwd)
-                }
-                ver = sdkVersionName
-            } else {
-                //快照版本
-                println "uploadArchives build beta"
-                snapshotRepository(url: mavenUrlSnapshot) {
-                    authentication(userName: mavenUserName, password: mavenPwd)
-                }
-                ver = sdkVersionNameSnapshot
-            }
-            //pom必需的参数
-            pom.project {
-                name pomName
-                version ver
-                artifactId pomArtifactId
-                groupId pomGroupId
-                packaging pomPackaging
-            }
-            doLast {
-                println "upload aar success build type:" + buildType
+def localFile="${rootDir}/plugin_libs"
+def sdkVersionName = isRelease ? version : version + "-SNAPSHOT"
+publishing {
+    publications {
+        service(MavenPublication) {
+            afterEvaluate {
+                from components.findByName('release')
+                groupId = group
+                artifactId = 'kotlinCommonUtils'
+                version = sdkVersionName
             }
         }
     }
+
+    repositories {
+        maven {
+            name = "Snapshot"
+            url = mavenUrlSnapshot
+            credentials {
+                username = mavenUserName
+                password = mavenPwd
+            }
+        }
+        maven {
+            name = "Release"
+            url = mavenUrl
+            credentials {
+                username = mavenUserName
+                password = mavenPwd
+            }
+        }
+        maven {
+            name = "mavenLocalFile"
+            url = uri(localFile)
+        }
+    }
+}
+task deleteBuild(type: Delete) {
+    println "deleteBuild()"
+    def buildDir = project.buildDir.absolutePath
+    delete buildDir
+}
+task deleteLocalFile(type: Delete) {
+    println "deleteLocalFile()"
+    def buildDir = localFile
+    delete buildDir
+}
+
+assemble.mustRunAfter 'deleteBuild'
+publishServicePublicationToSnapshotRepository.mustRunAfter 'assemble'
+task publishSnapshotToMaven(dependsOn: [
+        'deleteBuild',// 0
+        'deleteLocalFile',// 1
+        'assemble',// 1
+        'publishServicePublicationToSnapshotRepository' //2
+], group: 'publish-group') {
+    println "publishSnapshotToMaven()"
+}
+publishServicePublicationToReleaseRepository.mustRunAfter 'assemble'
+task publishReleaseToMaven(dependsOn: [
+        'deleteBuild',// 0
+        'deleteLocalFile',// 1
+        'assemble',// 1
+        'publishServicePublicationToReleaseRepository' //2
+], group: 'publish-group') {
+    println "publishReleaseToMaven()"
+}
+
+publishServicePublicationToMavenLocalFileRepository.mustRunAfter 'assembleRelease'
+task publishToMavenLocalFile(dependsOn: [
+        'deleteBuild',// 0
+        'deleteLocalFile',// 1
+        'assembleRelease',// 2
+        'publishServicePublicationToMavenLocalFileRepository' //3
+], group: 'publish-group') {
+    println "publishToMavenLocalFile()"
 }
