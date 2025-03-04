@@ -13,7 +13,7 @@ kotlinCommonUtils is a Kotlin tool library that simplifies Android development, 
 -[Download](#Download)<br>
 -[Usage](#Usage)<br>
 -[Permission](#Permission)<br>
--[Issues](https://github.com/peihua8858/PictureSelector/wiki/%E5%A6%82%E4%BD%95%E6%8F%90Issues%3F)<br>
+-[Issues](https://github.com/peihua8858/kotlinCommonUtils/wiki/%E5%A6%82%E4%BD%95%E6%8F%90Issues%3F)<br>
 -[License](#License)<br>
 
 
