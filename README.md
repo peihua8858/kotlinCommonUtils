@@ -86,10 +86,10 @@ if (map.isNonEmpty()) {
 }
 ```
 3、权限 DSL用法
-< a herf='https://github.com/peihua8858/AndroidxPermissions.git'> 废弃，请使用 Androidx permissions</a>
+[废弃，请使用 Androidx permissions](https://github.com/peihua8858/AndroidxPermissions.git)
 ```kotlin
 import com.fz.common.permissions.requestPermissionsDsl
-@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
+@Deprecated("Use androidx permissions")
 requestPermissionsDsl(Manifest.permission.POST_NOTIFICATIONS) {
     onDenied {
          showToast("Denied")
