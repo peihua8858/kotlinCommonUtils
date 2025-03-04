@@ -12,6 +12,7 @@ import kotlin.contracts.contract
  * @param permissions vararg of all the permissions for request.
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 inline fun FragmentActivity.requestPermissions(
     vararg permissions: String,
     requestBlock: PermissionRequest.() -> Unit,
@@ -23,6 +24,7 @@ inline fun FragmentActivity.requestPermissions(
  * @param permissions vararg of all the permissions for request.
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 inline fun FragmentActivity.requestPermissionsDsl(
     vararg permissions: String,
     requestBlock: PermissionCallbacksDSL.() -> Unit,
@@ -35,6 +37,7 @@ inline fun FragmentActivity.requestPermissionsDsl(
  * @param permissions vararg of all the permissions for request.
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 inline fun Fragment.requestPermissions(
     vararg permissions: String,
     requestBlock: PermissionRequest.() -> Unit,
@@ -46,6 +49,7 @@ inline fun Fragment.requestPermissions(
  * @param permissions vararg of all the permissions for request.
  * @param requestBlock block constructing [PermissionRequest] object for permission request.
  */
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 inline fun Fragment.requestPermissionsDsl(
     vararg permissions: String,
     requestBlock: PermissionCallbacksDSL.() -> Unit,

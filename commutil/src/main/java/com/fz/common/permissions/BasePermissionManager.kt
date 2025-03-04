@@ -4,7 +4,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 abstract class BasePermissionManager : Fragment() {
 
     protected val rationalRequest = mutableMapOf<Int, Boolean>()

@@ -2,7 +2,7 @@ package com.fz.common.permissions
 
 import android.content.pm.PackageManager
 import androidx.annotation.CheckResult
-
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 interface PermissionCallbacks {
 
     /**
@@ -35,6 +35,7 @@ interface PermissionCallbacks {
 /**
  * DSL implementation for [PermissionCallbacks].
  */
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 class PermissionCallbacksDSL : PermissionCallbacks {
 
     private var onGranted: () -> Unit = {}
