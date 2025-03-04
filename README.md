@@ -26,6 +26,7 @@ kotlinCommonUtils是一个Kotlin工具库，可以简化Android开发，使代�
 repositories {
   google()
   mavenCentral()
+  maven { url 'https://jitpack.io' }
 }
 
 dependencies {
