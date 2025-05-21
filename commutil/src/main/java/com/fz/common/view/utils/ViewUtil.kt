@@ -641,3 +641,12 @@ class AnimatorListenerModel<T> {
 }
 val View.isLandScape: Boolean
     get() = context.isLandScape
+
+
+
+fun View.getDimen(id: Int) = resources.getDimension(id)
+fun View.getDimenPixel(id: Int) = resources.getDimensionPixelSize(id)
+fun View.getDimenPixelOffset(id: Int) = resources.getDimensionPixelOffset(id)
+fun View.getDimenPixelSize(id: Int) = resources.getDimensionPixelSize(id)
+fun View.getString(id: Int) = resources.getString(id)
+fun View.getStringArray(id: Int) = resources.getStringArray(id)
