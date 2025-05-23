@@ -472,7 +472,7 @@ fun File?.writeToFile(
     fileName: String?,
     deleteParentAllFile: Boolean,
 ): File? {
-    if (fileName == null) {
+    if (fileName == null || data == null) {
         return null
     }
     if (deleteParentAllFile) {
@@ -484,6 +484,31 @@ fun File?.writeToFile(
     }
     val image = File(this, fileName)
     return image.writeToFile(data)
+}
+
+fun File?.writeToFile(data: InputStream?, deleteFile: Boolean = false): File? {
+    if (this == null || data == null) {
+        return null
+    }
+    if (deleteFile) {
+        val isDelete = delete()
+        KLog.d("LockWriteFile>>>isDelete:$isDelete")
+    }
+    try {
+        FileOutputStream(this).use { outStream ->
+            data.use { fis ->
+                val buffer = ByteArray(1024)
+                var length: Int
+                while (fis.read(buffer).also { length = it } > 0) {
+                    outStream.write(buffer, 0, length)
+                }
+                outStream.flush()
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return this
 }
 
 fun File?.writeToFile(data: ByteArray?): File? {
