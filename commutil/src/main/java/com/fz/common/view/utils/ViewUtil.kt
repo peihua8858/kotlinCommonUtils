@@ -26,14 +26,19 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.fz.common.listener.OnNoDoubleClickListener
 import com.fz.common.utils.checkContext
 import com.fz.common.utils.dLog
+import com.fz.common.utils.getDimen
+import com.fz.common.utils.getDimenPixel
+import com.fz.common.utils.getDimenPixelOffset
 import com.fz.common.utils.getDimens
 import com.fz.common.utils.getResourceId
+import com.fz.common.utils.getStringArray
 import com.fz.common.utils.isAppRtl
 import com.fz.common.utils.isLandScape
 import com.fz.common.utils.isN
 import com.fz.common.utils.resolveAttribute
 import java.util.*
 import kotlin.math.max
+
 fun View.getDimensionPixelSize(id: Int): Int {
     return resources.getDimensionPixelSize(id)
 }
@@ -169,6 +174,31 @@ fun View?.getString(@StringRes resourceId: Int): String {
     return context.getString(resourceId)
 }
 
+fun View.getDimen(id: Int): Float {
+    val context: Context = checkContext(this) ?: return 0f
+    return context.getDimen(id)
+}
+
+fun View.getDimenPixel(id: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return context.getDimenPixel(id)
+}
+
+fun View.getDimenPixelOffset(id: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return context.getDimenPixelOffset(id)
+}
+
+fun View.getDimenPixelSize(id: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return context.getDimenPixelOffset(id)
+}
+
+fun View.getStringArray(id: Int): Array<String> {
+    val context: Context = checkContext(this) ?: return arrayOf()
+    return context.getStringArray(id)
+}
+
 /**
  * 获取资源id
  *
@@ -266,9 +296,19 @@ fun View?.setMarginByDp(start: Int, top: Int, end: Int, bottom: Int) {
  * @date 2018/12/7 18:09
  * @version 1.0
  */
-fun View?.setViewPaddingPx(@Px paddingStart: Int, @Px paddingTop: Int, @Px paddingEnd: Int, @Px paddingBottom: Int) {
+fun View?.setViewPaddingPx(
+    @Px paddingStart: Int,
+    @Px paddingTop: Int,
+    @Px paddingEnd: Int,
+    @Px paddingBottom: Int,
+) {
     if (this == null) return
-    setPaddingRelative(max(paddingStart, 0), max(paddingTop, 0), max(paddingEnd, 0), max(paddingBottom, 0))
+    setPaddingRelative(
+        max(paddingStart, 0),
+        max(paddingTop, 0),
+        max(paddingEnd, 0),
+        max(paddingBottom, 0)
+    )
 }
 
 /**
@@ -283,9 +323,19 @@ fun View?.setViewPaddingPx(@Px paddingStart: Int, @Px paddingTop: Int, @Px paddi
  * @date 2018/12/7 18:09
  * @version 1.0
  */
-fun View?.setViewPaddingDp(paddingStart: Int, paddingTop: Int, paddingEnd: Int, paddingBottom: Int) {
+fun View?.setViewPaddingDp(
+    paddingStart: Int,
+    paddingTop: Int,
+    paddingEnd: Int,
+    paddingBottom: Int,
+) {
     if (this == null) return
-    setViewPaddingPx(dip2px(paddingStart), dip2px(paddingTop), dip2px(paddingEnd), dip2px(paddingBottom))
+    setViewPaddingPx(
+        dip2px(paddingStart),
+        dip2px(paddingTop),
+        dip2px(paddingEnd),
+        dip2px(paddingBottom)
+    )
 }
 
 
@@ -380,7 +430,7 @@ fun View?.setMargin(view: View) {
  */
 fun View.animationWidth(
     isExpend: Boolean, width: Int, duration: Long = 300,
-    model: (AnimatorListenerModel<Animator>.() -> Unit)? = null
+    model: (AnimatorListenerModel<Animator>.() -> Unit)? = null,
 ) {
     val viewWrapper = ViewWrapper(this)
     val animation = if (isExpend) ObjectAnimator.ofInt(
@@ -483,7 +533,7 @@ fun View.animateOut(
     isVertical: Boolean = false,
     offset: Int = if (isVertical) this.height else this.width,
     duration: Long = 300,
-    model: (AnimatorListenerModel<View>.() -> Unit)? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null,
 ) {
     try {
         var tempOffset = offset
@@ -518,7 +568,7 @@ fun View.animateOut(
 fun View.animateIn(
     isVertical: Boolean = false,
     duration: Long = 300,
-    model: (AnimatorListenerModel<View>.() -> Unit)? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null,
 ) {
     dLog { "newState>>>>animateIn" }
     visibility = View.VISIBLE
@@ -544,7 +594,7 @@ fun View.animateIn(
 fun View.animateAlpha(
     isVisible: Boolean = true,
     duration: Long = 300,
-    model: (AnimatorListenerModel<View>.() -> Unit)? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null,
 ) {
     dLog { "newState>>>>animateAlpha" }
     visibility = View.VISIBLE
@@ -639,14 +689,6 @@ class AnimatorListenerModel<T> {
         this.onAnimationResume?.invoke(view)
     }
 }
+
 val View.isLandScape: Boolean
     get() = context.isLandScape
-
-
-
-fun View.getDimen(id: Int) = resources.getDimension(id)
-fun View.getDimenPixel(id: Int) = resources.getDimensionPixelSize(id)
-fun View.getDimenPixelOffset(id: Int) = resources.getDimensionPixelOffset(id)
-fun View.getDimenPixelSize(id: Int) = resources.getDimensionPixelSize(id)
-fun View.getString(id: Int) = resources.getString(id)
-fun View.getStringArray(id: Int) = resources.getStringArray(id)
