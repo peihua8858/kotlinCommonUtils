@@ -8,6 +8,9 @@ import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -33,6 +36,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
+import kotlin.math.max
 
 val UTF8: Charset = Charset.forName("UTF-8")
 private val sf = SimpleDateFormat("yyyyMMdd_HHmmssSS")
@@ -1045,6 +1049,76 @@ fun Context.cacheFile(cacheName: String): File {
     return file
 }
 
+fun String.decodePathOptionsFile(screenWidth: Int, screenHeight: Int): Bitmap? {
+    try {
+        val mScreenWidth = screenWidth
+        val mScreenHeight = screenHeight
+        val file = File(this)
+        val o = BitmapFactory.Options()
+        o.inJustDecodeBounds = true
+        BitmapFactory.decodeStream(FileInputStream(file), null, o)
+        val width_tmp = o.outWidth
+        val height_tmp = o.outHeight
+        var scale = 1
+        if (width_tmp <= mScreenWidth && height_tmp <= mScreenHeight) {
+            scale = 1
+        } else {
+            val widthFit: Double = width_tmp * 1.0 / mScreenWidth
+            val heightFit: Double = height_tmp * 1.0 / mScreenHeight
+            val fit = max(widthFit, heightFit)
+            scale = (fit + 0.5).toInt()
+        }
+        var bitmap: Bitmap? = null
+        if (scale == 1) {
+            bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+        } else {
+            val o2 = BitmapFactory.Options()
+            o2.inSampleSize = scale
+            bitmap = BitmapFactory.decodeStream(FileInputStream(file), null, o2)
+        }
+        if (bitmap != null) {
+            eLog { "scale = " + scale + " bitmap.size = " + (bitmap.getRowBytes() * bitmap.getHeight()) }
+        }
+        return bitmap
+    } catch (e: Throwable) {
+        eLog { "fileNotFoundException, e: $e" }
+    }
+    return null
+}
+
+fun Bitmap.adjustBitmapOrientation(filePath: String): Bitmap? {
+    var exifInterface: ExifInterface? = null
+    try {
+        exifInterface = ExifInterface(filePath)
+    } catch (e: Throwable) {
+        e.printStackTrace()
+    }
+    var rotation = 0
+    if (exifInterface != null) {
+        val orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0)
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotation = 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotation = 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotation = 270
+            else -> {}
+        }
+    }
+    dLog { "adjustBitmapOrientation, adjust degree " + rotation + "to 0." }
+    if (rotation == 0) {
+        return this
+    }
+    val matrix = Matrix()
+    matrix.postRotate(rotation.toFloat())
+    return Bitmap.createBitmap(
+        this,
+        0,
+        0,
+        getWidth(),
+        getHeight(),
+        matrix,
+        true
+    )
+}
 /**
  * 转换文件大小
  *
