@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Base64
@@ -20,6 +21,9 @@ import com.fz.common.array.isNonEmpty
 import com.fz.common.text.isNonEmpty
 import com.fz.common.utils.*
 import com.socks.library.KLog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.io.*
 import java.nio.charset.Charset
 import java.text.DateFormat
@@ -27,6 +31,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
 val UTF8: Charset = Charset.forName("UTF-8")
 private val sf = SimpleDateFormat("yyyyMMdd_HHmmssSS")
@@ -509,6 +515,47 @@ fun File?.writeToFile(data: InputStream?, deleteFile: Boolean = false): File? {
         e.printStackTrace()
     }
     return this
+}
+
+
+suspend fun InputStream?.writeToFile(
+    file: File?,
+    bufferSize: Int = 4096,
+): Boolean {
+    val parentFile = file?.parentFile
+    if (file == null || this == null || parentFile == null) {
+        return false
+    }
+    if (file.exists()) {
+        file.delete()
+    }
+    if (parentFile.exists().not()) {
+        parentFile.mkdirs()
+    }
+    val context: CoroutineContext = if (Looper.myLooper() == Looper.getMainLooper()) {
+        Dispatchers.IO
+    } else {
+        coroutineContext
+    }
+    return withContext(context) {
+        try {
+            return@withContext FileOutputStream(file).use { fos ->
+                return@withContext this@writeToFile.use { fis ->
+                    val buffer = ByteArray(bufferSize)
+                    var length: Int
+                    while (fis.read(buffer).also { length = it } > 0 && isActive) {
+                        fos.write(buffer, 0, length)
+                        dLog { "writeToFile length: $length" }
+                    }
+                    fos.flush()
+                    true
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return@withContext false
+        }
+    }
 }
 
 fun File?.writeToFile(data: ByteArray?): File? {
