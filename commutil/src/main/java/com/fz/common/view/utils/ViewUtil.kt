@@ -389,7 +389,20 @@ fun View?.setPaddingStartByDp(start: Int) {
  * @date 2022/5/14 19:12
  * @version 1.0
  */
-fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
+fun View.animationWidth(isExpend: Boolean, width: Int = 0, duration: Long = 300) {
+    val widthId = 0x20133542
+    var offset = width
+    if (offset == 0) {
+        offset = getTag(widthId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.width
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredWidth
+            }
+            setTag(widthId, offset)
+        }
+    }
     val viewWrapper = ViewWrapper(this)
     val animation = if (isExpend) ObjectAnimator.ofInt(
         viewWrapper, "width", 0, width
@@ -397,16 +410,60 @@ fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
     else ObjectAnimator.ofInt(viewWrapper, "width", width, 0)
     animation.duration = duration
     animation.addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationStart(animation: Animator) {
-            if (isExpend) this@animationWidth.visibility = View.VISIBLE
-        }
-
         override fun onAnimationEnd(animation: Animator) {
             if (!isExpend) this@animationWidth.visibility = View.GONE
         }
     })
     animation.addUpdateListener {
         viewWrapper.setWidth(it.animatedValue as Int)
+        if (isExpend) this@animationWidth.visibility = View.VISIBLE
+    }
+    animation.start()
+}
+
+
+/**
+ * [View]高度展开折叠动画
+ * @param   isExpend  true:展开  false:收起
+ * @param   height     展开时的宽度
+ * @param duration 动画时长
+ * @author dingpeihua
+ * @date 2022/5/14 19:12
+ * @version 1.0
+ */
+fun View.animationHeight(isExpend: Boolean, height: Int = 0, duration: Long = 300) {
+    val heightId = 0x20133543
+    var offset = height
+    if (offset == 0) {
+        offset = getTag(heightId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.height
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredHeight
+            }
+            setTag(heightId, offset)
+        }
+        setTag(heightId, offset)
+    }
+    val viewWrapper = ViewWrapper(this)
+    val animation = if (isExpend) ObjectAnimator.ofInt(
+        viewWrapper, "height", 0, offset
+    )
+    else ObjectAnimator.ofInt(viewWrapper, "height", offset, 0)
+    animation.duration = duration
+    animation.addListener(object : AnimatorListenerAdapter() {
+
+        override fun onAnimationEnd(animation: Animator) {
+            if (!isExpend) this@animationHeight.visibility = View.GONE
+        }
+    })
+    animation.addUpdateListener {
+        val value = it.animatedValue as Int
+        viewWrapper.setHeight(value)
+        if (isExpend && value > 0) {
+            this@animationHeight.visibility = View.VISIBLE
+        }
     }
     animation.start()
 }
@@ -432,6 +489,19 @@ fun View.animationWidth(
     isExpend: Boolean, width: Int, duration: Long = 300,
     model: (AnimatorListenerModel<Animator>.() -> Unit)? = null,
 ) {
+    var offset = width
+    if (offset == 0) {
+        val widthId = 0x20133542
+        offset = getTag(widthId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.width
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredWidth
+            }
+            setTag(widthId, offset)
+        }
+    }
     val viewWrapper = ViewWrapper(this)
     val animation = if (isExpend) ObjectAnimator.ofInt(
         viewWrapper, "width", 0, width
@@ -452,6 +522,57 @@ fun View.animationWidth(
     })
     animation.addUpdateListener {
         viewWrapper.setWidth(it.animatedValue as Int)
+        if (isExpend) this@animationWidth.visibility = View.VISIBLE
+    }
+    animation.start()
+}
+
+/**
+ * [View]高度展开折叠动画
+ * @param   isExpend  true:展开  false:收起
+ * @param   height     展开时的宽度
+ * @param duration 动画时长
+ * @author dingpeihua
+ * @date 2022/5/14 19:12
+ * @version 1.0
+ */
+fun View.animationHeight(
+    isExpend: Boolean, height: Int = 0, duration: Long = 300,
+    model: (AnimatorListenerModel<Animator>.() -> Unit)? = null,
+) {
+    var offset = height
+    if (offset == 0) {
+        val heightId = 0x20133543
+        offset = getTag(heightId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.height
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredHeight
+            }
+            setTag(heightId, offset)
+        }
+        setTag(heightId, offset)
+    }
+    val viewWrapper = ViewWrapper(this)
+    val animation = if (isExpend) ObjectAnimator.ofInt(
+        viewWrapper, "height", 0, offset
+    )
+    else ObjectAnimator.ofInt(viewWrapper, "height", offset, 0)
+    animation.duration = duration
+    val listener = if (model != null) AnimatorListenerModel<Animator>().apply(model) else null
+    animation.addListener(object : InternalAnimatorListenerAdapter(listener) {
+        override fun onAnimationEnd(animation: Animator) {
+            super.onAnimationEnd(animation)
+            if (!isExpend) this@animationHeight.visibility = View.GONE
+        }
+    })
+    animation.addUpdateListener {
+        val value = it.animatedValue as Int
+        viewWrapper.setHeight(value)
+        if (isExpend && value > 0) {
+            this@animationHeight.visibility = View.VISIBLE
+        }
     }
     animation.start()
 }
@@ -500,6 +621,16 @@ private class ViewWrapper(val view: View) {
 
     fun getWidth(): Int {
         return view.layoutParams.width
+    }
+
+    @Keep
+    fun setHeight(height: Int) {
+        view.layoutParams.height = height
+        view.requestLayout() //必须调用，否则宽度改变但UI没有刷新
+    }
+
+    fun getHeight(): Int {
+        return view.layoutParams.height
     }
 }
 
