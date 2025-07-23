@@ -1114,31 +1114,6 @@ fun Long.formatFileSize(): String {
 }
 
 
-suspend fun File.writeToZip(
-    parent: String,
-    zos: ZipOutputStream,
-    bufferSize: Int = 4096,
-    zipLevel: Int = 0,
-    callback: (progress: Long, speed: Long) -> Unit = { process, speed -> },
-): Boolean {
-    try {
-        val zipEntry = ZipEntry(parent + getName())
-        val totalLength = length()
-        if (zipLevel == 0) {
-            zipEntry.setMethod(ZipOutputStream.STORED)
-            zipEntry.setCompressedSize(totalLength)
-            zipEntry.setSize(totalLength)
-            zipEntry.setCrc(this.cRC32.value)
-        }
-        zos.putNextEntry(zipEntry)
-        val fis = inputStream()
-        return fis.writeToZip(zos, bufferSize, callback = callback)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return false
-    }
-}
-
 suspend fun File?.writeToZip(
     parent: String,
     zos: ZipOutputStream,
@@ -1167,7 +1142,21 @@ suspend fun File?.writeToZip(
             }
         }
     } else if (isFile) {
-        writeToZip(parentTemp, zos, bufferSize, zipLevel, callback)
+        try {
+            val zipEntry = ZipEntry(parent + getName())
+            val totalLength = length()
+            if (zipLevel == 0) {
+                zipEntry.setMethod(ZipOutputStream.STORED)
+                zipEntry.compressedSize = totalLength
+                zipEntry.setSize(totalLength)
+                zipEntry.setCrc(this.cRC32.value)
+            }
+            zos.putNextEntry(zipEntry)
+            val fis = inputStream()
+             fis.writeToZip(zos, bufferSize, callback = callback)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
 
