@@ -1117,7 +1117,8 @@ fun Long.formatFileSize(): String {
 suspend fun File.writeToZip(
     parent: String,
     zos: ZipOutputStream,
-    zipLevel: Int,
+    bufferSize: Int = 4096,
+    zipLevel: Int = 0,
     callback: (progress: Long, speed: Long) -> Unit = { process, speed -> },
 ): Boolean {
     try {
@@ -1131,7 +1132,7 @@ suspend fun File.writeToZip(
         }
         zos.putNextEntry(zipEntry)
         val fis = inputStream()
-        return fis.writeToZip(zos, callback = callback)
+        return fis.writeToZip(zos, bufferSize, callback = callback)
     } catch (e: Exception) {
         e.printStackTrace()
         return false
@@ -1139,8 +1140,11 @@ suspend fun File.writeToZip(
 }
 
 suspend fun File?.writeToZip(
-    parent: String, zos: ZipOutputStream, zipLevel: Int,
-    callback: (progress: Long) -> Unit = { process -> },
+    parent: String,
+    zos: ZipOutputStream,
+    bufferSize: Int = 4096,
+    zipLevel: Int = 0,
+    callback: (progress: Long, speed: Long) -> Unit = { process, speed -> },
 ) {
     if (this == null) {
         return
@@ -1152,7 +1156,7 @@ suspend fun File?.writeToZip(
         if (fileItemList != null) {
             if (fileItemList.size > 0) {
                 for (f in fileItemList) {
-                    f.writeToZip(parentTemp, zos, zipLevel)
+                    f.writeToZip(parentTemp, zos, bufferSize, zipLevel, callback)
                 }
             } else {
                 try {
@@ -1163,30 +1167,8 @@ suspend fun File?.writeToZip(
             }
         }
     } else if (isFile) {
-        writeToZip(parentTemp, zos, zipLevel, callback)
+        writeToZip(parentTemp, zos, bufferSize, zipLevel, callback)
     }
-}
-
-
-
-suspend fun InputStream?.writeToFile(
-    file: File?,
-    bufferSize: Int = 4096,
-    isCloseOs: Boolean = true,
-    callback: (progress: Long, speed: Long) -> Unit = { process, isComplete -> },
-): Boolean {
-    val parentFile = file?.parentFile
-    if (file == null || this == null || parentFile == null) {
-        return false
-    }
-    if (file.exists()) {
-        file.delete()
-    }
-    if (parentFile.exists().not()) {
-        parentFile.mkdirs()
-    }
-    val os = FileOutputStream(file)
-    return writeToFile(os, bufferSize, isCloseOs, callback)
 }
 
 

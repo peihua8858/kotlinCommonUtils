@@ -1,5 +1,6 @@
 @file:JvmName("IOUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.file
 
 import android.database.Cursor
@@ -127,6 +128,26 @@ fun InputStream?.copy(out: OutputStream) {
             }
         }
     }
+}
+
+suspend fun InputStream?.writeToFile(
+    file: File?,
+    bufferSize: Int = 4096,
+    isCloseOs: Boolean = true,
+    callback: (progress: Long, speed: Long) -> Unit = { process, isComplete -> },
+): Boolean {
+    val parentFile = file?.parentFile
+    if (file == null || this == null || parentFile == null) {
+        return false
+    }
+    if (file.exists()) {
+        file.delete()
+    }
+    if (parentFile.exists().not()) {
+        parentFile.mkdirs()
+    }
+    val os = FileOutputStream(file)
+    return writeToFile(os, bufferSize, isCloseOs, callback)
 }
 
 
