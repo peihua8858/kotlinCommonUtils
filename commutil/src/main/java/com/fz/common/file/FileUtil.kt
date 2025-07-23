@@ -34,6 +34,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.zip.CRC32
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.math.max
@@ -1049,43 +1052,6 @@ fun Context.cacheFile(cacheName: String): File {
     return file
 }
 
-fun String.decodePathOptionsFile(screenWidth: Int, screenHeight: Int): Bitmap? {
-    try {
-        val mScreenWidth = screenWidth
-        val mScreenHeight = screenHeight
-        val file = File(this)
-        val o = BitmapFactory.Options()
-        o.inJustDecodeBounds = true
-        BitmapFactory.decodeStream(FileInputStream(file), null, o)
-        val width_tmp = o.outWidth
-        val height_tmp = o.outHeight
-        var scale = 1
-        if (width_tmp <= mScreenWidth && height_tmp <= mScreenHeight) {
-            scale = 1
-        } else {
-            val widthFit: Double = width_tmp * 1.0 / mScreenWidth
-            val heightFit: Double = height_tmp * 1.0 / mScreenHeight
-            val fit = max(widthFit, heightFit)
-            scale = (fit + 0.5).toInt()
-        }
-        var bitmap: Bitmap? = null
-        if (scale == 1) {
-            bitmap = BitmapFactory.decodeStream(FileInputStream(file))
-        } else {
-            val o2 = BitmapFactory.Options()
-            o2.inSampleSize = scale
-            bitmap = BitmapFactory.decodeStream(FileInputStream(file), null, o2)
-        }
-        if (bitmap != null) {
-            eLog { "scale = " + scale + " bitmap.size = " + (bitmap.getRowBytes() * bitmap.getHeight()) }
-        }
-        return bitmap
-    } catch (e: Throwable) {
-        eLog { "fileNotFoundException, e: $e" }
-    }
-    return null
-}
-
 fun Bitmap.adjustBitmapOrientation(filePath: String): Bitmap? {
     var exifInterface: ExifInterface? = null
     try {
@@ -1146,3 +1112,87 @@ fun Long.formatFileSize(): String {
         }
     }
 }
+
+
+suspend fun File.writeToZip(
+    parent: String,
+    zos: ZipOutputStream,
+    zipLevel: Int,
+    callback: (progress: Long, speed: Long) -> Unit = { process, speed -> },
+): Boolean {
+    try {
+        val zipEntry = ZipEntry(parent + getName())
+        val totalLength = length()
+        if (zipLevel == 0) {
+            zipEntry.setMethod(ZipOutputStream.STORED)
+            zipEntry.setCompressedSize(totalLength)
+            zipEntry.setSize(totalLength)
+            zipEntry.setCrc(this.cRC32.value)
+        }
+        zos.putNextEntry(zipEntry)
+        val fis = inputStream()
+        return fis.writeToZip(zos, callback = callback)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return false
+    }
+}
+
+suspend fun File?.writeToZip(
+    parent: String, zos: ZipOutputStream, zipLevel: Int,
+    callback: (progress: Long) -> Unit = { process -> },
+) {
+    if (this == null) {
+        return
+    }
+    var parentTemp = parent
+    if (isDirectory) {
+        parentTemp += this.getName() + File.separator
+        val fileItemList = this.listFiles()
+        if (fileItemList != null) {
+            if (fileItemList.size > 0) {
+                for (f in fileItemList) {
+                    f.writeToZip(parentTemp, zos, zipLevel)
+                }
+            } else {
+                try {
+                    zos.putNextEntry(ZipEntry(parentTemp))
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    } else if (isFile) {
+        writeToZip(parentTemp, zos, zipLevel, callback)
+    }
+}
+
+
+
+suspend fun InputStream?.writeToFile(
+    file: File?,
+    bufferSize: Int = 4096,
+    isCloseOs: Boolean = true,
+    callback: (progress: Long, speed: Long) -> Unit = { process, isComplete -> },
+): Boolean {
+    val parentFile = file?.parentFile
+    if (file == null || this == null || parentFile == null) {
+        return false
+    }
+    if (file.exists()) {
+        file.delete()
+    }
+    if (parentFile.exists().not()) {
+        parentFile.mkdirs()
+    }
+    val os = FileOutputStream(file)
+    return writeToFile(os, bufferSize, isCloseOs, callback)
+}
+
+
+/**
+ * 获取一个文件的CRC32值
+ */
+@get:Throws(java.lang.Exception::class)
+val File.cRC32: CRC32
+    get() = FileInputStream(this).cRC32
