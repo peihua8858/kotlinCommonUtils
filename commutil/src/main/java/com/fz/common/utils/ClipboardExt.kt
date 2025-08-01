@@ -12,7 +12,7 @@ fun CharSequence?.copyTextToClipboard(context: Context): Boolean {
         return false
     }
     val c = context.clipboardManager
-    val clipData = ClipData.newPlainText("text label", this)
+    val clipData = ClipData.newPlainText("text", this)
     try {
         c?.setPrimaryClip(clipData)
         return true
@@ -33,7 +33,7 @@ fun Context.pasteText(): CharSequence {
 /**
  * 实现粘贴功能
  *
- * @param context
+ * @param [this]
  * @author dingpeihua
  * @date 2019/10/16 18:22
  * @version 1.0
@@ -83,11 +83,6 @@ fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)
     val cm = clipboardManager
     val clipData = ClipData.newPlainText("text", content)
     cm?.let {
-        try {
-            cm.setPrimaryClip(clipData)
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
                 ClipboardManager.OnPrimaryClipChangedListener {
@@ -96,6 +91,12 @@ fun Context.copyToClipBoard(content: CharSequence, callback: ((Boolean) -> Unit)
                     callback(true)
                 }
             })
+        }
+        try {
+            cm.setPrimaryClip(clipData)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            callback?.invoke(false)
         }
     }
 }
@@ -105,11 +106,6 @@ fun Context.copyToClipBoard(intent: Intent, callback: ((Boolean) -> Unit)? = nul
     val cm = clipboardManager
     val clipData = ClipData.newIntent("Intent", intent)
     cm?.let {
-        try {
-            cm.setPrimaryClip(clipData)
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
                 ClipboardManager.OnPrimaryClipChangedListener {
@@ -118,6 +114,12 @@ fun Context.copyToClipBoard(intent: Intent, callback: ((Boolean) -> Unit)? = nul
                     callback(true)
                 }
             })
+        }
+        try {
+            cm.setPrimaryClip(clipData)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            callback?.invoke(false)
         }
     }
 }
@@ -127,11 +129,6 @@ fun Context.copyToClipBoard(uri: Uri, callback: ((Boolean) -> Unit)? = null) {
     val cm = clipboardManager
     val clipData = ClipData.newUri(contentResolver, "URI", uri)
     cm?.let {
-        try {
-            cm.setPrimaryClip(clipData)
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
         callback?.let {
             cm.addPrimaryClipChangedListener(object :
                 ClipboardManager.OnPrimaryClipChangedListener {
@@ -140,6 +137,12 @@ fun Context.copyToClipBoard(uri: Uri, callback: ((Boolean) -> Unit)? = null) {
                     callback(true)
                 }
             })
+        }
+        try {
+            cm.setPrimaryClip(clipData)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            callback?.invoke(false)
         }
     }
 }
