@@ -33,8 +33,8 @@ import com.fz.common.utils.getDimens
 import com.fz.common.utils.getResourceId
 import com.fz.common.utils.getStringArray
 import com.fz.common.utils.isAppRtl
+import com.fz.common.utils.isAtLeastN
 import com.fz.common.utils.isLandScape
-import com.fz.common.utils.isN
 import com.fz.common.utils.resolveAttribute
 import java.util.*
 import kotlin.math.max
@@ -512,7 +512,6 @@ fun View.animationWidth(
     animation.addListener(object : InternalAnimatorListenerAdapter(listener) {
         override fun onAnimationStart(animation: Animator) {
             super.onAnimationStart(animation)
-            this@animationWidth.
             if (isExpend) this@animationWidth.visibility = View.VISIBLE
         }
 
@@ -651,7 +650,7 @@ fun View.measureHeight(maxWidth: Int): Int {
 }
 
 fun View.isRtl(): Boolean {
-    if (isN) {
+    if (isAtLeastN) {
         return resources.configuration.locales.get(0).isAppRtl()
     }
     return resources.configuration.locale.isAppRtl()
