@@ -3,11 +3,16 @@ package com.fz.common.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
+import android.graphics.Paint
 import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
+import androidx.core.graphics.createBitmap
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
 import java.io.FileInputStream
@@ -119,4 +124,15 @@ fun String.decodePathOptionsFile(screenWidth: Int, screenHeight: Int): Bitmap? {
         eLog { "fileNotFoundException, e: $e" }
     }
     return null
+}
+
+fun Bitmap.toBlackAndWhite(): Bitmap {
+    val bmpMonochrome = createBitmap(width, height)
+    val canvas = Canvas(bmpMonochrome)
+    val ma = ColorMatrix()
+    ma.setSaturation(0f)
+    val paint = Paint()
+    paint.setColorFilter(ColorMatrixColorFilter(ma))
+    canvas.drawBitmap(this, 0f, 0f, paint)
+    return bmpMonochrome
 }

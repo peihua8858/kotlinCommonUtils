@@ -150,7 +150,6 @@ suspend fun InputStream?.writeToFile(
     return writeToFile(os, bufferSize, isCloseOs, callback)
 }
 
-
 suspend fun InputStream?.writeToFile(
     os: OutputStream?,
     bufferSize: Int = 4096,

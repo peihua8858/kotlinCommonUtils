@@ -512,6 +512,7 @@ fun View.animationWidth(
     animation.addListener(object : InternalAnimatorListenerAdapter(listener) {
         override fun onAnimationStart(animation: Animator) {
             super.onAnimationStart(animation)
+            this@animationWidth.
             if (isExpend) this@animationWidth.visibility = View.VISIBLE
         }
 
