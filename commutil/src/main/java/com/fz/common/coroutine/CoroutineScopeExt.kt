@@ -7,6 +7,14 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+public fun WorkScope(): CoroutineScope = ContextScope(SupervisorJob() + Dispatchers.IO)
+
+internal class ContextScope(context: CoroutineContext) : CoroutineScope {
+    override val coroutineContext: CoroutineContext = context
+    // CoroutineScope is used intentionally for user-friendly representation
+    override fun toString(): String = "CoroutineScope(coroutineContext=$coroutineContext)"
+}
+
 /**
  * 在主线程开启协程执行[ApiModel.onRequest]
  * @author dingpeihua

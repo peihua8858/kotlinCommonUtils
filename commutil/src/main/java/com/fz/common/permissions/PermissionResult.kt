@@ -3,7 +3,7 @@ package com.fz.common.permissions
 import android.app.Activity
 import androidx.core.app.ActivityCompat
 import java.lang.ref.WeakReference
-
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 sealed class PermissionResult(val requestCode: Int) {
     class PermissionGranted(requestCode: Int) : PermissionResult(requestCode)
     class PermissionDenied(
@@ -21,6 +21,7 @@ sealed class PermissionResult(val requestCode: Int) {
 /**
  * Represents permission request to retry after rationale message is shown.
  */
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 class PermissionRequestDsl internal constructor(
         activity: Activity,
         val permissions: List<String>,

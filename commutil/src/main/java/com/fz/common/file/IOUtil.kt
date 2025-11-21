@@ -1,12 +1,28 @@
 @file:JvmName("IOUtil")
 @file:JvmMultifileClass
+
 package com.fz.common.file
 
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.os.Looper
 import android.text.TextUtils
 import androidx.annotation.NonNull
+import com.fz.common.utils.dLog
+import com.fz.common.utils.eLog
 import com.socks.library.KLog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.io.*
+import java.util.zip.CRC32
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
+import kotlin.math.max
 
 fun Closeable?.close() {
     if (this != null) {
@@ -113,3 +129,114 @@ fun InputStream?.copy(out: OutputStream) {
         }
     }
 }
+
+suspend fun InputStream?.writeToFile(
+    file: File?,
+    bufferSize: Int = 4096,
+    isCloseOs: Boolean = true,
+    callback: (progress: Long, speed: Long) -> Unit = { process, isComplete -> },
+): Boolean {
+    val parentFile = file?.parentFile
+    if (file == null || this == null || parentFile == null) {
+        return false
+    }
+    if (file.exists()) {
+        file.delete()
+    }
+    if (parentFile.exists().not()) {
+        parentFile.mkdirs()
+    }
+    val os = FileOutputStream(file)
+    return writeToFile(os, bufferSize, isCloseOs, callback)
+}
+
+suspend fun InputStream?.writeToFile(
+    os: OutputStream?,
+    bufferSize: Int = 4096,
+    isCloseOs: Boolean = true,
+    callback: (progress: Long, speed: Long) -> Unit = { process, speed -> },
+): Boolean {
+    if (os == null || this == null) {
+        return false
+    }
+    return use {
+        if (isCloseOs) {
+            os.use {
+                writeToFileNoClose(os, bufferSize, callback)
+            }
+        } else {
+            writeToFileNoClose(os, bufferSize, callback)
+        }
+    }
+}
+
+
+suspend fun InputStream?.writeToZip(
+    zos: ZipOutputStream,
+    bufferSize: Int = 4096,
+    isCloseZip: Boolean = true,
+    callback: (progress: Long, speed: Long) -> Unit = { process, speed -> },
+): Boolean {
+    if (this == null) {
+        return false
+    }
+    return this.use { fins ->
+        if (isCloseZip) {
+            zos.use { zois ->
+                fins.writeToFileNoClose(zois, bufferSize, callback)
+            }
+        } else {
+            writeToFileNoClose(zos, bufferSize, callback)
+        }
+    }
+}
+
+/**
+ * InputStream 写入 OutputStream,且不做关闭处理，由外部自行关闭
+ */
+suspend fun InputStream.writeToFileNoClose(
+    ios: OutputStream,
+    bufferSize: Int = 4096,
+    callback: (progress: Long, speed: Long) -> Unit = { process, speed -> },
+): Boolean {
+    try {
+        val context: CoroutineContext = if (Looper.myLooper() == Looper.getMainLooper()) {
+            Dispatchers.IO
+        } else {
+            coroutineContext
+        }
+        val fis = this
+        return withContext(context) {
+            val buffer = ByteArray(bufferSize)
+            var length: Int
+            var progress = 0L
+            while ((fis.read(buffer).also { length = it }) != -1 && isActive) {
+                ios.write(buffer, 0, length)
+                progress += length.toLong()
+                callback(progress, length.toLong())
+            }
+            callback(progress, length.toLong())
+            ios.flush()
+            dLog { "writeToFile, save file  to $ios successful" }
+            true
+        }
+    } catch (e: Throwable) {
+        e.printStackTrace()
+        dLog { "writeToFile, save file  to $ios failed,e:${e.message}" }
+        return false
+    }
+}
+
+@get:Throws(java.lang.Exception::class)
+val InputStream.cRC32: CRC32
+    get() {
+        this.use {
+            val crc = CRC32()
+            val bytes = ByteArray(1024)
+            var length: Int
+            while ((read(bytes).also { length = it }) != -1) {
+                crc.update(bytes, 0, length)
+            }
+            return crc
+        }
+    }

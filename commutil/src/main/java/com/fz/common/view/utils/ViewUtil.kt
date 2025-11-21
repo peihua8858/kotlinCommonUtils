@@ -26,14 +26,19 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.fz.common.listener.OnNoDoubleClickListener
 import com.fz.common.utils.checkContext
 import com.fz.common.utils.dLog
+import com.fz.common.utils.getDimen
+import com.fz.common.utils.getDimenPixel
+import com.fz.common.utils.getDimenPixelOffset
 import com.fz.common.utils.getDimens
 import com.fz.common.utils.getResourceId
+import com.fz.common.utils.getStringArray
 import com.fz.common.utils.isAppRtl
+import com.fz.common.utils.isAtLeastN
 import com.fz.common.utils.isLandScape
-import com.fz.common.utils.isN
 import com.fz.common.utils.resolveAttribute
 import java.util.*
 import kotlin.math.max
+
 fun View.getDimensionPixelSize(id: Int): Int {
     return resources.getDimensionPixelSize(id)
 }
@@ -169,6 +174,31 @@ fun View?.getString(@StringRes resourceId: Int): String {
     return context.getString(resourceId)
 }
 
+fun View.getDimen(id: Int): Float {
+    val context: Context = checkContext(this) ?: return 0f
+    return context.getDimen(id)
+}
+
+fun View.getDimenPixel(id: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return context.getDimenPixel(id)
+}
+
+fun View.getDimenPixelOffset(id: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return context.getDimenPixelOffset(id)
+}
+
+fun View.getDimenPixelSize(id: Int): Int {
+    val context: Context = checkContext(this) ?: return 0
+    return context.getDimenPixelOffset(id)
+}
+
+fun View.getStringArray(id: Int): Array<String> {
+    val context: Context = checkContext(this) ?: return arrayOf()
+    return context.getStringArray(id)
+}
+
 /**
  * 获取资源id
  *
@@ -266,9 +296,19 @@ fun View?.setMarginByDp(start: Int, top: Int, end: Int, bottom: Int) {
  * @date 2018/12/7 18:09
  * @version 1.0
  */
-fun View?.setViewPaddingPx(@Px paddingStart: Int, @Px paddingTop: Int, @Px paddingEnd: Int, @Px paddingBottom: Int) {
+fun View?.setViewPaddingPx(
+    @Px paddingStart: Int,
+    @Px paddingTop: Int,
+    @Px paddingEnd: Int,
+    @Px paddingBottom: Int,
+) {
     if (this == null) return
-    setPaddingRelative(max(paddingStart, 0), max(paddingTop, 0), max(paddingEnd, 0), max(paddingBottom, 0))
+    setPaddingRelative(
+        max(paddingStart, 0),
+        max(paddingTop, 0),
+        max(paddingEnd, 0),
+        max(paddingBottom, 0)
+    )
 }
 
 /**
@@ -283,9 +323,19 @@ fun View?.setViewPaddingPx(@Px paddingStart: Int, @Px paddingTop: Int, @Px paddi
  * @date 2018/12/7 18:09
  * @version 1.0
  */
-fun View?.setViewPaddingDp(paddingStart: Int, paddingTop: Int, paddingEnd: Int, paddingBottom: Int) {
+fun View?.setViewPaddingDp(
+    paddingStart: Int,
+    paddingTop: Int,
+    paddingEnd: Int,
+    paddingBottom: Int,
+) {
     if (this == null) return
-    setViewPaddingPx(dip2px(paddingStart), dip2px(paddingTop), dip2px(paddingEnd), dip2px(paddingBottom))
+    setViewPaddingPx(
+        dip2px(paddingStart),
+        dip2px(paddingTop),
+        dip2px(paddingEnd),
+        dip2px(paddingBottom)
+    )
 }
 
 
@@ -339,7 +389,20 @@ fun View?.setPaddingStartByDp(start: Int) {
  * @date 2022/5/14 19:12
  * @version 1.0
  */
-fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
+fun View.animationWidth(isExpend: Boolean, width: Int = 0, duration: Long = 300) {
+    val widthId = 0x20133542
+    var offset = width
+    if (offset == 0) {
+        offset = getTag(widthId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.width
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredWidth
+            }
+            setTag(widthId, offset)
+        }
+    }
     val viewWrapper = ViewWrapper(this)
     val animation = if (isExpend) ObjectAnimator.ofInt(
         viewWrapper, "width", 0, width
@@ -347,16 +410,60 @@ fun View.animationWidth(isExpend: Boolean, width: Int, duration: Long = 300) {
     else ObjectAnimator.ofInt(viewWrapper, "width", width, 0)
     animation.duration = duration
     animation.addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationStart(animation: Animator) {
-            if (isExpend) this@animationWidth.visibility = View.VISIBLE
-        }
-
         override fun onAnimationEnd(animation: Animator) {
             if (!isExpend) this@animationWidth.visibility = View.GONE
         }
     })
     animation.addUpdateListener {
         viewWrapper.setWidth(it.animatedValue as Int)
+        if (isExpend) this@animationWidth.visibility = View.VISIBLE
+    }
+    animation.start()
+}
+
+
+/**
+ * [View]高度展开折叠动画
+ * @param   isExpend  true:展开  false:收起
+ * @param   height     展开时的宽度
+ * @param duration 动画时长
+ * @author dingpeihua
+ * @date 2022/5/14 19:12
+ * @version 1.0
+ */
+fun View.animationHeight(isExpend: Boolean, height: Int = 0, duration: Long = 300) {
+    val heightId = 0x20133543
+    var offset = height
+    if (offset == 0) {
+        offset = getTag(heightId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.height
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredHeight
+            }
+            setTag(heightId, offset)
+        }
+        setTag(heightId, offset)
+    }
+    val viewWrapper = ViewWrapper(this)
+    val animation = if (isExpend) ObjectAnimator.ofInt(
+        viewWrapper, "height", 0, offset
+    )
+    else ObjectAnimator.ofInt(viewWrapper, "height", offset, 0)
+    animation.duration = duration
+    animation.addListener(object : AnimatorListenerAdapter() {
+
+        override fun onAnimationEnd(animation: Animator) {
+            if (!isExpend) this@animationHeight.visibility = View.GONE
+        }
+    })
+    animation.addUpdateListener {
+        val value = it.animatedValue as Int
+        viewWrapper.setHeight(value)
+        if (isExpend && value > 0) {
+            this@animationHeight.visibility = View.VISIBLE
+        }
     }
     animation.start()
 }
@@ -380,8 +487,21 @@ fun View?.setMargin(view: View) {
  */
 fun View.animationWidth(
     isExpend: Boolean, width: Int, duration: Long = 300,
-    model: (AnimatorListenerModel<Animator>.() -> Unit)? = null
+    model: (AnimatorListenerModel<Animator>.() -> Unit)? = null,
 ) {
+    var offset = width
+    if (offset == 0) {
+        val widthId = 0x20133542
+        offset = getTag(widthId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.width
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredWidth
+            }
+            setTag(widthId, offset)
+        }
+    }
     val viewWrapper = ViewWrapper(this)
     val animation = if (isExpend) ObjectAnimator.ofInt(
         viewWrapper, "width", 0, width
@@ -402,6 +522,57 @@ fun View.animationWidth(
     })
     animation.addUpdateListener {
         viewWrapper.setWidth(it.animatedValue as Int)
+        if (isExpend) this@animationWidth.visibility = View.VISIBLE
+    }
+    animation.start()
+}
+
+/**
+ * [View]高度展开折叠动画
+ * @param   isExpend  true:展开  false:收起
+ * @param   height     展开时的宽度
+ * @param duration 动画时长
+ * @author dingpeihua
+ * @date 2022/5/14 19:12
+ * @version 1.0
+ */
+fun View.animationHeight(
+    isExpend: Boolean, height: Int = 0, duration: Long = 300,
+    model: (AnimatorListenerModel<Animator>.() -> Unit)? = null,
+) {
+    var offset = height
+    if (offset == 0) {
+        val heightId = 0x20133543
+        offset = getTag(heightId) as? Int ?: 0
+        if (offset == 0) {
+            offset = this.height
+            if (offset == 0) {
+                measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                offset = measuredHeight
+            }
+            setTag(heightId, offset)
+        }
+        setTag(heightId, offset)
+    }
+    val viewWrapper = ViewWrapper(this)
+    val animation = if (isExpend) ObjectAnimator.ofInt(
+        viewWrapper, "height", 0, offset
+    )
+    else ObjectAnimator.ofInt(viewWrapper, "height", offset, 0)
+    animation.duration = duration
+    val listener = if (model != null) AnimatorListenerModel<Animator>().apply(model) else null
+    animation.addListener(object : InternalAnimatorListenerAdapter(listener) {
+        override fun onAnimationEnd(animation: Animator) {
+            super.onAnimationEnd(animation)
+            if (!isExpend) this@animationHeight.visibility = View.GONE
+        }
+    })
+    animation.addUpdateListener {
+        val value = it.animatedValue as Int
+        viewWrapper.setHeight(value)
+        if (isExpend && value > 0) {
+            this@animationHeight.visibility = View.VISIBLE
+        }
     }
     animation.start()
 }
@@ -451,6 +622,16 @@ private class ViewWrapper(val view: View) {
     fun getWidth(): Int {
         return view.layoutParams.width
     }
+
+    @Keep
+    fun setHeight(height: Int) {
+        view.layoutParams.height = height
+        view.requestLayout() //必须调用，否则宽度改变但UI没有刷新
+    }
+
+    fun getHeight(): Int {
+        return view.layoutParams.height
+    }
 }
 
 fun View.measureSize(): Size {
@@ -469,7 +650,7 @@ fun View.measureHeight(maxWidth: Int): Int {
 }
 
 fun View.isRtl(): Boolean {
-    if (isN) {
+    if (isAtLeastN) {
         return resources.configuration.locales.get(0).isAppRtl()
     }
     return resources.configuration.locale.isAppRtl()
@@ -483,7 +664,7 @@ fun View.animateOut(
     isVertical: Boolean = false,
     offset: Int = if (isVertical) this.height else this.width,
     duration: Long = 300,
-    model: (AnimatorListenerModel<View>.() -> Unit)? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null,
 ) {
     try {
         var tempOffset = offset
@@ -518,7 +699,7 @@ fun View.animateOut(
 fun View.animateIn(
     isVertical: Boolean = false,
     duration: Long = 300,
-    model: (AnimatorListenerModel<View>.() -> Unit)? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null,
 ) {
     dLog { "newState>>>>animateIn" }
     visibility = View.VISIBLE
@@ -544,7 +725,7 @@ fun View.animateIn(
 fun View.animateAlpha(
     isVisible: Boolean = true,
     duration: Long = 300,
-    model: (AnimatorListenerModel<View>.() -> Unit)? = null
+    model: (AnimatorListenerModel<View>.() -> Unit)? = null,
 ) {
     dLog { "newState>>>>animateAlpha" }
     visibility = View.VISIBLE
@@ -639,5 +820,6 @@ class AnimatorListenerModel<T> {
         this.onAnimationResume?.invoke(view)
     }
 }
+
 val View.isLandScape: Boolean
     get() = context.isLandScape

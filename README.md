@@ -13,7 +13,7 @@ kotlinCommonUtils是一个Kotlin工具库，可以简化Android开发，使代�
 -[如何引用](#如何引用)<br>
 -[进阶使用](#进阶使用)<br>
 -[权限](#权限)<br>
--[如何提Issues](https://github.com/peihua8858/PictureSelector/wiki/%E5%A6%82%E4%BD%95%E6%8F%90Issues%3F)<br>
+-[如何提Issues](https://github.com/peihua8858/kotlinCommonUtils/wiki/%E5%A6%82%E4%BD%95%E6%8F%90Issues%3F)<br>
 -[License](#License)<br>
 
 
@@ -26,6 +26,7 @@ kotlinCommonUtils是一个Kotlin工具库，可以简化Android开发，使代�
 repositories {
   google()
   mavenCentral()
+  maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -86,8 +87,10 @@ if (map.isNonEmpty()) {
 }
 ```
 3、权限 DSL用法
+[废弃，请使用 Androidx permissions](https://github.com/peihua8858/AndroidxPermissions.git)
 ```kotlin
 import com.fz.common.permissions.requestPermissionsDsl
+@Deprecated("Use androidx permissions")
 requestPermissionsDsl(Manifest.permission.POST_NOTIFICATIONS) {
     onDenied {
          showToast("Denied")

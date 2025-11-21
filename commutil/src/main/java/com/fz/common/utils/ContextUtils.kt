@@ -414,3 +414,10 @@ val Context.isLandScape: Boolean
         Log.d("isLandScape", resources.configuration.orientation.toString())
         return isLandScape
     }
+
+
+fun Context.getDimen(id: Int)=resources.getDimension(id)
+fun Context.getDimenPixel(id: Int) = resources.getDimensionPixelSize(id)
+fun Context.getDimenPixelOffset(id: Int) = resources.getDimensionPixelOffset(id)
+fun Context.getDimenPixelSize(id: Int) = resources.getDimensionPixelSize(id)
+fun Context.getStringArray(id: Int) = resources.getStringArray(id)

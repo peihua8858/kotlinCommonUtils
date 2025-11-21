@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentActivity
  * A headless fragment which wraps the boilerplate code for checking and requesting permission.
  * A simple [Fragment] subclass.
  */
+@Deprecated("Use androidx permissions < a herf='https://github.com/peihua8858/AndroidxPermissions.git'>github</a>")
 class DslPermissionManager : BasePermissionManager() {
 
     override fun onPermissionResult(requestCode: Int, result: PermissionResult) {
