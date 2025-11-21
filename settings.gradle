@@ -1,2 +1,3 @@
 //include ':app'
-include ':commutil'
+//include ':commutil'
+include ':tools'

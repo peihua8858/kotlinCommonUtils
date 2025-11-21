@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.github.peihua8858:KLog:1.0.3'
     implementation 'com.github.peihua8858:ToastCompat:1.0.2'
     implementation "org.jetbrains.kotlin:kotlin-reflect"
+    api 'com.github.peihua8858.KotlinTools:tools-android:1.0.0'
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
